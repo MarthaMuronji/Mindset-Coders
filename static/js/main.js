@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const navCollapse = document.querySelector('.nav-collapse');
+    if (navCollapse) {
+        navCollapse.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                navCollapse.classList.remove('open');
+            });
+        });
+    }
 
     const revealEls = document.querySelectorAll('.reveal');
 

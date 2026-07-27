@@ -67,6 +67,61 @@ img {
     padding: 18px 32px;
 }
 
+.nav-collapse {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+}
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.nav-toggle span {
+    width: 24px;
+    height: 2px;
+    background: var(--navy);
+    border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-collapse {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        padding: 20px 0 10px;
+        gap: 20px;
+    }
+
+    .nav-collapse.open {
+        display: flex;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .btn-login {
+        align-self: center;
+    }
+}
+
 .logo {
     font-family: 'Poppins', sans-serif;
     font-size: 24px;
@@ -584,19 +639,8 @@ section h2 {
     }
 }
 
+
 @media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        gap: 14px;
-        padding: 16px;
-    }
-
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 16px;
-    }
-
     .hero-content h1 {
         font-size: 30px;
     }
@@ -628,6 +672,8 @@ section h2 {
         padding: 24px 16px;
     }
 }
+
+
 
 /* ===== Scroll reveal ===== */
 .reveal {
