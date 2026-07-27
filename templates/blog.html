@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Our Blog</span>
+    <h1>Stories from the field</h1>
+    <p>Updates, lessons learned, and stories from learners, educators, and schools across our network.</p>
+</section>
+
+<section class="programs-list">
+    {% for post in posts %}
+    <div class="program-detail-card reveal">
+        {% if post.cover_image %}
+            <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="photo-placeholder">
+        {% else %}
+            <div class="photo-placeholder"><span>Photo coming soon</span></div>
+        {% endif %}
+        <div class="program-detail-text">
+            <span class="mv-label">{{ post.created_at|date:"F j, Y" }} &middot; {{ post.author }}</span>
+            <h2><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h2>
+            <p>{{ post.excerpt }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <div class="program-detail-card reveal">
+        <div class="photo-placeholder"><span>Photo coming soon</span></div>
+        <div class="program-detail-text">
+            <span class="mv-label">Coming Soon</span>
+            <h2>Our first blog post is on the way</h2>
+            <p>We're preparing stories from our classrooms, competitions, and communities. Check back soon.</p>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Have a story to share?</h2>
+    <p>If you're part of our community and want to contribute, we'd love to hear from you.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

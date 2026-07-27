@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Events | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Events</span>
+    <h1>Where our community comes together</h1>
+    <p>Bootcamps, hackathons, showcases, and championship finals — see what's coming up and relive what we've built together.</p>
+</section>
+
+<section class="programs-preview">
+    <h2>Upcoming Events</h2>
+    <p class="section-subtitle">Mark your calendar</p>
+    <div class="programs-grid">
+        <div class="program-card reveal reveal-delay-1">
+            <h3>WRO National Qualifiers</h3>
+            <p>Regional qualifying rounds for this year's World Robot Olympiad challenge.</p>
+        </div>
+        <div class="program-card reveal reveal-delay-2">
+            <h3>Teacher Training Bootcamp</h3>
+            <p>A multi-day intensive for educators pursuing robotics certification.</p>
+        </div>
+        <div class="program-card reveal reveal-delay-3">
+            <h3>AI4KIDS Hackathon</h3>
+            <p>A one-day showcase where young learners present their first AI-powered projects.</p>
+        </div>
+    </div>
+</section>
+
+<section class="timeline">
+    <h2>Past Events</h2>
+    <p class="section-subtitle">Moments from our community</p>
+    <div class="timeline-track">
+        <div class="timeline-item reveal reveal-delay-1">
+            <span class="timeline-year">2025</span>
+            <p>WRO Uganda Finals — hosted our largest national championship yet.</p>
+        </div>
+        <div class="timeline-item reveal reveal-delay-2">
+            <span class="timeline-year">2024</span>
+            <p>Innovation Hackathon — 40+ teams built projects over a single weekend.</p>
+        </div>
+        <div class="timeline-item reveal reveal-delay-3">
+            <span class="timeline-year">2023</span>
+            <p>ROBOBOX Launch Bootcamp — introduced our robotics kit to partner schools nationwide.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Want us at your school or event?</h2>
+    <p>We host and co-host events across Uganda — let's talk about what you have in mind.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

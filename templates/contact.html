@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Get In Touch</span>
+    <h1>Let's build something together</h1>
+    <p>Whether you're a school, educator, parent, or partner — we'd love to hear from you.</p>
+</section>
+
+<section class="contact-section">
+    <div class="contact-form-wrap reveal reveal-delay-1">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-success">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">Name</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.role.id_for_label }}">I am a...</label>
+                {{ form.role }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.message.id_for_label }}">Message</label>
+                {{ form.message }}
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+    </div>
+
+    <div class="contact-info reveal reveal-delay-2">
+        <h3>Other ways to reach us</h3>
+        <p><strong>Email:</strong> hello@mindsetcoders.ug</p>
+        <p><strong>Phone:</strong> +256 XXX XXX XXX</p>
+        <p><strong>Location:</strong> Kampala, Uganda</p>
+        <p style="margin-top: 20px; font-size: 14px; color: var(--text-muted);">We typically respond within 1–2 business days.</p>
+        
+        <div class="footer-socials">
+    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+    <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+</div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}For Educators | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">For Educators</span>
+    <h1>Build the skills to lead STEM in your classroom</h1>
+    <p>Training and certification that equips teachers to run coding, robotics, and AI literacy programs confidently — no prior tech background required.</p>
+</section>
+
+<section class="why-us">
+    <h2>What We Offer Educators</h2>
+    <p class="section-subtitle">Practical training, not just theory</p>
+    <div class="why-list">
+        <div class="why-item reveal reveal-delay-1">
+            <span class="why-icon"><i class="fa-solid fa-robot"></i></span>
+            <p>Robotics certification — hands-on training with the ROBOBOX kit and classroom-ready lesson plans.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-2">
+            <span class="why-icon"><i class="fa-solid fa-brain"></i></span>
+            <p>AI literacy training — understand and teach foundational AI concepts to your students.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-3">
+            <span class="why-icon"><i class="fa-solid fa-laptop-code"></i></span>
+            <p>Coding fundamentals — build your own confidence before teaching it to learners.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-4">
+            <span class="why-icon"><i class="fa-solid fa-comments"></i></span>
+            <p>Ongoing support — a community of trained educators to troubleshoot with, long after the workshop ends.</p>
+        </div>
+        <div class="why-item reveal">
+            <span class="why-icon"><i class="fa-solid fa-trophy"></i></span>
+            <p>A certificate recognized across our partner schools and network.</p>
+        </div>
+    </div>
+</section>
+
+<section class="founder-story reveal">
+    <div class="story-image">
+        <div class="photo-placeholder">
+            <span>Photo coming soon</span>
+        </div>
+    </div>
+    <div class="story-text">
+        <span class="mv-label">How It Works</span>
+        <h2>From first workshop to confident classroom delivery</h2>
+        <p>Our teacher training runs in cohorts — hands-on sessions covering robotics, coding, and AI literacy, paired with lesson plans you can use immediately. Most educators leave able to run their first session within days.</p>
+        <p>Training is available individually or as part of a whole-school partnership through our For Schools program.</p>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Ready to grow your teaching skills?</h2>
+    <p>Join our next educator training cohort — tell us a bit about yourself to get started.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

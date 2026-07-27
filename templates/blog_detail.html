@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">{{ post.created_at|date:"F j, Y" }}</span>
+    <h1>{{ post.title }}</h1>
+    <p>By {{ post.author }}</p>
+</section>
+
+<section class="founder-story reveal">
+    {% if post.cover_image %}
+        <div class="story-image">
+            <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
+        </div>
+    {% endif %}
+    <div class="story-text">
+        {{ post.content|linebreaks }}
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>More stories from our community</h2>
+    <a href="{% url 'blog' %}" class="btn btn-primary">Back to all posts</a>
+</section>
+
+{% endblock %}

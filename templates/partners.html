@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Partners | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Our Partners</span>
+    <h1>Building this ecosystem together</h1>
+    <p>We work with funders, corporates, and global STEM networks to bring quality STEM education to more learners across Uganda.</p>
+</section>
+
+<section class="trusted-by reveal">
+    <p class="trusted-label">Trusted By</p>
+    <div class="trusted-logos">
+        <span>Mastercard Foundation</span>
+        <span class="divider"></span>
+        <span>Google</span>
+        <span class="divider"></span>
+        <span>MTN Uganda</span>
+        <span class="divider"></span>
+        <span>Stanbic Bank</span>
+        <span class="divider"></span>
+        <span>WRO Global</span>
+    </div>
+</section>
+
+<section class="why-us">
+    <h2>Ways to Partner With Us</h2>
+    <p class="section-subtitle">Different ways to get involved</p>
+    <div class="why-list">
+        <div class="why-item reveal reveal-delay-1">
+            <span class="why-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+            <p>Funding partnerships — support programs reaching underserved schools and learners.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-2">
+            <span class="why-icon"><i class="fa-solid fa-building"></i></span>
+            <p>Corporate partnerships — sponsor events, provide mentors, or co-design programs.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-3">
+            <span class="why-icon"><i class="fa-solid fa-globe"></i></span>
+            <p>Global STEM networks — collaborate on curriculum, competitions, and best practices.</p>
+        </div>
+        <div class="why-item reveal">
+            <span class="why-icon"><i class="fa-solid fa-gift"></i></span>
+            <p>In-kind support — equipment, venues, or volunteer expertise for our programs.</p>
+        </div>
+    </div>
+</section>
+
+<section class="founder-story reveal">
+    <div class="story-image">
+        <div class="photo-placeholder">
+            <span>Photo coming soon</span>
+        </div>
+    </div>
+    <div class="story-text">
+        <span class="mv-label">Why Partner With Us</span>
+        <h2>A track record you can build on</h2>
+        <p>Since 2018, we've reached 20,000+ learners, trained 1,000+ educators, and engaged 200+ schools across Uganda — all while running the country's official WRO national program. Partnering with us means backing an organization with real reach, real results, and deep roots in the communities we serve.</p>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Let's build something lasting</h2>
+    <p>Tell us about your organization and how you'd like to get involved.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

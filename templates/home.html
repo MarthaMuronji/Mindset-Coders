@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="badge">We are Uganda's official WRO affiliate</span>
+        <h1>Building STEM pathways for Africa's next innovators</h1>
+        <p>From curiosity to <strong>innovation</strong>, entrepreneurship, and future careers — Mindset Coders connects learners, educators, and schools across Uganda.</p>
+        <div class="hero-actions">
+            <a href="{% url 'programs' %}" class="btn btn-primary">Explore programs</a>
+            <a href="{% url 'partners' %}" class="btn btn-outline">Partner with us</a>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+    <div class="hero-photo hero-placeholder"></div>
+    <div class="dot-grid"></div>
+</div>
+</section>
+
+<div class="stats-row reveal">
+    <div class="stat-card">
+        <span class="stat-number" data-count="20000" data-suffix="+">0</span>
+        <span class="stat-label">Learners reached</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number" data-count="1000" data-suffix="+">0</span>
+        <span class="stat-label">Educators trained</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number" data-count="200" data-suffix="+">0</span>
+        <span class="stat-label">Schools engaged</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number" data-count="2018" data-suffix="">0</span>
+        <span class="stat-label">Since</span>
+    </div>
+</div>
+
+<div class="pathway">
+    <span class="ribbon-label">THE PATHWAY:</span>
+    <div class="pathway-steps">
+    <span class="pathway-step reveal" style="transition-delay: 0.05s;">Explore</span>
+    <span class="pathway-connector"></span>
+    <span class="pathway-step reveal" style="transition-delay: 0.1s;">Learn</span>
+    <span class="pathway-connector"></span>
+    <span class="pathway-step reveal" style="transition-delay: 0.15s;">Build</span>
+    <span class="pathway-connector"></span>
+    <span class="pathway-step reveal" style="transition-delay: 0.2s;">Compete</span>
+    <span class="pathway-connector"></span>
+    <span class="pathway-step reveal" style="transition-delay: 0.25s;">Innovate</span>
+    <span class="pathway-connector"></span>
+    <span class="pathway-step reveal" style="transition-delay: 0.3s;">Lead</span>
+</div>
+</div>
+
+<section class="programs-preview">
+    <h2>What We Do</h2>
+    <p class="section-subtitle">Practical, hands-on STEM programs for every audience</p>
+<div class="programs-grid">
+    <a href="{% url 'for_schools' %}" class="program-card reveal reveal-delay-1">
+        <h3>For Schools</h3>
+        <p>STEM club setup, robotics programs, coding, and teacher development.</p>
+    </a>
+    <a href="{% url 'for_educators' %}" class="program-card reveal reveal-delay-2">
+        <h3>For Educators</h3>
+        <p>Training workshops, AI literacy, and robotics certification.</p>
+    </a>
+    <a href="{% url 'for_learners' %}" class="program-card reveal reveal-delay-3">
+        <h3>For Learners</h3>
+        <p>STEM camps, coding programs, innovation challenges, and competitions.</p>
+    </a>
+    <a href="{% url 'partners' %}" class="program-card reveal reveal-delay-4">
+        <h3>For Partners</h3>
+        <p>Program design, event delivery, and ecosystem building.</p>
+    </a>
+</div>
+    <div class="see-all-link reveal">
+        <a href="{% url 'programs' %}">See all programs &rarr;</a>
+    </div>
+</section>
+
+<section class="wro-spotlight reveal">
+    <div class="wro-spotlight-content">
+        <span class="badge badge-flagship">Flagship Program</span>
+        <h3>WRO Uganda National Championship</h3>
+        <p>We're the country's official World Robot Olympiad affiliate — preparing learners to compete globally.</p>
+        <a href="{% url 'competitions' %}" class="btn btn-primary cta-pulse">Learn more</a>
+    </div>
+    <div class="wro-spotlight-image">
+    <div class="wro-placeholder"></div>
+</div>
+</section>
+
+<section class="trusted-by reveal">
+    <p class="trusted-label">Trusted By</p>
+    <div class="trusted-logos">
+        <span>Mastercard Foundation</span>
+        <span class="divider"></span>
+        <span>Google</span>
+        <span class="divider"></span>
+        <span>MTN Uganda</span>
+        <span class="divider"></span>
+        <span>Stanbic Bank</span>
+        <span class="divider"></span>
+        <span>WRO Global</span>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Ready to build the future with us?</h2>
+    <p>Whether you're a school, educator, parent, or partner — there's a place for you in the Mindset Coders ecosystem.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}For Schools | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">For Schools</span>
+    <h1>Bring STEM education into your classrooms</h1>
+    <p>We partner with schools across Uganda to set up STEM clubs, deliver robotics and coding programs, and train teachers to sustain it all long-term.</p>
+</section>
+
+<section class="why-us">
+    <h2>What We Offer Schools</h2>
+    <p class="section-subtitle">A complete package, not just a one-off workshop</p>
+    <div class="why-list">
+        <div class="why-item reveal reveal-delay-1">
+            <span class="why-icon"><i class="fa-solid fa-school"></i></span>
+            <p>STEM club setup — curriculum, equipment guidance, and a structured program calendar.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-2">
+            <span class="why-icon"><i class="fa-solid fa-robot"></i></span>
+            <p>Robotics programs using the ROBOBOX kit, built specifically for Ugandan classroom realities.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-3">
+            <span class="why-icon"><i class="fa-solid fa-laptop-code"></i></span>
+            <p>Coding instruction from beginner fundamentals through project-based learning.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-4">
+            <span class="why-icon"><i class="fa-solid fa-chalkboard-teacher"></i></span>
+            <p>Teacher development, so your staff can run and grow the program independently.</p>
+        </div>
+        <div class="why-item reveal">
+            <span class="why-icon"><i class="fa-solid fa-trophy"></i></span>
+            <p>A pathway to competition — qualified students can compete at WRO Uganda nationals.</p>
+        </div>
+    </div>
+</section>
+
+<section class="founder-story reveal">
+    <div class="story-image">
+        <div class="photo-placeholder">
+            <span>Photo coming soon</span>
+        </div>
+    </div>
+    <div class="story-text">
+        <span class="mv-label">How It Works</span>
+        <h2>From first conversation to a running STEM club</h2>
+        <p>We start with a conversation about your school's context, learners, and resources. From there, we design a program that fits — whether that's a full 12-week curriculum, a weekend club, or teacher-led sessions we train your staff to run.</p>
+        <p>Most schools see their first STEM club sessions running within weeks, not months.</p>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Ready to bring STEM to your school?</h2>
+    <p>Tell us about your school and we'll help you design the right program.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

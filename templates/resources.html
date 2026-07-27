@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resources | Mindset Coders Uganda{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Resources</span>
+    <h1>Tools and guides for learners, educators, and schools</h1>
+    <p>Free materials to help you get started, whether you're a teacher building your first STEM club or a learner exploring on your own.</p>
+</section>
+
+<section class="programs-preview">
+    <h2>Browse by Category</h2>
+    <p class="section-subtitle">Curated to help you take the next step</p>
+    <div class="programs-grid">
+        <div class="program-card reveal reveal-delay-1">
+            <h3>For Educators</h3>
+            <p>Lesson plans, ROBOBOX guides, and classroom activity sheets.</p>
+        </div>
+        <div class="program-card reveal reveal-delay-2">
+            <h3>For Learners</h3>
+            <p>Beginner coding tutorials, robotics challenges, and practice projects.</p>
+        </div>
+        <div class="program-card reveal reveal-delay-3">
+            <h3>For Schools</h3>
+            <p>STEM club starter kits, program templates, and partnership guides.</p>
+        </div>
+        <div class="program-card reveal reveal-delay-4">
+            <h3>Competition Prep</h3>
+            <p>Past WRO challenge briefs, judging rubrics, and qualifier tips.</p>
+        </div>
+    </div>
+</section>
+
+<section class="why-us">
+    <h2>Featured Resources</h2>
+    <p class="section-subtitle">Popular downloads and guides</p>
+    <div class="why-list">
+        <div class="why-item reveal reveal-delay-1">
+            <span class="why-check"><i>&#10003;</i></span>
+            <p>ROBOBOX Getting Started Guide — set up your first robotics kit in under an hour.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-2">
+            <span class="why-check"><i>&#10003;</i></span>
+            <p>STEM Club Starter Toolkit — everything a school needs to launch a club from scratch.</p>
+        </div>
+        <div class="why-item reveal reveal-delay-3">
+            <span class="why-check"><i>&#10003;</i></span>
+            <p>WRO Qualifier Prep Sheet — past challenge themes and what judges look for.</p>
+        </div>
+        <div class="why-item reveal">
+            <span class="why-check"><i>&#10003;</i></span>
+            <p>AI4KIDS Intro Activity Pack — a first hands-on AI lesson for young learners.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Can't find what you're looking for?</h2>
+    <p>Reach out and we'll point you in the right direction.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}
