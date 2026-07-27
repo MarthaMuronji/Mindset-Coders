@@ -653,27 +653,30 @@ section h2 {
         font-size: 26px;
     }
 
-    .pathway-connector{
+    .pathway-connector {
         display: none;
     }
 
     .pathway-steps {
         flex-direction: column;
         align-items: center;
+        gap: 36px;
     }
 
     .pathway-step:not(:last-child)::after {
-    content: '↓';
-    position: absolute;
-    right: auto;
-    top: auto;
-    bottom: -24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 18px;
-    color: var(--green);
-    font-weight: 700;
-}
+        content: '↓';
+        position: absolute;
+        right: auto;
+        top: 100%;
+        bottom: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 6px;
+        font-size: 20px;
+        color: var(--green);
+        font-weight: 700;
+        z-index: 3;
+    }
 
     .stats-row {
         margin-top: -30px;
