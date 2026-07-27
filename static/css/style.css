@@ -653,19 +653,27 @@ section h2 {
         font-size: 26px;
     }
 
+    .pathway-connector{
+        display: none;
+    }
+
     .pathway-steps {
         flex-direction: column;
         align-items: center;
     }
 
     .pathway-step:not(:last-child)::after {
-        content: '↓';
-        right: auto;
-        top: auto;
-        bottom: -24px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+    content: '↓';
+    position: absolute;
+    right: auto;
+    top: auto;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    color: var(--green);
+    font-weight: 700;
+}
 
     .stats-row {
         margin-top: -30px;
