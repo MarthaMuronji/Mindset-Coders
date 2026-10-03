@@ -2,17 +2,20 @@
 {% load static %}
 
 {% block title %}Home | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Home | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Mindset Coders is a STEAM EdTech product company building learning pathways, tools and resources for learners and schools in Uganda.{% endblock %}
+{% block og_description %}Mindset Coders is a STEAM EdTech product company building learning pathways, tools and resources for learners and schools in Uganda.{% endblock %}
 
 {% block content %}
 
 <section class="hero">
     <div class="hero-content reveal">
         <span class="badge">Uganda's official WRO affiliate</span>
-        <h1>We build STEAM learning pathways</h1>
+        <h1>We build <span class="hero-steam">STEAM</span> learning pathways</h1>
         <p>We build the tools, resources and systems that enable STEAM education, from curiosity to creation.</p>
         <div class="hero-actions">
             <!-- TODO: link to Mindset Learn page when built -->
-            <a href="#" class="btn btn-primary">Join Mindset Learn</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary">Join Mindset Learn</a>
             <a href="{% url 'for_schools' %}" class="btn btn-outline">Bring STEAM to Your School</a>
         </div>
     </div>
@@ -54,7 +57,8 @@
     </div>
 </section>
 
-<section class="home-section steam-pathway reveal">
+<section class="home-section steam-pathway section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
     <h2>Discover → Build → Innovate</h2>
     <p class="section-subtitle">Every learner starts with curiosity. They learn by making things, then take those ideas further than the classroom.</p>
     <div class="steam-pathway-steps">
@@ -79,7 +83,8 @@
     <p class="steam-pathway-closing reveal reveal-delay-4">Technology doesn't replace creativity. It gives creativity new ways to come alive, through robotics, music, design, storytelling and more.</p>
 </section>
 
-<section class="home-section home-mindset-learn section-tint reveal">
+<section class="home-section home-mindset-learn section-tint section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
     <div class="section-split">
         <div class="section-split-text">
             <h2>A learning pathway for the next generation of innovators</h2>
@@ -89,7 +94,7 @@
                 <span class="pricing-chip">Six levels: UGX 20,000 each</span>
             </div>
             <!-- TODO: link to Mindset Learn page when built -->
-            <a href="#" class="btn btn-primary">Join Mindset Learn</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary">Join Mindset Learn</a>
         </div>
         <div class="img-slot img-slot--mindset-learn">
             <!-- TODO: static/images/mindset-learn.jpg -->
@@ -109,9 +114,6 @@
                 <li><i class="fa-solid fa-check" aria-hidden="true"></i> AI education</li>
                 <li><i class="fa-solid fa-check" aria-hidden="true"></i> STEAM clubs</li>
                 <li><i class="fa-solid fa-check" aria-hidden="true"></i> Teacher training</li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Competition preparation</li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Learning kits</li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i> Access to Mindset Learn</li>
             </ul>
             <a href="{% url 'for_schools' %}" class="btn btn-primary">Bring STEAM to Your School</a>
         </div>
@@ -128,7 +130,7 @@
         <h2>Learning that reaches beyond Uganda</h2>
         <p>Our learners compete at the World Robot Olympiad, collaborate with students in other countries and show their work to a global STEAM community. WRO is one doorway, and there are more.</p>
         <!-- TODO: link to Global Opportunities page when built -->
-        <a href="#" class="btn btn-primary">Explore Global Opportunities</a>
+        <a href="{% url 'contact' %}" class="btn btn-primary">Explore Global Opportunities</a>
     </div>
     <div class="wro-spotlight-image">
         <div class="img-slot img-slot--global-wro">
@@ -139,84 +141,52 @@
     </div>
 </section>
 
-<section class="home-section home-innovators reveal">
-    <div class="section-split">
-        <div class="section-split-text">
-            <h2>Where young ideas meet opportunity</h2>
-            <p>Some student projects are too good to stay in the classroom. The Innovators' Circle showcases promising young innovators and connects them to the support they need. You can fund, equip, mentor or partner with them.</p>
-            <div class="action-chips">
-                <span class="action-chip"><i class="fa-solid fa-hand-holding-dollar" aria-hidden="true"></i> Fund</span>
-                <span class="action-chip"><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Equip</span>
-                <span class="action-chip"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Mentor</span>
-                <span class="action-chip"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Partner</span>
+<section class="home-section home-duo reveal">
+    <div class="home-duo-grid">
+        <article class="home-duo-card build-card">
+            <div class="img-slot img-slot--innovators img-slot--innovators-card">
+                <!-- TODO: static/images/innovators.jpg -->
+                <div class="img-slot__placeholder" aria-hidden="true"></div>
+                <img src="{% static 'images/innovators.jpg' %}" alt="Young innovators presenting a STEAM project from the Innovators' Circle" width="560" height="420" loading="lazy" onerror="this.remove()">
             </div>
-            <!-- TODO: link to Innovators' Circle page when built -->
-            <a href="#" class="btn btn-primary">Meet the Innovators</a>
-        </div>
-        <div class="img-slot img-slot--innovators">
-            <!-- TODO: static/images/innovators.jpg -->
-            <div class="img-slot__placeholder" aria-hidden="true"></div>
-            <img src="{% static 'images/innovators.jpg' %}" alt="Young innovators presenting a STEAM project from the Innovators' Circle" width="560" height="420" loading="lazy" onerror="this.remove()">
-        </div>
+            <div class="home-duo-card-body">
+                <h2>Where young ideas meet opportunity</h2>
+                <p>Some student projects are too good to stay in the classroom. The Innovators' Circle showcases promising young innovators and connects them to the support they need. You can fund, equip, mentor or partner with them.</p>
+                <div class="action-chips">
+                    <span class="action-chip"><i class="fa-solid fa-hand-holding-dollar" aria-hidden="true"></i> Fund</span>
+                    <span class="action-chip"><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Equip</span>
+                    <span class="action-chip"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Mentor</span>
+                    <span class="action-chip"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Partner</span>
+                </div>
+                <!-- TODO: link to Innovators' Circle page when built -->
+                <a href="{% url 'contact' %}" class="btn btn-primary">Meet the Innovators</a>
+            </div>
+        </article>
+        <article class="home-duo-card build-card home-duo-card--university">
+            <div class="home-duo-card-body">
+                <div class="why-icon home-duo-card-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h2>Prepare for university, from here</h2>
+                <p>Through our partnership with Prep Genius in India, students can prepare for the SAT and other entrance tests, with support for studying at universities in the United States.</p>
+                <!-- TODO: link to University Preparation page when built -->
+                <a href="{% url 'contact' %}" class="btn btn-primary">Explore University Preparation</a>
+            </div>
+        </article>
     </div>
 </section>
 
 <section class="home-section home-products reveal">
     <h2>Tools to learn by making</h2>
     <p class="section-subtitle">Our physical and digital kits put STEAM in learners' hands, from unplugged coding activities to robotics.</p>
-    <div class="product-tiles">
-        <div class="product-tile reveal reveal-delay-1">
-            <div class="product-tile-icon why-icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
-            <h3>Byte's World</h3>
-            <div class="img-slot img-slot--product">
-                <!-- TODO: product image Byte's World -->
-                <div class="img-slot__placeholder" aria-hidden="true"></div>
-            </div>
-        </div>
-        <div class="product-tile reveal reveal-delay-2">
-            <div class="product-tile-icon why-icon" aria-hidden="true"><i class="fa-solid fa-brain"></i></div>
-            <h3>Byte Thinks</h3>
-            <div class="img-slot img-slot--product">
-                <!-- TODO: product image Byte Thinks -->
-                <div class="img-slot__placeholder" aria-hidden="true"></div>
-            </div>
-        </div>
-        <div class="product-tile reveal reveal-delay-3">
-            <div class="product-tile-icon why-icon" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
-            <h3>RoboBOX</h3>
-            <div class="img-slot img-slot--product">
-                <!-- TODO: product image RoboBOX -->
-                <div class="img-slot__placeholder" aria-hidden="true"></div>
-            </div>
-        </div>
-        <div class="product-tile reveal reveal-delay-4">
-            <div class="product-tile-icon why-icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></div>
-            <h3>Mission cards</h3>
-            <div class="img-slot img-slot--product">
-                <!-- TODO: product image Mission cards -->
-                <div class="img-slot__placeholder" aria-hidden="true"></div>
-            </div>
-        </div>
-        <div class="product-tile reveal reveal-delay-5">
-            <div class="product-tile-icon why-icon" aria-hidden="true"><i class="fa-solid fa-chalkboard-user"></i></div>
-            <h3>Teacher resources</h3>
-            <div class="img-slot img-slot--product">
-                <!-- TODO: product image Teacher resources -->
-                <div class="img-slot__placeholder" aria-hidden="true"></div>
-            </div>
-        </div>
+    <!-- TODO: add product photo tiles when assets are ready -->
+    <div class="product-pills">
+        <span class="product-pill reveal reveal-delay-1"><i class="fa-solid fa-cube" aria-hidden="true"></i> Byte's World</span>
+        <span class="product-pill reveal reveal-delay-2"><i class="fa-solid fa-brain" aria-hidden="true"></i> Byte Thinks</span>
+        <span class="product-pill reveal reveal-delay-3"><i class="fa-solid fa-robot" aria-hidden="true"></i> RoboBOX</span>
+        <span class="product-pill reveal reveal-delay-4"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Mission cards</span>
+        <span class="product-pill reveal reveal-delay-5"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Teacher resources</span>
     </div>
     <!-- TODO: link to Shop page when built -->
-    <p class="section-cta-wrap"><a href="#" class="btn btn-primary">Shop Mindset Coders</a></p>
-</section>
-
-<section class="home-section home-university reveal">
-    <div class="home-university-inner">
-        <h2>Prepare for university, from here</h2>
-        <p>Through our partnership with Prep Genius in India, students can prepare for the SAT and other entrance tests, with support for studying at universities in the United States.</p>
-        <!-- TODO: link to University Preparation page when built -->
-        <a href="#" class="btn btn-primary">Explore University Preparation</a>
-    </div>
+    <p class="section-cta-wrap"><a href="{% url 'contact' %}" class="btn btn-primary">Shop Mindset Coders</a></p>
 </section>
 
 <section class="home-section home-impact reveal">
@@ -236,26 +206,24 @@
             <span class="stat-label">Schools</span>
         </div>
         <div class="stat-card">
-    <span class="stat-number">2018</span>
-    <span class="stat-label">Founded</span>
-</div>
+            <span class="stat-number">2018</span>
+            <span class="stat-label">Founded</span>
+        </div>
     </div>
+    {% comment %}Restore story cards below when real learner stories exist.
     <div class="story-cards">
-        <!-- TODO: replace with real learner story -->
         <article class="story-card reveal reveal-delay-1">
             <div class="img-slot img-slot--story">
                 <div class="img-slot__placeholder" aria-hidden="true"></div>
             </div>
             <p class="story-card-placeholder">Story coming soon</p>
         </article>
-        <!-- TODO: replace with real learner story -->
         <article class="story-card reveal reveal-delay-2">
             <div class="img-slot img-slot--story">
                 <div class="img-slot__placeholder" aria-hidden="true"></div>
             </div>
             <p class="story-card-placeholder">Story coming soon</p>
         </article>
-        <!-- TODO: replace with real learner story -->
         <article class="story-card reveal reveal-delay-3">
             <div class="img-slot img-slot--story">
                 <div class="img-slot__placeholder" aria-hidden="true"></div>
@@ -263,6 +231,7 @@
             <p class="story-card-placeholder">Story coming soon</p>
         </article>
     </div>
+    {% endcomment %}
 </section>
 
 <section class="home-section home-ecosystem reveal">
@@ -283,22 +252,27 @@
     </div>
     <div class="ecosystem-categories">
         <div class="ecosystem-category reveal reveal-delay-1">
+            <div class="why-icon ecosystem-category-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></div>
             <h3>Strategic partners</h3>
             <p>Organisations helping deliver and expand the ecosystem.</p>
         </div>
         <div class="ecosystem-category reveal reveal-delay-2">
+            <div class="why-icon ecosystem-category-icon" aria-hidden="true"><i class="fa-solid fa-school"></i></div>
             <h3>Education partners</h3>
             <p>Schools, universities and education organisations.</p>
         </div>
         <div class="ecosystem-category reveal reveal-delay-3">
+            <div class="why-icon ecosystem-category-icon" aria-hidden="true"><i class="fa-solid fa-microchip"></i></div>
             <h3>Technology partners</h3>
             <p>Technology and product collaborators.</p>
         </div>
         <div class="ecosystem-category reveal reveal-delay-4">
+            <div class="why-icon ecosystem-category-icon" aria-hidden="true"><i class="fa-solid fa-seedling"></i></div>
             <h3>Funding and impact partners</h3>
             <p>Organisations supporting access and scale.</p>
         </div>
         <div class="ecosystem-category reveal reveal-delay-5">
+            <div class="why-icon ecosystem-category-icon" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
             <h3>Competition and global partners</h3>
             <p>WRO and international networks.</p>
         </div>
@@ -310,10 +284,10 @@
     <h2>Ready to be part of it?</h2>
     <div class="cta-banner-actions">
         <!-- TODO: link to Mindset Learn page when built -->
-        <a href="#" class="btn btn-primary">Join Mindset Learn</a>
+        <a href="{% url 'contact' %}" class="btn btn-primary">Join Mindset Learn</a>
         <a href="{% url 'for_schools' %}" class="btn btn-outline btn-outline-light">Bring STEAM to Your School</a>
         <!-- TODO: link to Shop page when built -->
-        <a href="#" class="btn btn-outline btn-outline-light">Shop</a>
+        <a href="{% url 'contact' %}" class="btn btn-outline btn-outline-light">Shop</a>
         <a href="{% url 'partners' %}" class="btn btn-outline btn-outline-light">Partner With Us</a>
     </div>
 </section>
