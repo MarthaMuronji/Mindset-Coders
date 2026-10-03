@@ -1732,3 +1732,47 @@ section h2 {
     outline: 2px solid var(--green);
     outline-offset: 3px;
 }
+
+.why-steam > p {
+    max-width: 780px;
+    margin: 0 auto 24px;
+    color: var(--text-muted);
+    line-height: 1.75;
+}
+
+.why-steam-quote {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    border-left: 4px solid var(--green);
+    border-radius: 0 12px 12px 0;
+    background: var(--green-light);
+    color: var(--navy);
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+.about-ecosystem .ecosystem-category {
+    padding: 24px 20px;
+    border: 1px solid var(--green-light);
+    border-radius: 14px;
+    background: var(--white);
+    text-align: center;
+}
+
+.about-ecosystem .ecosystem-category-icon {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.team-card-feature {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.team-card-tags {
+    justify-content: center;
+    margin: 20px 0 0;
+}
