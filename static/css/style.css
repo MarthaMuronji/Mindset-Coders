@@ -1918,3 +1918,144 @@ section h2 {
         margin-right: 16px;
     }
 }
+
+/* ===== Home page mobile layout =====
+   These desktop grid rules are declared later in the file than the old
+   mobile rules, so they were winning at every width. Reassert them here,
+   at the end of the file, where the cascade finally lets them apply. */
+@media (max-width: 768px) {
+    .home-duo-grid,
+    .home-mindset-learn .section-split,
+    .home-for-schools .section-split,
+    .home-global.wro-spotlight,
+    .home-build .build-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Shared mobile stacking =====
+   The desktop grid rules for these two sections are declared later in the
+   file than their original mobile rules, so the desktop rules were winning
+   at every width (horizontal scrolling on About and Mindset Learn at 375px,
+   a crushed image column on For Schools). Restated here at the end of the
+   file, where the cascade finally lets them apply. */
+@media (max-width: 768px) {
+    .founder-story,
+    .section-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Header nav below 1000px =====
+   The two-row wrap band that used to cover 769px to 960px has been removed
+   and replaced by a single break point: below 1000px the nav collapses into
+   the hamburger (Login stays inside the collapsed panel), and from 1000px up
+   the nav is one single row. Same declarations as the mobile block at the
+   top of the file, just applied over the wider band. */
+@media (max-width: 999px) {
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-collapse {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        padding: 20px 0 10px;
+        gap: 20px;
+    }
+
+    .nav-collapse.open {
+        display: flex;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .btn-login {
+        align-self: center;
+    }
+}
+
+/* ===== Colour contrast =====
+   White text on the bright green (--green, #2FA84F) is 3.07:1, below the
+   4.5:1 required for button text. Buttons get a darker green background
+   and an even darker hover; the bright green stays for icons, borders and
+   accents. */
+:root {
+    --green-btn: #1E7A38;
+    --green-btn-hover: #18622D;
+}
+
+.btn-login,
+.cta-banner .btn-primary {
+    background: var(--green-btn);
+}
+
+.btn-login:hover,
+.cta-banner .btn-primary:hover {
+    background: var(--green-btn-hover);
+}
+
+.hero-steam {
+    color: var(--green-dark);
+}
+
+/* Flagship badge: the old #0B3818 text on --green was 4.29:1,
+   --navy-dark on --green is 5.14:1. */
+.badge-flagship {
+    color: var(--navy-dark);
+}
+
+/* ===== Header nav from 1101px to 1150px =====
+   The tightened nav rules above stop at 1100px, but the default spacing
+   only fits at about 1137px, so between 1101px and 1136px the single-row
+   nav still pushed the page into horizontal scrolling. Carry the same
+   tightening a little further; from 1151px up the default spacing fits. */
+@media (min-width: 1101px) and (max-width: 1150px) {
+    .nav-collapse {
+        gap: 20px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 13px;
+    }
+
+    .logo {
+        margin-right: 16px;
+    }
+}
+
+/* ===== Older pages: mobile stacking =====
+   These rows had no mobile rule (or their desktop rule was declared after
+   the old mobile one), so at 375px they stayed side by side and overflowed
+   the viewport. */
+@media (max-width: 768px) {
+    .program-detail-card,
+    .program-detail-card.reverse {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+
+    .contact-section {
+        flex-direction: column;
+        gap: 24px;
+        padding: 0 20px 4rem;
+    }
+
+    .wro-spotlight {
+        grid-template-columns: 1fr;
+    }
+}
