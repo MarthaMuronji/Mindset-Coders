@@ -9,6 +9,9 @@ from .forms import ContactForm
 def home(request):
     return render(request, 'home.html')
 
+def mindset_learn(request):
+    return render(request, 'mindset_learn.html')
+
 def about(request):
     return render(request, 'about.html')
 
@@ -28,6 +31,9 @@ def contact(request):
 
 def competitions(request):
     return render(request, 'competitions.html')
+
+def global_opportunities(request):
+    return render(request, 'global_opportunities.html')
 
 def for_schools(request):
     return render(request, 'for_schools.html')

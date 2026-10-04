@@ -8,31 +8,53 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const revealEls = document.querySelectorAll('.reveal');
 
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                revealObserver.unobserve(entry.target);
-            }
+    if (prefersReducedMotion) {
+        revealEls.forEach(function (el) {
+            el.classList.add('is-visible');
         });
-    }, { threshold: 0.15 });
+    } else {
+        const revealObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
 
-    revealEls.forEach(el => revealObserver.observe(el));
+        revealEls.forEach(function (el) {
+            revealObserver.observe(el);
+        });
+    }
 
     const counters = document.querySelectorAll('.stat-number[data-count]');
 
-    const countObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateCount(entry.target);
-                countObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.5 });
+    function setFinalCount(el) {
+        const target = parseInt(el.dataset.count, 10);
+        const suffix = el.dataset.suffix || '';
+        el.textContent = target.toLocaleString() + suffix;
+    }
 
-    counters.forEach(el => countObserver.observe(el));
+    if (prefersReducedMotion) {
+        counters.forEach(setFinalCount);
+    } else {
+        const countObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    animateCount(entry.target);
+                    countObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(function (el) {
+            countObserver.observe(el);
+        });
+    }
 
     function animateCount(el) {
         const target = parseInt(el.dataset.count, 10);

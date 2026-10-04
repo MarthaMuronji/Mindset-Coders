@@ -5,38 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mindset Coders Uganda{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Mindset Coders Uganda builds accessible STEM learning pathways for young people across Africa.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}Mindset Coders is a STEAM EdTech product company building learning pathways, tools and resources for learners and schools in Uganda.{% endblock %}">
+    <meta property="og:title" content="{% block meta_title_og %}Mindset Coders Uganda{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Mindset Coders is a STEAM EdTech product company building learning pathways, tools and resources for learners and schools in Uganda.{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta name="theme-color" content="#16324F">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <noscript>
+        <style>
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        </style>
+    </noscript>
 </head>
 <body>
 
     <header class="site-header">
         <nav class="navbar">
-    <a href="{% url 'home' %}" class="logo">
-        mindset<span class="logo-accent">&lt;/&gt;</span>
-    </a>
-    <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-collapse').classList.toggle('open')">
-        <span></span><span></span><span></span>
-    </button>
-    <div class="nav-collapse">
-        <ul class="nav-links">
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'programs' %}">Programs</a></li>
-            <li><a href="{% url 'competitions' %}">Competitions</a></li>
-            <li><a href="{% url 'events' %}">Events</a></li>
-            <li><a href="{% url 'resources' %}">Resources</a></li>
-            <li><a href="{% url 'partners' %}">Partners</a></li>
-            <li><a href="{% url 'blog' %}">Blog</a></li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-        </ul>
-        <a href="#" class="btn btn-login">Login</a>
-    </div>
-</nav>
+            <a href="{% url 'home' %}" class="logo">
+                mindset<span class="logo-accent">&lt;/&gt;</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-collapse').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-collapse">
+                <!-- Planned nav items when pages exist: Shop -->
+                <ul class="nav-links">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'about' %}">About</a></li>
+    <li><a href="{% url 'mindset_learn' %}">Mindset Learn</a></li>
+    <li><a href="{% url 'programs' %}">Programs</a></li>
+    <li><a href="{% url 'for_schools' %}">For Schools</a></li>
+    <li><a href="{% url 'global_opportunities' %}">Global Opportunities</a></li>
+    <li><a href="{% url 'partners' %}">Our Ecosystem</a></li>
+    <li><a href="{% url 'contact' %}">Contact</a></li>
+</ul>
+                <a href="#" class="btn btn-login">Login</a>
+            </div>
+        </nav>
     </header>
 
     <main>
@@ -46,13 +59,23 @@
 
     <footer class="site-footer">
         <div class="footer-brand">mindset<span class="logo-accent">&lt;/&gt;</span></div>
+
+        <ul class="footer-links">
+    <li><a href="{% url 'events' %}">Events</a></li>
+    <li><a href="{% url 'resources' %}">Resources</a></li>
+    <li><a href="{% url 'blog' %}">Blog</a></li>
+    <li><a href="{% url 'for_educators' %}">For Educators</a></li>
+    <li><a href="{% url 'for_learners' %}">For Learners</a></li>
+    <li><a href="{% url 'competitions' %}">Competitions</a></li>
+</ul>
+
         <p class="footer-copy">&copy; {% now "Y" %} Mindset Coders Uganda. Think. Code. Create. Solve.</p>
-       <div class="footer-socials">
-    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-    <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
-    <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-</div>
+        <div class="footer-socials">
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
     </footer>
 
     <script src="{% static 'js/main.js' %}"></script>

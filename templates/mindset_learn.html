@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mindset Learn | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Mindset Learn is a STEAM learning pathway for students, with six levels, projects, challenges and a community of learners.{% endblock %}
+
+{% block content %}
+
+<section class="hero section-decor">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <div class="hero-content reveal">
+        <span class="badge">The learner platform</span>
+        <h1>A STEAM learning pathway for the next generation of innovators</h1>
+        <p>Mindset Learn takes students from curiosity to creation, one level at a time.</p>
+        <div class="hero-actions">
+            <!-- TODO: swap for the platform link -->
+            <a href="{% url 'contact' %}" class="btn btn-primary">Join Mindset Learn</a>
+            <a href="#how-it-works" class="btn btn-outline">See how it works</a>
+        </div>
+    </div>
+    <div class="hero-visual reveal reveal-delay-1">
+        <div class="img-slot img-slot--hero hero-visual-slot">
+            <!-- TODO: static/images/mindset-learn.jpg -->
+            <div class="img-slot__placeholder" aria-hidden="true"></div>
+            <img src="{% static 'images/mindset-learn.jpg' %}" alt="A learner using Mindset Learn on a laptop" width="420" height="336" onerror="this.remove()">
+        </div>
+    </div>
+</section>
+
+<section class="home-section section-decor mindset-how reveal" id="how-it-works">
+    <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
+    <h2>Learn, build, and keep moving up</h2>
+    <p class="section-subtitle">Students subscribe to the platform and progress through structured learning levels. Each level combines learning content, projects, challenges and a community of other learners.</p>
+    <div class="build-cards-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></div>
+            <h3>Lessons</h3>
+            <p>Structured content that builds step by step.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-hammer"></i></div>
+            <h3>Projects</h3>
+            <p>Real things to make along the way.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-puzzle-piece"></i></div>
+            <h3>Challenges</h3>
+            <p>Problems to solve and skills to test.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-people-group"></i></div>
+            <h3>Community</h3>
+            <p>Other learners to share and grow with.</p>
+        </div>
+    </div>
+</section>
+
+<section class="home-section steam-pathway section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>Discover → Build → Innovate</h2>
+    <p class="section-subtitle">The pathway is designed to move learners from curiosity to creation.</p>
+    <div class="steam-pathway-steps">
+        <div class="steam-pathway-step reveal reveal-delay-1">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
+            <h3>Discover</h3>
+            <p>Explore coding, robotics, design and creativity.</p>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-2">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-hammer"></i></span>
+            <h3>Build</h3>
+            <p>Turn ideas into real projects.</p>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-3">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+            <h3>Innovate</h3>
+            <p>Solve real problems and share them with the world.</p>
+        </div>
+    </div>
+</section>
+
+<section class="home-section mindset-levels reveal">
+    <h2>Six levels, one clear path</h2>
+    <p class="section-subtitle">Learners move through six levels. You can see where you are, and what comes next.</p>
+    <div class="mindset-level-grid">
+        <article class="mindset-level-card ecosystem-category reveal reveal-delay-1">
+            <span class="mindset-level-number">1</span>
+            <h3>Level 1</h3>
+            <p>Details coming soon</p>
+        </article>
+        <article class="mindset-level-card ecosystem-category reveal reveal-delay-2">
+            <span class="mindset-level-number">2</span>
+            <h3>Level 2</h3>
+            <p>Details coming soon</p>
+        </article>
+        <article class="mindset-level-card ecosystem-category reveal reveal-delay-3">
+            <span class="mindset-level-number">3</span>
+            <h3>Level 3</h3>
+            <p>Details coming soon</p>
+        </article>
+        <article class="mindset-level-card ecosystem-category reveal reveal-delay-4">
+            <span class="mindset-level-number">4</span>
+            <h3>Level 4</h3>
+            <p>Details coming soon</p>
+        </article>
+        <article class="mindset-level-card ecosystem-category reveal reveal-delay-5">
+            <span class="mindset-level-number">5</span>
+            <h3>Level 5</h3>
+            <p>Details coming soon</p>
+        </article>
+        <article class="mindset-level-card ecosystem-category reveal reveal-delay-1">
+            <span class="mindset-level-number">6</span>
+            <h3>Level 6</h3>
+            <p>Details coming soon</p>
+        </article>
+    </div>
+    {% comment %}Add level names and descriptions here later.{% endcomment %}
+    <p class="mindset-level-note">More courses and levels will be added as the platform grows.</p>
+</section>
+
+<section class="section-tint mindset-pricing">
+    <h2>Simple, transparent pricing</h2>
+    <div class="mindset-pricing-grid">
+        <article class="mindset-pricing-card reveal reveal-delay-1">
+            <h3 class="mindset-pricing-label">Registration</h3>
+            <p class="mindset-pricing-amount">UGX 5,000</p>
+            <p class="pricing-chip mindset-pricing-detail">One time, per learner</p>
+        </article>
+        <article class="mindset-pricing-card reveal reveal-delay-2">
+            <h3 class="mindset-pricing-label">Each level</h3>
+            <p class="mindset-pricing-amount">UGX 20,000</p>
+            <p class="pricing-chip mindset-pricing-detail">Six levels in total</p>
+        </article>
+    </div>
+</section>
+
+<section class="home-section reveal">
+    <div class="section-split">
+        <div class="section-split-text">
+            <h2>More than a classroom</h2>
+            <p>Learners can access international competitions and peer learning opportunities through the wider Mindset Coders ecosystem.</p>
+        </div>
+        <div class="section-cta-wrap">
+            <a href="{% url 'global_opportunities' %}" class="btn btn-primary">Explore Global Opportunities</a>
+        </div>
+    </div>
+</section>
+
+<section class="home-section section-tint reveal">
+    <div class="section-split">
+        <div class="section-split-text">
+            <h2>Bringing a whole class?</h2>
+            <p>Schools can adopt Mindset Learn as part of the full Mindset Coders STEAM ecosystem.</p>
+        </div>
+        <div class="section-cta-wrap">
+            <a href="{% url 'for_schools' %}" class="btn btn-primary">Bring STEAM to Your School</a>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Ready to start?</h2>
+    <!-- TODO: swap for the platform link -->
+    <a href="{% url 'contact' %}" class="btn btn-primary">Join Mindset Learn</a>
+</section>
+
+{% endblock %}
