@@ -53,6 +53,9 @@ def for_learners(request):
 def partners(request):
     return render(request, 'partners.html')
 
+def innovators_circle(request):
+    return render(request, 'innovators_circle.html')
+
 def blog(request):
     posts = Post.objects.filter(published=True)
     return render(request, 'blog.html', {'posts': posts})

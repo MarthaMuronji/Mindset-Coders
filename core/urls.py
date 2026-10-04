@@ -16,6 +16,7 @@ urlpatterns = [
     path('events/', views.events, name='events'),
     path('for-learners/', views.for_learners, name='for_learners'),
     path('partners/', views.partners, name='partners'),
+    path('innovators-circle/', views.innovators_circle, name='innovators_circle'),
     path('resources/', views.resources, name='resources'),
     path('blog/', views.blog, name='blog'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
