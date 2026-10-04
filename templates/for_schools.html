@@ -2,38 +2,65 @@
 {% load static %}
 
 {% block title %}For Schools | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Schools can adopt the Mindset Coders STEAM ecosystem: STEAM programs, coding, robotics and AI education, teacher training, learning kits and access to Mindset Learn.{% endblock %}
 
 {% block content %}
 
 <section class="about-hero reveal">
     <span class="badge">For Schools</span>
-    <h1>Bring STEM education into your classrooms</h1>
-    <p>We partner with schools across Uganda to set up STEM clubs, deliver robotics and coding programs, and train teachers to sustain it all long-term.</p>
+    <h1>Bring STEAM to your school</h1>
+    <p>We partner with schools across Uganda to set up STEAM clubs, deliver coding, robotics and AI programs, and train teachers to sustain it all long term.</p>
 </section>
 
-<section class="why-us">
-    <h2>What We Offer Schools</h2>
-    <p class="section-subtitle">A complete package, not just a one-off workshop</p>
-    <div class="why-list">
-        <div class="why-item reveal reveal-delay-1">
-            <span class="why-icon"><i class="fa-solid fa-school"></i></span>
-            <p>STEM club setup — curriculum, equipment guidance, and a structured program calendar.</p>
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>More than a workshop</h2>
+    <p class="section-subtitle">Your school can adopt a broader STEAM learning ecosystem</p>
+    <div class="build-cards-grid adopt-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-flask"></i></div>
+            <h3>STEAM learning programs</h3>
+            <p>A full 12 week curriculum, a weekend club, or teacher-led sessions, designed around your school.</p>
         </div>
-        <div class="why-item reveal reveal-delay-2">
-            <span class="why-icon"><i class="fa-solid fa-robot"></i></span>
-            <p>Robotics programs using the ROBOBOX kit, built specifically for Ugandan classroom realities.</p>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></div>
+            <h3>Coding and robotics</h3>
+            <p>Beginner fundamentals through project-based learning, with RoboBOX kits built for Ugandan classroom realities.</p>
         </div>
-        <div class="why-item reveal reveal-delay-3">
-            <span class="why-icon"><i class="fa-solid fa-laptop-code"></i></span>
-            <p>Coding instruction from beginner fundamentals through project-based learning.</p>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-brain"></i></div>
+            <h3>AI education</h3>
+            <p>Hands-on introductions to AI for your learners.</p>
         </div>
-        <div class="why-item reveal reveal-delay-4">
-            <span class="why-icon"><i class="fa-solid fa-chalkboard-teacher"></i></span>
-            <p>Teacher development, so your staff can run and grow the program independently.</p>
+        <div class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-school"></i></div>
+            <h3>STEAM clubs</h3>
+            <p>Club setup with curriculum, equipment guidance and a structured program calendar.</p>
         </div>
-        <div class="why-item reveal">
-            <span class="why-icon"><i class="fa-solid fa-trophy"></i></span>
-            <p>A pathway to competition — qualified students can compete at WRO Uganda nationals.</p>
+        <div class="build-card reveal reveal-delay-5">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <h3>Teacher development</h3>
+            <p>Training so your staff can run and grow the program independently.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Competition preparation</h3>
+            <p>A pathway to compete at WRO Uganda nationals and beyond.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-box-open"></i></div>
+            <h3>Learning kits and resources</h3>
+            <p>Kits and classroom resources for learning by making.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h3>Mindset Learn access</h3>
+            <p>Give learners access to the Mindset Learn platform and its six levels.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-route"></i></div>
+            <h3>Student pathways</h3>
+            <p>Routes from the classroom to international opportunities.</p>
         </div>
     </div>
 </section>
@@ -46,14 +73,23 @@
     </div>
     <div class="story-text">
         <span class="mv-label">How It Works</span>
-        <h2>From first conversation to a running STEM club</h2>
-        <p>We start with a conversation about your school's context, learners, and resources. From there, we design a program that fits — whether that's a full 12-week curriculum, a weekend club, or teacher-led sessions we train your staff to run.</p>
-        <p>Most schools see their first STEM club sessions running within weeks, not months.</p>
+        <h2>From first conversation to a running STEAM club</h2>
+        <p>We start with a conversation about your school's context, learners and resources. From there, we design a program that fits, whether that's a full 12 week curriculum, a weekend club, or teacher-led sessions we train your staff to run.</p>
+        <p>Most schools see their first STEAM club sessions running within weeks, not months.</p>
+    </div>
+</section>
+
+<section class="section-tint reveal">
+    <h2>Beyond the classroom</h2>
+    <p class="section-subtitle">Learners can access international competitions and peer learning opportunities through the wider Mindset Coders ecosystem.</p>
+    <div class="section-cta-wrap">
+        <!-- TODO: switch to the Global Opportunities page when it is built -->
+        <a href="{% url 'competitions' %}" class="btn btn-primary">Explore Global Opportunities</a>
     </div>
 </section>
 
 <section class="cta-banner reveal">
-    <h2>Ready to bring STEM to your school?</h2>
+    <h2>Ready to bring STEAM to your school?</h2>
     <p>Tell us about your school and we'll help you design the right program.</p>
     <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
 </section>

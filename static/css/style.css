@@ -1879,3 +1879,20 @@ section h2 {
     justify-content: center;
     margin: 20px 0 0;
 }
+
+/* ===== For schools: adopt grid (1 / 2 / 3 columns) ===== */
+.build-cards-grid.adopt-grid {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .build-cards-grid.adopt-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 980px) {
+    .build-cards-grid.adopt-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
