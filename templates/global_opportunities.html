@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Global Opportunities | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Mindset Coders connects learners to a wider global STEAM ecosystem through international competitions, peer learning and showcases for learner projects.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Global Opportunities</span>
+    <h1>Learning that reaches beyond Uganda</h1>
+    <p>Mindset Coders connects learners to a wider global STEAM ecosystem, through competitions, peer learning and the chance to show their work to the world.</p>
+    <div class="hero-actions">
+        <a href="{% url 'contact' %}" class="btn btn-primary">Talk to us</a>
+        <a href="#ways-to-take-part" class="btn btn-outline">Ways to take part</a>
+    </div>
+</section>
+
+<section class="home-section section-decor reveal" id="ways-to-take-part">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>Ways to take part</h2>
+    <p class="section-subtitle">WRO is one doorway, and there are more</p>
+    <div class="build-cards-grid adopt-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-globe"></i></div>
+            <h3>International competitions</h3>
+            <p>STEAM and robotics competitions where learners test what they have built against peers from other countries.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
+            <h3>World Robot Olympiad</h3>
+            <p>Uganda's top teams represent the country at the WRO finals. We have been Uganda's official WRO affiliate since 2020 and run the national qualifiers.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></div>
+            <h3>Technovation Girls</h3>
+            <p>We lead Technovation Girls in Uganda's Central region.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></div>
+            <h3>Africa Code Week</h3>
+            <p>We led Africa Code Week in Uganda from 2019 to 2022.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-5">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-people-group"></i></div>
+            <h3>Peer to peer learning</h3>
+            <p>Learners collaborate with students in other countries.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <h3>Showcase your work</h3>
+            <p>Chances to present learner projects and innovations to a global STEAM community.</p>
+        </div>
+    </div>
+</section>
+
+<section class="home-section wro-spotlight home-global reveal">
+    <div class="wro-spotlight-content">
+        <span class="badge badge-flagship">Flagship program</span>
+        <h2>WRO Uganda National Championship</h2>
+        <p>As Uganda's official World Robot Olympiad affiliate, we run the national qualifiers that send our top learners to compete on the global stage.</p>
+        <a href="{% url 'competitions' %}" class="btn btn-primary">See competition details</a>
+    </div>
+    <div class="wro-spotlight-image">
+        <div class="img-slot img-slot--global-wro">
+            <!-- TODO: static/images/global-wro.jpg -->
+            <div class="img-slot__placeholder" aria-hidden="true"></div>
+            <img src="{% static 'images/global-wro.jpg' %}" alt="Mindset Coders learners representing Uganda at a global robotics competition" width="480" height="360" loading="lazy" onerror="this.remove()">
+        </div>
+    </div>
+</section>
+
+<section class="home-section steam-pathway reveal">
+    <h2>From classroom to global stage</h2>
+    <div class="steam-pathway-steps">
+        <div class="steam-pathway-step reveal reveal-delay-1">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
+            <h3>Learn</h3>
+            <p>Build skills at school or on Mindset Learn.</p>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-2">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-trophy"></i></span>
+            <h3>Compete</h3>
+            <p>Take part in national qualifiers and innovation challenges.</p>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-3">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-plane"></i></span>
+            <h3>Go global</h3>
+            <p>Represent Uganda in international competitions and networks.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Ready to take learners global?</h2>
+    <p>Tell us about your school or learner and we'll point you to the next opportunity.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}

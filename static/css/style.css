@@ -1896,3 +1896,25 @@ section h2 {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* ===== Global Opportunities page ===== */
+#ways-to-take-part {
+    scroll-margin-top: 100px;
+}
+
+.about-hero .hero-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+
+/* Nav spacing shortened so the longer nav stays on one line at about 1024px */
+@media (min-width: 769px) and (max-width: 1100px) {
+    .nav-collapse {
+        gap: 20px;
+    }
+
+    .logo {
+        margin-right: 16px;
+    }
+}

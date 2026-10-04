@@ -32,6 +32,9 @@ def contact(request):
 def competitions(request):
     return render(request, 'competitions.html')
 
+def global_opportunities(request):
+    return render(request, 'global_opportunities.html')
+
 def for_schools(request):
     return render(request, 'for_schools.html')
 
