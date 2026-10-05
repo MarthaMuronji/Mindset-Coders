@@ -2239,3 +2239,12 @@ a.build-card:focus-visible {
 .build-card .story-card-placeholder {
     margin-top: 14px;
 }
+
+/* ===== Contact save: error level message ===== */
+
+/* Same message box as .form-success, in a palette colour so it cannot be
+   mistaken for the success state. White on --navy is about 13:1 contrast. */
+.form-success.form-error {
+    background: var(--navy);
+    color: var(--white);
+}

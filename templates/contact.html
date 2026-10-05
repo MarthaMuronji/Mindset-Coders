@@ -59,7 +59,7 @@
 
         {% if messages %}
             {% for message in messages %}
-                <div class="form-success">{{ message }}</div>
+                <div class="form-success{% if message.tags == 'error' %} form-error{% endif %}">{{ message }}</div>
             {% endfor %}
         {% endif %}
 

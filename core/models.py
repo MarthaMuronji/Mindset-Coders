@@ -24,3 +24,19 @@ class Post(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
+class ContactMessage(models.Model):
+    """A message sent through the contact form, shown in the Django admin."""
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    role = models.CharField(max_length=20)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    handled = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.email})'
