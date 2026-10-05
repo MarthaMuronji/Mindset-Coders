@@ -1,71 +1,99 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Partners | Mindset Coders Uganda{% endblock %}
+{% block title %}Our Ecosystem | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Mindset Coders is part of a wider network of organisations that help deliver, expand and support STEAM education. Here is how it all fits together.{% endblock %}
 
 {% block content %}
 
 <section class="about-hero reveal">
-    <span class="badge">Our Partners</span>
-    <h1>Building this ecosystem together</h1>
-    <p>We work with funders, corporates, and global STEM networks to bring quality STEM education to more learners across Uganda.</p>
-</section>
-
-<section class="trusted-by reveal">
-    <p class="trusted-label">Trusted By</p>
-    <div class="trusted-logos">
-        <span>Mastercard Foundation</span>
-        <span class="divider"></span>
-        <span>Google</span>
-        <span class="divider"></span>
-        <span>MTN Uganda</span>
-        <span class="divider"></span>
-        <span>Stanbic Bank</span>
-        <span class="divider"></span>
-        <span>WRO Global</span>
+    <span class="badge">Our Ecosystem</span>
+    <h1>One ecosystem, many partners</h1>
+    <p>Mindset Coders is part of a wider network of organisations that help deliver, expand and support STEAM education. Here is how it all fits together.</p>
+    <div class="hero-actions">
+        <a href="{% url 'contact' %}" class="btn btn-green">Partner With Us</a>
+        <a href="#partner-categories" class="btn btn-outline">Meet our partners</a>
     </div>
 </section>
 
-<section class="why-us">
-    <h2>Ways to Partner With Us</h2>
-    <p class="section-subtitle">Different ways to get involved</p>
-    <div class="why-list">
-        <div class="why-item reveal reveal-delay-1">
-            <span class="why-icon"><i class="fa-solid fa-sack-dollar"></i></span>
-            <p>Funding partnerships — support programs reaching underserved schools and learners.</p>
-        </div>
-        <div class="why-item reveal reveal-delay-2">
-            <span class="why-icon"><i class="fa-solid fa-building"></i></span>
-            <p>Corporate partnerships — sponsor events, provide mentors, or co-design programs.</p>
-        </div>
-        <div class="why-item reveal reveal-delay-3">
-            <span class="why-icon"><i class="fa-solid fa-globe"></i></span>
-            <p>Global STEM networks — collaborate on curriculum, competitions, and best practices.</p>
-        </div>
-        <div class="why-item reveal">
-            <span class="why-icon"><i class="fa-solid fa-gift"></i></span>
-            <p>In-kind support — equipment, venues, or volunteer expertise for our programs.</p>
-        </div>
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>How the ecosystem fits together</h2>
+    <p class="section-subtitle">Mindset Coders is the organisation behind the tools, resources and systems that enable STEAM education. Each part of the ecosystem has its own place.</p>
+    <div class="build-cards-grid adopt-grid">
+        <a href="{% url 'mindset_learn' %}" class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></div>
+            <h3>Mindset Learn</h3>
+            <p>The digital learning platform.</p>
+        </a>
+        <a href="{% url 'for_schools' %}" class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-school"></i></div>
+            <h3>For Schools</h3>
+            <p>School programmes.</p>
+        </a>
+        <a href="{% url 'global_opportunities' %}" class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-globe"></i></div>
+            <h3>Global Opportunities</h3>
+            <p>International competitions and global peer learning.</p>
+        </a>
+        <a href="{% url 'university_preparation' %}" class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h3>University Preparation</h3>
+            <p>SAT preparation delivered with Prep Genius.</p>
+        </a>
+        <a href="{% url 'innovators_circle' %}" class="build-card reveal reveal-delay-5">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-rocket"></i></div>
+            <h3>The Innovators' Circle</h3>
+            <p>Backing young innovators.</p>
+        </a>
     </div>
 </section>
 
-<section class="founder-story reveal">
-    <div class="story-image">
-        <div class="photo-placeholder">
-            <span>Photo coming soon</span>
+<section class="home-section section-tint section-decor reveal" id="partner-categories">
+    <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
+    <h2>Our partners</h2>
+    <p class="section-subtitle">Partners come from many places. We group them so it is clear how each one helps.</p>
+    <div class="build-cards-grid adopt-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></div>
+            <h3>Strategic Partners</h3>
+            <p>Organisations helping deliver or expand the ecosystem.</p>
+            <div class="logo-placeholder">Partner logos coming soon</div>
         </div>
-    </div>
-    <div class="story-text">
-        <span class="mv-label">Why Partner With Us</span>
-        <h2>A track record you can build on</h2>
-        <p>Since 2018, we've reached 20,000+ learners, trained 1,000+ educators, and engaged 200+ schools across Uganda — all while running the country's official WRO national program. Partnering with us means backing an organization with real reach, real results, and deep roots in the communities we serve.</p>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-school"></i></div>
+            <h3>Education Partners</h3>
+            <p>Schools, universities and education organisations.</p>
+            <div class="logo-placeholder">Partner logos coming soon</div>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-microchip"></i></div>
+            <h3>Technology Partners</h3>
+            <p>Technology and product collaborators.</p>
+            <div class="logo-placeholder">Partner logos coming soon</div>
+        </div>
+        <div class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-seedling"></i></div>
+            <h3>Funding and Impact Partners</h3>
+            <p>Organisations supporting access and scale.</p>
+            <div class="logo-placeholder">Partner logos coming soon</div>
+        </div>
+        <div class="build-card reveal reveal-delay-5">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Competition and Global Partners</h3>
+            <p>WRO and international networks.</p>
+            <p class="partner-name">WRO Global</p>
+            <div class="logo-placeholder">Partner logos coming soon</div>
+        </div>
     </div>
 </section>
 
 <section class="cta-banner reveal">
-    <h2>Let's build something lasting</h2>
-    <p>Tell us about your organization and how you'd like to get involved.</p>
-    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+    <h2>Want to be part of the ecosystem?</h2>
+    <p>Collaborate, fund or expand the ecosystem with us.</p>
+    <div class="cta-banner-actions">
+        <a href="{% url 'contact' %}" class="btn btn-green">Partner With Us</a>
+        <a href="{% url 'global_opportunities' %}" class="btn btn-outline btn-outline-light">Explore Global Opportunities</a>
+    </div>
 </section>
 
 {% endblock %}
