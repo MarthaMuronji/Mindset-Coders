@@ -19,6 +19,7 @@ urlpatterns = [
     path('innovators-circle/', views.innovators_circle, name='innovators_circle'),
     path('university-preparation/', views.university_preparation, name='university_preparation'),
     path('shop/', views.shop, name='shop'),
+    path('impact/', views.impact, name='impact'),
     path('resources/', views.resources, name='resources'),
     path('blog/', views.blog, name='blog'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),

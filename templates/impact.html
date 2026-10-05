@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Impact and Stories | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Behind every number is a learner, a teacher or a school. This is where their stories live.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Impact and Stories</span>
+    <h1>Learning that leads somewhere</h1>
+    <p>Behind every number is a learner, a teacher or a school. This is where their stories live.</p>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>Our impact in numbers</h2>
+    <div class="section-cta-wrap">
+        <div class="stats-row stats-row--inline reveal">
+            <div class="stat-card">
+                <span class="stat-number" data-count="20000" data-suffix="+">0</span>
+                <span class="stat-label">Learners</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-count="1000" data-suffix="+">0</span>
+                <span class="stat-label">Educators</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" data-count="200" data-suffix="+">0</span>
+                <span class="stat-label">Schools</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">2018</span>
+                <span class="stat-label">Founded</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="home-section section-tint section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
+    <h2>Stories</h2>
+    <p class="section-subtitle">Stories will be added here as they are shared, with permission from the learners, schools and teachers involved.</p>
+    <div class="build-cards-grid">
+        <article class="build-card reveal reveal-delay-1">
+            <h3>Learner stories</h3>
+            <p>What learners build, try and achieve.</p>
+            <p class="story-card-placeholder">Stories coming soon</p>
+        </article>
+        <article class="build-card reveal reveal-delay-2">
+            <h3>School stories</h3>
+            <p>How schools bring STEAM to their learners.</p>
+            <p class="story-card-placeholder">Stories coming soon</p>
+        </article>
+        <article class="build-card reveal reveal-delay-3">
+            <h3>Teacher stories</h3>
+            <p>How teachers lead STEAM in the classroom.</p>
+            <p class="story-card-placeholder">Stories coming soon</p>
+        </article>
+        <article class="build-card reveal reveal-delay-4">
+            <h3>Competition stories</h3>
+            <p>Learners on the national and global stage.</p>
+            <p class="story-card-placeholder">Stories coming soon</p>
+        </article>
+    </div>
+    <!--
+    Ready to use story card. Copy one of these into the grid above when a real story
+    is ready to publish, then fill in the placeholders. The story photo goes in the
+    img-slot block below: swap the placeholder div for the photo when the asset exists.
+
+    <div class="build-cards-grid">
+        <article class="build-card reveal reveal-delay-1">
+            <div class="img-slot img-slot--story">
+                <div class="img-slot__placeholder" aria-hidden="true"></div>
+            </div>
+            <span class="mv-label">Story category</span>
+            <h3>{{ story.headline }}</h3>
+            <p>{{ story.summary }}</p>
+            <p class="story-card-placeholder">{{ story.quote }}</p>
+            <p class="mv-label">{{ story.who }}</p>
+            <a href="{% url 'contact' %}?topic=story" class="btn btn-green btn-sm">Share a story</a>
+        </article>
+    </div>
+    -->
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Have a story to share?</h2>
+    <p>If a learner, school or teacher has something worth telling, we would love to hear it.</p>
+    <div class="cta-banner-actions">
+        <a href="{% url 'contact' %}?topic=story" class="btn btn-green">Share a story</a>
+        <a href="{% url 'global_opportunities' %}" class="btn btn-outline btn-outline-light">Explore Global Opportunities</a>
+    </div>
+</section>
+
+{% endblock %}
