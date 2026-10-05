@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Post, ContactMessage
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
 from .forms import ContactForm
+from .models import ContactMessage, Post
 from .notifications import send_contact_notification
 
 # Starting text for the message box when someone arrives from a route card.
@@ -118,3 +119,12 @@ def blog(request):
 def blog_detail(request, slug):
     post = get_object_or_404(Post, slug=slug, published=True)
     return render(request, 'blog_detail.html', {'post': post})
+
+def robots_txt(request):
+    """robots.txt rules, with the sitemap address for this host."""
+    lines = [
+        'User-agent: *',
+        'Disallow: /admin/',
+        'Sitemap: {}'.format(request.build_absolute_uri('/sitemap.xml')),
+    ]
+    return HttpResponse('\n'.join(lines) + '\n', content_type='text/plain')
