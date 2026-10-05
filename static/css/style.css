@@ -1688,7 +1688,7 @@ section h2 {
 
 .form-success {
     background: var(--green-light, #E8F7EA);
-    color: var(--green-dark, #248F41);
+    color: var(--green-text, #1E7A38);
     padding: 0.8rem 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
@@ -2212,4 +2212,11 @@ a.build-card:focus-visible {
 /* Grey logo placeholder sits below the category text */
 .build-card .logo-placeholder {
     margin-top: 16px;
+}
+
+/* ===== Contact and Get Started page ===== */
+
+/* Anchor target from the route cards clears the sticky header */
+#contact-form {
+    scroll-margin-top: 100px;
 }
