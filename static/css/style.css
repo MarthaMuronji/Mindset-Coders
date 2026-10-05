@@ -2149,3 +2149,42 @@ section h2 {
         text-align: center;
     }
 }
+
+/* ===== University Preparation page ===== */
+
+/* Anchor target clears the sticky header */
+#what-you-can-prepare-for {
+    scroll-margin-top: 100px;
+}
+
+/* Green button using the sitewide #1E7A38 green (white text on it, 5.4:1) */
+.btn-green {
+    background: var(--green-btn);
+    color: var(--white);
+    box-shadow: 0 4px 14px rgba(30, 122, 56, 0.3);
+}
+
+.btn-green:hover {
+    background: var(--green-btn-hover);
+}
+
+/* Grey placeholder block until the Prep Genius logo asset arrives */
+.logo-placeholder {
+    background: #E9EDF0;
+    border: 1px solid #D3DEE3;
+    border-radius: 16px;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Cards sit below the section heading */
+.build-cards-grid.prep-grid {
+    margin-top: 36px;
+}
