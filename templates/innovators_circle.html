@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}The Innovators' Circle | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}The Innovators' Circle showcases promising young innovators and connects them to funding, equipment, mentorship and partnerships.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">The Innovators' Circle</span>
+    <h1>Where young ideas meet opportunity</h1>
+    <p>A curated community and showcase for promising student innovators whose ideas and projects have the potential to grow beyond the classroom.</p>
+    <div class="hero-actions">
+        <a href="#ways-to-support" class="btn btn-primary">Support an innovator</a>
+        <a href="#featured-innovators" class="btn btn-outline">Meet the innovators</a>
+    </div>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>More than a showcase</h2>
+    <p class="section-subtitle">The Innovators' Circle turns promising student innovation into visibility, support and potential venture opportunities. It connects recognition with practical support and pathways to further opportunity.</p>
+</section>
+
+<section class="home-section section-tint section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
+    <h2>From student project to real venture</h2>
+    <p class="section-subtitle">Where it fits, the Circle supports a pathway from student project to commercial or social venture, including incubation, mentorship, business development and connections to pitch competitions.</p>
+    <div class="steam-pathway-steps circle-pathway">
+        <div class="steam-pathway-step reveal reveal-delay-1">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
+            <h3>Discover</h3>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-2">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-hammer"></i></span>
+            <h3>Build</h3>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-3">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+            <h3>Innovate</h3>
+        </div>
+        <span class="steam-pathway-arrow steam-pathway-arrow-mid" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <span class="steam-pathway-arrow steam-pathway-break" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-4">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-trophy"></i></span>
+            <h3>Compete</h3>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-5">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></span>
+            <h3>Connect</h3>
+        </div>
+        <span class="steam-pathway-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+        <div class="steam-pathway-step reveal reveal-delay-1">
+            <span class="steam-pathway-icon why-icon" aria-hidden="true"><i class="fa-solid fa-rocket"></i></span>
+            <h3>Launch</h3>
+        </div>
+    </div>
+</section>
+
+<section class="home-section reveal" id="ways-to-support">
+    <h2>Four ways to back a young innovator</h2>
+    <div class="build-cards-grid support-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <h3>Fund</h3>
+            <p>Contribute toward travel, competition, pitch and other participation costs.</p>
+            <!-- TODO: link to a funding or payment route when the client confirms how people can give -->
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Fund an innovator</a>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-toolbox"></i></div>
+            <h3>Equip</h3>
+            <p>Provide materials, technology, tools or other resources needed to develop an innovation.</p>
+            <!-- TODO: link to an equipment or donation route when the client confirms how people can give -->
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Equip an innovator</a>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-user-group"></i></div>
+            <h3>Mentor</h3>
+            <p>Offer business, technical, creative or industry expertise.</p>
+            <!-- TODO: link to a mentor sign up route when the client confirms how mentors apply -->
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Mentor an innovator</a>
+        </div>
+        <div class="build-card reveal reveal-delay-4">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></div>
+            <h3>Partner</h3>
+            <p>Support an innovation commercially, strategically or through institutional collaboration.</p>
+            <!-- TODO: link to a partnership route when the client confirms how partners get in touch -->
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Partner with us</a>
+        </div>
+    </div>
+</section>
+
+<section class="home-section section-decor reveal" id="featured-innovators">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>Featured innovators</h2>
+    <p class="section-subtitle">Students may be featured after taking part in Mindset Coders programs, competitions, challenges or other STEAM activities.</p>
+    <div class="trusted-by innovators-empty reveal reveal-delay-1">
+        <span class="why-icon steam-pathway-icon" aria-hidden="true"><i class="fa-solid fa-hourglass-half"></i></span>
+        <p>Featured innovators will appear here soon.</p>
+    </div>
+    {% comment %}Restore and repeat per innovator when real profiles are available.
+    <div class="build-cards-grid support-grid">
+        <article class="build-card innovator-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></div>
+            <span class="mv-label">Student or team name</span>
+            <h3>{{ innovator.name }}</h3>
+            <p class="innovator-field"><span class="mv-label">School</span>{{ innovator.school }}</p>
+            <p class="innovator-field"><span class="mv-label">Innovation</span>{{ innovator.innovation }}</p>
+            <p class="innovator-field"><span class="mv-label">Category</span>{{ innovator.category }}</p>
+            <p class="innovator-field"><span class="mv-label">What they are building</span>{{ innovator.building }}</p>
+            <p class="innovator-field"><span class="mv-label">Achievements</span>{{ innovator.achievements }}</p>
+            <p class="innovator-field"><span class="mv-label">Where they are going next</span>{{ innovator.next_steps }}</p>
+            <p class="innovator-field"><span class="mv-label">What they need</span>{{ innovator.needs }}</p>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Support this innovator</a>
+        </article>
+    </div>
+    {% endcomment %}
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Want to back a young innovator?</h2>
+    <p>Tell us how you would like to support and we will connect you.</p>
+    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+</section>
+
+{% endblock %}
