@@ -2188,3 +2188,28 @@ section h2 {
 .build-cards-grid.prep-grid {
     margin-top: 36px;
 }
+
+/* ===== Our Ecosystem page ===== */
+
+/* Anchor target clears the sticky header */
+#partner-categories {
+    scroll-margin-top: 100px;
+}
+
+/* The whole card is the link, so give it the sitewide focus ring */
+a.build-card:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+}
+
+/* Existing partner named inside a category block */
+.build-card .partner-name {
+    margin-top: 12px;
+    color: var(--navy);
+    font-weight: 600;
+}
+
+/* Grey logo placeholder sits below the category text */
+.build-card .logo-placeholder {
+    margin-top: 16px;
+}
