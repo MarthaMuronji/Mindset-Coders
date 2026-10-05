@@ -2232,3 +2232,10 @@ a.build-card:focus-visible {
 #products .build-card .logo-placeholder {
     margin-top: 0;
 }
+
+/* ===== Impact and Stories page ===== */
+
+/* Placeholder label sits below the story line */
+.build-card .story-card-placeholder {
+    margin-top: 14px;
+}

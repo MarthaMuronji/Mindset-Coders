@@ -13,6 +13,7 @@ TOPIC_STARTERS = {
     'university': 'I would like to know more about University Preparation.',
     'products': 'I would like to know more about your products and resources.',
     'partner': 'I would like to partner with Mindset Coders.',
+    'story': 'I would like to share a story with Mindset Coders.',
 }
 
 
@@ -88,6 +89,9 @@ PRODUCTS = [
 
 def shop(request):
     return render(request, 'shop.html', {'products': PRODUCTS})
+
+def impact(request):
+    return render(request, 'impact.html')
 
 def blog(request):
     posts = Post.objects.filter(published=True)
