@@ -1,15 +1,21 @@
 {% load static %}
+{% load seo_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% canonical_url request as canonical %}
     <title>{% block title %}Mindset Coders Uganda{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Mindset Coders is a STEAM EdTech product company building learning pathways, tools and resources for learners and schools in Uganda.{% endblock %}">
+    <link rel="canonical" href="{{ canonical }}">
     <meta property="og:title" content="{% block meta_title_og %}Mindset Coders Uganda{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Mindset Coders is a STEAM EdTech product company building learning pathways, tools and resources for learners and schools in Uganda.{% endblock %}">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:url" content="{{ canonical }}">
+    <meta property="og:site_name" content="Mindset Coders Uganda">
+    <meta name="twitter:card" content="summary">
+    <!-- og:image goes here when there is an image file worth sharing -->
     <meta name="theme-color" content="#16324F">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
