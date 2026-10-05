@@ -75,6 +75,20 @@ def innovators_circle(request):
 def university_preparation(request):
     return render(request, 'university_preparation.html')
 
+# Shop page products: adding one entry here adds one product tile on the page.
+PRODUCTS = [
+    {'name': "Byte's World / Coding Unplugged"},
+    {'name': 'Byte Thinks'},
+    {'name': 'RoboBOX'},
+    {'name': 'Robotics kits'},
+    {'name': 'STEAM learning kits'},
+    {'name': 'Teacher resources'},
+    {'name': 'Mission cards and other learning resources'},
+]
+
+def shop(request):
+    return render(request, 'shop.html', {'products': PRODUCTS})
+
 def blog(request):
     posts = Post.objects.filter(published=True)
     return render(request, 'blog.html', {'posts': posts})
