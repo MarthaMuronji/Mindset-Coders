@@ -2220,3 +2220,15 @@ a.build-card:focus-visible {
 #contact-form {
     scroll-margin-top: 100px;
 }
+
+/* ===== Shop page ===== */
+
+/* Anchor target from the hero button clears the sticky header */
+#products {
+    scroll-margin-top: 100px;
+}
+
+/* The photo placeholder is the first block in each product tile */
+#products .build-card .logo-placeholder {
+    margin-top: 0;
+}
