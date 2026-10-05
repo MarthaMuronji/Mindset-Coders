@@ -3,6 +3,7 @@ from .models import Post, ContactMessage
 from django.contrib import messages
 from django.shortcuts import redirect
 from .forms import ContactForm
+from .notifications import send_contact_notification
 
 # Starting text for the message box when someone arrives from a route card.
 # Any other topic value is ignored, and the value is never printed anywhere.
@@ -36,7 +37,7 @@ def contact(request):
         if form.is_valid():
             # Keep the message so the team can read it and mark it handled in the admin
             try:
-                ContactMessage.objects.create(
+                contact_message = ContactMessage.objects.create(
                     name=form.cleaned_data['name'],
                     email=form.cleaned_data['email'],
                     role=form.cleaned_data['role'],
@@ -46,6 +47,12 @@ def contact(request):
                 # Saving failed, so keep the typed input and ask the sender to retry
                 messages.error(request, "Sorry, we could not send your message. Please try again in a moment.")
             else:
+                # Notify the team, but never let the email change the outcome above
+                admin_url = request.build_absolute_uri('/admin/core/contactmessage/')
+                try:
+                    send_contact_notification(contact_message, admin_url)
+                except Exception:
+                    pass
                 messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
                 return redirect('contact')
     else:
