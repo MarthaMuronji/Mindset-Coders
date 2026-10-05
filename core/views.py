@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Post
+from .models import Post, ContactMessage
 from django.contrib import messages
 from django.shortcuts import redirect
 from .forms import ContactForm
@@ -34,9 +34,20 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            # For now, just confirm receipt — email sending wired up later
-            messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
-            return redirect('contact')
+            # Keep the message so the team can read it and mark it handled in the admin
+            try:
+                ContactMessage.objects.create(
+                    name=form.cleaned_data['name'],
+                    email=form.cleaned_data['email'],
+                    role=form.cleaned_data['role'],
+                    message=form.cleaned_data['message'],
+                )
+            except Exception:
+                # Saving failed, so keep the typed input and ask the sender to retry
+                messages.error(request, "Sorry, we could not send your message. Please try again in a moment.")
+            else:
+                messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
+                return redirect('contact')
     else:
         starter = TOPIC_STARTERS.get(request.GET.get('topic', ''))
         initial = {}
