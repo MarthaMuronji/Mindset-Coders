@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}University Preparation | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}University Preparation brings SAT preparation and support for studying in the United States to Mindset Coders learners. It is delivered in partnership with Prep Genius, India.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">University Preparation</span>
+    <h1>Prepare for the next step beyond school</h1>
+    <p>University Preparation brings SAT preparation and support for studying in the United States to Mindset Coders learners. It is delivered in partnership with Prep Genius, India.</p>
+    <div class="hero-actions">
+        <a href="{% url 'contact' %}" class="btn btn-green">Register your interest</a>
+        <a href="#what-you-can-prepare-for" class="btn btn-outline">What you can prepare for</a>
+    </div>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <div class="section-split">
+        <div class="section-split-text">
+            <h2>Delivered with Prep Genius</h2>
+            <p>Mindset Coders works with strategic partners to open up education and university opportunities for learners. Our first university preparation partner is Prep Genius, based in India.</p>
+        </div>
+        <div class="logo-placeholder">Prep Genius logo coming soon</div>
+    </div>
+</section>
+
+<section class="home-section section-tint section-decor reveal" id="what-you-can-prepare-for">
+    <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
+    <h2>What you can prepare for</h2>
+    <div class="build-cards-grid prep-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></div>
+            <h3>SAT preparation</h3>
+            <p>Preparation for the SAT, the entrance test many universities in the United States ask for.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></div>
+            <h3>Other entrance tests</h3>
+            <p>Preparation for other relevant university entrance tests as the partnership grows.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-plane"></i></div>
+            <h3>Studying in the United States</h3>
+            <p>Resources and support for students who are interested in studying at universities in the United States.</p>
+        </div>
+    </div>
+</section>
+
+<section class="home-section reveal">
+    <h2>Who this is for</h2>
+    <p class="section-subtitle">Students who are thinking about university in the United States and want to prepare for the SAT and related tests. If that is you, register your interest and take the first step.</p>
+    <div class="section-cta-wrap">
+        <a href="{% url 'contact' %}" class="btn btn-green">Register your interest</a>
+    </div>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Ready to take the next step?</h2>
+    <p>Register your interest in University Preparation, or explore the other opportunities Mindset Coders opens up for learners.</p>
+    <div class="cta-banner-actions">
+        <a href="{% url 'contact' %}" class="btn btn-green">Register your interest</a>
+        <a href="{% url 'global_opportunities' %}" class="btn btn-outline btn-outline-light">Explore Global Opportunities</a>
+    </div>
+</section>
+
+{% endblock %}

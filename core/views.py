@@ -56,6 +56,9 @@ def partners(request):
 def innovators_circle(request):
     return render(request, 'innovators_circle.html')
 
+def university_preparation(request):
+    return render(request, 'university_preparation.html')
+
 def blog(request):
     posts = Post.objects.filter(published=True)
     return render(request, 'blog.html', {'posts': posts})
