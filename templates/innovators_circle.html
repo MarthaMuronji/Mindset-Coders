@@ -69,28 +69,28 @@
             <h3>Fund</h3>
             <p>Contribute toward travel, competition, pitch and other participation costs.</p>
             <!-- TODO: link to a funding or payment route when the client confirms how people can give -->
-            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Fund an innovator</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm" data-umami-event="contact-general" data-umami-event-from="innovators-circle">Fund an innovator</a>
         </div>
         <div class="build-card reveal reveal-delay-2">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-toolbox"></i></div>
             <h3>Equip</h3>
             <p>Provide materials, technology, tools or other resources needed to develop an innovation.</p>
             <!-- TODO: link to an equipment or donation route when the client confirms how people can give -->
-            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Equip an innovator</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm" data-umami-event="contact-general" data-umami-event-from="innovators-circle">Equip an innovator</a>
         </div>
         <div class="build-card reveal reveal-delay-3">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-user-group"></i></div>
             <h3>Mentor</h3>
             <p>Offer business, technical, creative or industry expertise.</p>
             <!-- TODO: link to a mentor sign up route when the client confirms how mentors apply -->
-            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Mentor an innovator</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm" data-umami-event="contact-general" data-umami-event-from="innovators-circle">Mentor an innovator</a>
         </div>
         <div class="build-card reveal reveal-delay-4">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></div>
             <h3>Partner</h3>
             <p>Support an innovation commercially, strategically or through institutional collaboration.</p>
             <!-- TODO: link to a partnership route when the client confirms how partners get in touch -->
-            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Partner with us</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm" data-umami-event="contact-general" data-umami-event-from="innovators-circle">Partner with us</a>
         </div>
     </div>
 </section>
@@ -116,7 +116,7 @@
             <p class="innovator-field"><span class="mv-label">Achievements</span>{{ innovator.achievements }}</p>
             <p class="innovator-field"><span class="mv-label">Where they are going next</span>{{ innovator.next_steps }}</p>
             <p class="innovator-field"><span class="mv-label">What they need</span>{{ innovator.needs }}</p>
-            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm">Support this innovator</a>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-sm" data-umami-event="contact-general" data-umami-event-from="innovators-circle">Support this innovator</a>
         </article>
     </div>
     {% endcomment %}
@@ -125,7 +125,7 @@
 <section class="cta-banner reveal">
     <h2>Want to back a young innovator?</h2>
     <p>Tell us how you would like to support and we will connect you.</p>
-    <a href="{% url 'contact' %}" class="btn btn-primary">Get in touch</a>
+    <a href="{% url 'contact' %}" class="btn btn-primary" data-umami-event="contact-general" data-umami-event-from="innovators-circle">Get in touch</a>
 </section>
 
 {% endblock %}

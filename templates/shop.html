@@ -12,7 +12,7 @@
     <h1>Learning kits and resources</h1>
     <p>Physical and digital learning products from Mindset Coders, for schools, teachers and learners.</p>
     <div class="hero-actions">
-        <a href="{% url 'contact' %}?topic=products" class="btn btn-green">Ask about a product</a>
+        <a href="{% url 'contact' %}?topic=products" class="btn btn-green" data-umami-event="contact-products" data-umami-event-from="shop">Ask about a product</a>
         <a href="#products" class="btn btn-outline">See the products</a>
     </div>
 </section>
@@ -28,7 +28,7 @@
             <div class="logo-placeholder">Photo coming soon</div>
             <h3>{{ product.name }}</h3>
             <p>Details coming soon</p>
-            <a href="{% url 'contact' %}?topic=products" class="btn btn-green btn-sm">Ask about this</a>
+            <a href="{% url 'contact' %}?topic=products" class="btn btn-green btn-sm" data-umami-event="contact-products" data-umami-event-from="shop" data-umami-event-product="{{ product.name }}">Ask about this</a>
         </div>
         {% endfor %}
     </div>
@@ -43,7 +43,7 @@
     <h2>Looking for something for your school?</h2>
     <p>Tell us what you need and we will get back to you.</p>
     <div class="cta-banner-actions">
-        <a href="{% url 'contact' %}?topic=products" class="btn btn-green">Ask about products</a>
+        <a href="{% url 'contact' %}?topic=products" class="btn btn-green" data-umami-event="contact-products" data-umami-event-from="shop">Ask about products</a>
         <a href="{% url 'for_schools' %}" class="btn btn-outline btn-outline-light">Bring STEAM to Your School</a>
     </div>
 </section>

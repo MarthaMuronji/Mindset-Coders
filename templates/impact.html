@@ -79,7 +79,7 @@
             <p>{{ story.summary }}</p>
             <p class="story-card-placeholder">{{ story.quote }}</p>
             <p class="mv-label">{{ story.who }}</p>
-            <a href="{% url 'contact' %}?topic=story" class="btn btn-green btn-sm">Share a story</a>
+            <a href="{% url 'contact' %}?topic=story" class="btn btn-green btn-sm" data-umami-event="contact-story" data-umami-event-from="impact">Share a story</a>
         </article>
     </div>
     -->
@@ -89,7 +89,7 @@
     <h2>Have a story to share?</h2>
     <p>If a learner, school or teacher has something worth telling, we would love to hear it.</p>
     <div class="cta-banner-actions">
-        <a href="{% url 'contact' %}?topic=story" class="btn btn-green">Share a story</a>
+        <a href="{% url 'contact' %}?topic=story" class="btn btn-green" data-umami-event="contact-story" data-umami-event-from="impact">Share a story</a>
         <a href="{% url 'global_opportunities' %}" class="btn btn-outline btn-outline-light">Explore Global Opportunities</a>
     </div>
 </section>

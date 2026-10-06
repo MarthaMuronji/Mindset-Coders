@@ -14,7 +14,7 @@
         <h1>We build <span class="hero-steam">STEAM</span> learning pathways</h1>
         <p>We build the tools, resources and systems that enable STEAM education, from curiosity to creation.</p>
         <div class="hero-actions">
-            <a href="{% url 'mindset_learn' %}" class="btn btn-primary">Join Mindset Learn</a>
+            <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
             <a href="{% url 'for_schools' %}" class="btn btn-outline">Bring STEAM to Your School</a>
         </div>
     </div>
@@ -92,7 +92,7 @@
                 <span class="pricing-chip">Registration: UGX 5,000</span>
                 <span class="pricing-chip">Six levels: UGX 20,000 each</span>
             </div>
-            <a href="{% url 'mindset_learn' %}" class="btn btn-primary">Join Mindset Learn</a>
+            <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
         </div>
         <div class="img-slot img-slot--mindset-learn">
             <!-- TODO: static/images/mindset-learn.jpg -->
@@ -278,10 +278,10 @@
 <section class="cta-banner reveal">
     <h2>Ready to be part of it?</h2>
     <div class="cta-banner-actions">
-        <a href="{% url 'mindset_learn' %}" class="btn btn-primary">Join Mindset Learn</a>
+        <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
         <a href="{% url 'for_schools' %}" class="btn btn-outline btn-outline-light">Bring STEAM to Your School</a>
         <!-- TODO: link to Shop page when built -->
-        <a href="{% url 'contact' %}" class="btn btn-outline btn-outline-light">Shop</a>
+        <a href="{% url 'contact' %}" class="btn btn-outline btn-outline-light" data-umami-event="contact-general" data-umami-event-from="home">Shop</a>
         <a href="{% url 'partners' %}" class="btn btn-outline btn-outline-light">Partner With Us</a>
     </div>
 </section>

@@ -16,6 +16,10 @@
     <meta property="og:site_name" content="Mindset Coders Uganda">
     <meta name="twitter:card" content="summary">
     <!-- og:image goes here when there is an image file worth sharing -->
+    {% umami_website_id as umami_id %}
+    {% if umami_id %}
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ umami_id }}"></script>
+    {% endif %}
     <meta name="theme-color" content="#16324F">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +57,7 @@
     <li><a href="{% url 'partners' %}">Our Ecosystem</a></li>
     <li><a href="{% url 'contact' %}">Contact</a></li>
 </ul>
-                <a href="#" class="btn btn-login">Login</a>
+                <a href="#" class="btn btn-login" data-umami-event="login-click">Login</a>
             </div>
         </nav>
     </header>
