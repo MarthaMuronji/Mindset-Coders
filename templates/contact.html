@@ -21,37 +21,37 @@
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></div>
             <h3>Students and parents</h3>
             <p>Access STEAM learning and opportunities.</p>
-            <a href="{% url 'contact' %}?topic=learner#contact-form" class="btn btn-green btn-sm">Register your interest</a>
+            <a href="{% url 'contact' %}?topic=learner#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-learner" data-umami-event-from="contact">Register your interest</a>
         </div>
         <div class="build-card reveal reveal-delay-2">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-school"></i></div>
             <h3>Schools</h3>
             <p>Adopt a STEAM pathway for your learners.</p>
-            <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-green btn-sm">Bring STEAM to Your School</a>
+            <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-school" data-umami-event-from="contact">Bring STEAM to Your School</a>
         </div>
         <div class="build-card reveal reveal-delay-3">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-globe"></i></div>
             <h3>Global opportunities</h3>
             <p>Find competitions and international opportunities.</p>
-            <a href="{% url 'contact' %}?topic=global#contact-form" class="btn btn-green btn-sm">Ask about global opportunities</a>
+            <a href="{% url 'contact' %}?topic=global#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-global" data-umami-event-from="contact">Ask about global opportunities</a>
         </div>
         <div class="build-card reveal reveal-delay-4">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
             <h3>University Preparation</h3>
             <p>Prepare for the SAT and related tests with Prep Genius.</p>
-            <a href="{% url 'contact' %}?topic=university#contact-form" class="btn btn-green btn-sm">Ask about University Preparation</a>
+            <a href="{% url 'contact' %}?topic=university#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-university" data-umami-event-from="contact">Ask about University Preparation</a>
         </div>
         <div class="build-card reveal reveal-delay-5">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
             <h3>Products and resources</h3>
             <p>Learning kits and resources for schools and learners.</p>
-            <a href="{% url 'contact' %}?topic=products#contact-form" class="btn btn-green btn-sm">Ask about products</a>
+            <a href="{% url 'contact' %}?topic=products#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-products" data-umami-event-from="contact">Ask about products</a>
         </div>
         <div class="build-card reveal reveal-delay-1">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></div>
             <h3>Partners</h3>
             <p>Collaborate, fund or expand the ecosystem.</p>
-            <a href="{% url 'contact' %}?topic=partner#contact-form" class="btn btn-green btn-sm">Partner With Us</a>
+            <a href="{% url 'contact' %}?topic=partner#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-partner" data-umami-event-from="contact">Partner With Us</a>
         </div>
     </div>
 </section>
@@ -63,6 +63,15 @@
         {% if messages %}
             {% for message in messages %}
                 <div class="form-success{% if message.tags == 'error' %} form-error{% endif %}">{{ message }}</div>
+                {% if message.tags == 'success' %}
+                <script>
+                    window.addEventListener('load', function () {
+                        if (window.umami) {
+                            window.umami.track('contact-form-sent');
+                        }
+                    });
+                </script>
+                {% endif %}
             {% endfor %}
         {% endif %}
 
