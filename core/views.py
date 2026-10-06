@@ -106,7 +106,7 @@ def university_preparation(request):
 # Shop page products: adding one entry here adds one product tile on the page.
 PRODUCTS = [
     {'name': "Byte's World / Coding Unplugged"},
-    {'name': 'Byte Thinks'},
+    {'name': 'Byte Thinks / AI Unplugged'},
     {'name': 'RoboBOX'},
     {'name': 'Robotics kits'},
     {'name': 'STEAM learning kits'},
