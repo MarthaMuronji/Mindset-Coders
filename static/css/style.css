@@ -2248,3 +2248,17 @@ a.build-card:focus-visible {
     background: var(--navy);
     color: var(--white);
 }
+
+/* ===== Round 2: old pages merged into the new sections ===== */
+
+/* Anchor targets from the old page redirects clear the sticky header */
+#programs,
+#teacher-training,
+#how-competitions-work {
+    scroll-margin-top: 100px;
+}
+
+/* Cards sit below the section heading when there is no intro line */
+#how-competitions-work .build-cards-grid {
+    margin-top: 36px;
+}

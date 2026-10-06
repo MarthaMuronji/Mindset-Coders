@@ -37,9 +37,6 @@ def mindset_learn(request):
 def about(request):
     return render(request, 'about.html')
 
-def programs(request):
-    return render(request, 'programs.html')
-
 def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -61,7 +58,7 @@ def contact(request):
                 try:
                     send_contact_notification(contact_message, admin_url)
                 except Exception:
-                    pass
+                    logger.exception("Failed to send contact notification")
                 messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
                 return redirect('contact')
     else:
@@ -73,26 +70,11 @@ def contact(request):
         form = ContactForm(initial=initial)
     return render(request, 'contact.html', {'form': form})
 
-def competitions(request):
-    return render(request, 'competitions.html')
-
 def global_opportunities(request):
     return render(request, 'global_opportunities.html')
 
 def for_schools(request):
     return render(request, 'for_schools.html')
-
-def for_educators(request):
-    return render(request, 'for_educators.html')
-
-def events(request):
-    return render(request, 'events.html')
-
-def resources(request):
-    return render(request, 'resources.html')
-
-def for_learners(request):
-    return render(request, 'for_learners.html')
 
 def partners(request):
     return render(request, 'partners.html')
