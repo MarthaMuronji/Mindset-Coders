@@ -49,12 +49,11 @@
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-collapse">
-                <!-- Planned nav items when pages exist: Shop -->
                 <ul class="nav-links">
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'about' %}">About</a></li>
     <li><a href="{% url 'mindset_learn' %}">Mindset Learn</a></li>
-    <li><a href="{% url 'programs' %}">Programs</a></li>
+    <li><a href="{% url 'shop' %}">Shop</a></li>
     <li><a href="{% url 'for_schools' %}">For Schools</a></li>
     <li><a href="{% url 'global_opportunities' %}">Global Opportunities</a></li>
     <li><a href="{% url 'partners' %}">Our Ecosystem</a></li>
@@ -74,12 +73,7 @@
         <div class="footer-brand">mindset<span class="logo-accent">&lt;/&gt;</span></div>
 
         <ul class="footer-links">
-    <li><a href="{% url 'events' %}">Events</a></li>
-    <li><a href="{% url 'resources' %}">Resources</a></li>
-    <li><a href="{% url 'blog' %}">Blog</a></li>
-    <li><a href="{% url 'for_educators' %}">For Educators</a></li>
-    <li><a href="{% url 'for_learners' %}">For Learners</a></li>
-    <li><a href="{% url 'competitions' %}">Competitions</a></li>
+    {% comment %}restore the Blog link when posts exist{% endcomment %}
     <li><a href="{% url 'innovators_circle' %}">Innovators' Circle</a></li>
     <li><a href="{% url 'university_preparation' %}">University Preparation</a></li>
     <li><a href="{% url 'shop' %}">Shop</a></li>
