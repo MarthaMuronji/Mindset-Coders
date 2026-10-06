@@ -181,7 +181,7 @@
         <span class="product-pill reveal reveal-delay-5"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Teacher resources</span>
     </div>
     <!-- TODO: link to Shop page when built -->
-    <p class="section-cta-wrap"><a href="{% url 'shop' %}" class="btn btn-primary">Shop Mindset Coders</a></p>
+    <p class="section-cta-wrap"><a href="{% url 'shop' %}" class="btn btn-primary" data-umami-event="go-shop" data-umami-event-from="home">Shop Mindset Coders</a></p>
 </section>
 
 <section class="home-section home-impact reveal">
@@ -281,7 +281,7 @@
         <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
         <a href="{% url 'for_schools' %}" class="btn btn-outline btn-outline-light">Bring STEAM to Your School</a>
         <!-- TODO: link to Shop page when built -->
-        <a href="{% url 'contact' %}" class="btn btn-outline btn-outline-light" data-umami-event="contact-general" data-umami-event-from="home">Shop</a>
+        <a href="{% url 'shop' %}" class="btn btn-outline btn-outline-light" data-umami-event="go-shop" data-umami-event-from="home">Shop</a>
         <a href="{% url 'partners' %}" class="btn btn-outline btn-outline-light">Partner With Us</a>
     </div>
 </section>

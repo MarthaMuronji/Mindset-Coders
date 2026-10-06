@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -5,6 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import ContactForm
 from .models import ContactMessage, Post
 from .notifications import send_contact_notification
+
+logger = logging.getLogger(__name__)
 
 # Starting text for the message box when someone arrives from a route card.
 # Any other topic value is ignored, and the value is never printed anywhere.
@@ -16,6 +20,10 @@ TOPIC_STARTERS = {
     'products': 'I would like to know more about your products and resources.',
     'partner': 'I would like to partner with Mindset Coders.',
     'story': 'I would like to share a story with Mindset Coders.',
+    'fund': "I would like to fund a young innovator through the Innovators' Circle.",
+    'equip': "I would like to equip a young innovator through the Innovators' Circle.",
+    'mentor': "I would like to mentor a young innovator through the Innovators' Circle.",
+    'circle-partner': "I would like to partner with the Innovators' Circle.",
 }
 
 
