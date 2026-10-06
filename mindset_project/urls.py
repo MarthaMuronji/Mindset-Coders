@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
+from django.templatetags.static import static
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 from core import views as core_views
 from core.sitemaps import StaticViewSitemap
@@ -27,6 +29,7 @@ sitemaps = {
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('favicon.ico', RedirectView.as_view(url=static('images/favicon-32.png'), permanent=False), name='favicon'),
     path('robots.txt', core_views.robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django-sitemaps'),
     path('', include('core.urls')),
