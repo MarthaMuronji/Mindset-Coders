@@ -2262,3 +2262,11 @@ a.build-card:focus-visible {
 #how-competitions-work .build-cards-grid {
     margin-top: 36px;
 }
+
+/* ===== Login text link on the dark CTA banner ===== */
+
+/* The see-all-link green is for light backgrounds and only reaches about
+   2.4:1 on the navy gradient, so white is used instead (about 13:1). */
+.cta-banner .see-all-link a {
+    color: var(--white);
+}
