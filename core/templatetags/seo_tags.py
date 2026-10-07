@@ -2,6 +2,7 @@
 import os
 
 from django import template
+from django.templatetags.static import static
 
 register = template.Library()
 
@@ -12,6 +13,18 @@ def canonical_url(request):
     if not hasattr(request, 'build_absolute_uri'):
         return ''
     return request.build_absolute_uri(request.path)
+
+
+@register.simple_tag
+def static_absolute_url(request, path):
+    """Absolute address of a static file for the current request."""
+    if not hasattr(request, 'build_absolute_uri'):
+        return ''
+    url = request.build_absolute_uri(static(path))
+    host = request.get_host().partition(':')[0]
+    if host not in ('localhost', '127.0.0.1') and url.startswith('http://'):
+        url = 'https://' + url[len('http://'):]
+    return url
 
 
 @register.simple_tag

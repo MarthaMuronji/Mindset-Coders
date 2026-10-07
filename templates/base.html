@@ -14,8 +14,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ canonical }}">
     <meta property="og:site_name" content="Mindset Coders Uganda">
-    <meta name="twitter:card" content="summary">
-    <!-- og:image goes here when there is an image file worth sharing -->
+    <meta name="twitter:card" content="summary_large_image">
+    {% static_absolute_url request 'images/og-image.png' as og_image %}
+    <meta property="og:image" content="{{ og_image }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Mindset Coders: we build the tools, resources and systems that enable STEAM education">
+    <meta name="twitter:image" content="{{ og_image }}">
     {% umami_website_id as umami_id %}
     {% if umami_id %}
     <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ umami_id }}"></script>
