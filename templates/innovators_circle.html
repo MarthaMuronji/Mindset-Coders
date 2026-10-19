@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}The Innovators' Circle | Mindset Coders Uganda{% endblock %}
 {% block meta_title_og %}The Innovators' Circle | Mindset Coders Uganda{% endblock %}
@@ -102,6 +103,9 @@
     <div class="trusted-by innovators-empty reveal reveal-delay-1">
         <span class="why-icon steam-pathway-icon" aria-hidden="true"><i class="fa-solid fa-hourglass-half"></i></span>
         <p>Featured innovators will appear here soon.</p>
+    </div>
+    <div class="img-slot img-slot--wide">
+        <img src="{% static 'images/innovators-page.jpg' %}" alt="A student presenting her robot to a teammate at the Uganda National Championship" width="900" height="600" loading="lazy" onerror="this.remove()">
     </div>
     {% comment %}Restore and repeat per innovator when real profiles are available.
     <div class="build-cards-grid support-grid">
