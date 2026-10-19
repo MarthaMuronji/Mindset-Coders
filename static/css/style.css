@@ -2283,3 +2283,13 @@ a.build-card:focus-visible {
     object-fit: cover;
     border-radius: 16px;
 }
+
+/* ===== Standalone photo slot on inner pages ===== */
+
+/* The default .img-slot box is 4 / 3; these slots hold 3 / 2 photos, so the
+   box follows the photo shape (cover then crops nothing) and the top margin
+   separates the photo from the card grid above, which has no bottom gap. */
+.img-slot--wide {
+    aspect-ratio: 3 / 2;
+    margin-top: 32px;
+}
