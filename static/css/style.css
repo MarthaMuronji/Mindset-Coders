@@ -2270,3 +2270,16 @@ a.build-card:focus-visible {
 .cta-banner .see-all-link a {
     color: var(--white);
 }
+
+/* ===== For Schools: How It Works photo ===== */
+
+/* The block this replaced had no aspect box, so the photo gets its own:
+   width fills the column, height follows the 3 / 2 ratio, and cover crops
+   the 900x600 file without distortion or a layout jump while loading. */
+.story-image img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 16px;
+}
