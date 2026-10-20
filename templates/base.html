@@ -22,7 +22,7 @@
     <meta property="og:image:alt" content="Mindset Coders: we build the tools, resources and systems that enable STEAM education">
     <meta name="twitter:image" content="{{ og_image }}">
     {% umami_website_id as umami_id %}
-    {% if umami_id %}
+    {% if umami_id and not hide_umami %}
     <script defer src="https://cloud.umami.is/script.js" data-website-id="{{ umami_id }}"></script>
     {% endif %}
     <meta name="theme-color" content="#16324F">

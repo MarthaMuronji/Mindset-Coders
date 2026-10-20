@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Stories to review | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Stories to review | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Private team page for reviewing the stories shared on the Mindset Coders website.{% endblock %}
+{% block og_description %}Private team page for reviewing the stories shared on the Mindset Coders website.{% endblock %}
+
+{% block content %}
+
+<section class="home-section">
+    <div class="review-head">
+        <h1>Stories to review</h1>
+        <div class="review-head-actions">
+            <a href="{% url 'impact' %}" class="btn btn-green btn-sm">View Impact page</a>
+            <a href="{% url 'review_password' %}" class="btn btn-outline btn-sm">Change password</a>
+            <form method="post" action="{% url 'review_logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline btn-sm">Log out</button>
+            </form>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="form-success{% if message.tags == 'error' %} form-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <nav class="review-tabs" aria-label="Story status">
+        <a href="{% url 'review_list' %}?tab=waiting" class="review-tab{% if tab == 'waiting' %} review-tab--active{% endif %}">Waiting <span class="review-tab-count">{{ counts.waiting }}</span></a>
+        <a href="{% url 'review_list' %}?tab=published" class="review-tab{% if tab == 'published' %} review-tab--active{% endif %}">Published <span class="review-tab-count">{{ counts.published }}</span></a>
+        <a href="{% url 'review_list' %}?tab=rejected" class="review-tab{% if tab == 'rejected' %} review-tab--active{% endif %}">Not published <span class="review-tab-count">{{ counts.rejected }}</span></a>
+    </nav>
+
+    {% if show_help %}
+    <p class="review-help">Before you approve a story, check that it is kind and accurate, has no phone numbers or home addresses, and that any child in it has a parent or guardian's permission.</p>
+    {% endif %}
+
+    {% for story in stories %}
+    <article class="review-card">
+        <div class="review-card-head">
+            <span class="mv-label">{{ story.get_category_display }}</span>
+            <span class="review-card-meta">{{ story.get_role_display }} &middot; {{ story.created_at|date:'j F Y, H:i' }}</span>
+        </div>
+        <dl class="review-facts">
+            <div>
+                <dt>Name on the website</dt>
+                <dd>{{ story.display_name }}</dd>
+            </div>
+            <div>
+                <dt>Submitted by</dt>
+                <dd>{{ story.name }}</dd>
+            </div>
+            <div>
+                <dt>Email</dt>
+                <dd>{{ story.email }}</dd>
+            </div>
+            <div>
+                <dt>Consent</dt>
+                <dd>{% if story.consent %}Given{% else %}Not given{% endif %}</dd>
+            </div>
+        </dl>
+        <p class="review-mail-row">
+            <a class="review-mail" href="mailto:{{ story.email }}?subject=Your%20story%20on%20Mindset%20Coders">Email the sender</a>
+        </p>
+        <form method="post" action="{% url 'review_action' story.pk %}?tab={{ tab }}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ story.edit_form.story.id_for_label }}">{{ story.edit_form.story.label }}</label>
+                {{ story.edit_form.story.errors }}
+                {{ story.edit_form.story }}
+            </div>
+            <div class="form-group">
+                <label for="{{ story.edit_form.category.id_for_label }}">{{ story.edit_form.category.label }}</label>
+                {{ story.edit_form.category.errors }}
+                {{ story.edit_form.category }}
+            </div>
+            <div class="form-group">
+                <label for="{{ story.edit_form.display_as.id_for_label }}">{{ story.edit_form.display_as.label }}</label>
+                {{ story.edit_form.display_as.errors }}
+                {{ story.edit_form.display_as }}
+            </div>
+            <div class="review-buttons">
+                <button type="submit" name="action" value="publish" class="btn btn-green">Approve and publish</button>
+                <button type="submit" name="action" value="save" class="btn btn-green">Save changes</button>
+                <button type="submit" name="action" value="reject" class="btn btn-outline">Do not publish</button>
+                {% if tab == 'published' %}
+                <button type="submit" name="action" value="take_down" class="btn btn-outline">Take down</button>
+                {% endif %}
+                {% if tab == 'rejected' %}
+                <button type="submit" name="action" value="waiting" class="btn btn-outline">Move back to waiting</button>
+                {% endif %}
+            </div>
+        </form>
+    </article>
+    {% empty %}
+    <p class="story-card-placeholder">{% if tab == 'waiting' %}No stories are waiting. When someone shares a story you will get an email.{% elif tab == 'published' %}No published stories yet.{% else %}No stories marked as not published.{% endif %}</p>
+    {% endfor %}
+</section>
+
+{% endblock %}

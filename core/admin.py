@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from .models import Post, ContactMessage, Story
 
 
@@ -25,14 +26,27 @@ class StoryAdmin(admin.ModelAdmin):
     list_display = ('created_at', 'name', 'category', 'role', 'approved')
     list_filter = ('approved', 'category')
     search_fields = ('name', 'story')
+    # The review area owns the review marks, so the admin only shows them
+    readonly_fields = ('rejected', 'reviewed_at', 'reviewed_by')
     actions = ('approve_selected', 'unapprove_selected')
 
     @admin.action(description='Approve selected')
     def approve_selected(self, request, queryset):
-        count = queryset.update(approved=True)
+        count = queryset.update(
+            approved=True,
+            rejected=False,
+            reviewed_at=timezone.now(),
+            reviewed_by=request.user,
+        )
         self.message_user(request, 'Approved {} selected {}.'.format(count, 'story' if count == 1 else 'stories'))
 
     @admin.action(description='Unapprove selected')
     def unapprove_selected(self, request, queryset):
-        count = queryset.update(approved=False)
+        # Back to waiting, with the review marks cleared
+        count = queryset.update(
+            approved=False,
+            rejected=False,
+            reviewed_at=None,
+            reviewed_by=None,
+        )
         self.message_user(request, 'Unapproved {} selected {}.'.format(count, 'story' if count == 1 else 'stories'))
