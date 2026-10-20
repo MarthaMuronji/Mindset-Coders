@@ -29,10 +29,16 @@ def _build_text(contact_message, admin_url):
     if hasattr(contact_message, 'role'):
         lines.append('Role: {}'.format(contact_message.role))
     lines.append('Sent: {}'.format(getattr(contact_message, 'created_at', None)))
+    # A story submission carries its text in "story" instead of "message";
+    # contact messages keep exactly the body they had before
+    if hasattr(contact_message, 'story'):
+        body = contact_message.story
+    else:
+        body = getattr(contact_message, 'message', '')
     lines.extend([
         '',
         'Message:',
-        str(getattr(contact_message, 'message', '')),
+        str(body),
         '',
         'All messages are in the admin: {}'.format(admin_url),
     ])

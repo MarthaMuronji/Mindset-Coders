@@ -1,0 +1,11 @@
+{% comment %}One approved story card, built from the ready to use card that used to
+sit in a comment on the Impact and Stories page. The photo slot stays a
+placeholder because this form takes no photos.{% endcomment %}
+<article class="build-card reveal {{ delay_class }}">
+    <div class="img-slot img-slot--story">
+        <div class="img-slot__placeholder" aria-hidden="true"></div>
+    </div>
+    <span class="mv-label">{{ category_label }}</span>
+    <h3>{{ story.display_name }}</h3>
+    <div class="story-text">{{ story.story|linebreaks }}</div>
+</article>

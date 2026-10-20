@@ -1,11 +1,13 @@
 import logging
 
 from django.contrib import messages
+from django.core.exceptions import ImproperlyConfigured
+from django.db import DatabaseError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ContactForm
-from .models import ContactMessage, Post
+from .forms import ContactForm, StoryForm
+from .models import ContactMessage, Post, Story
 from .notifications import send_contact_notification
 
 logger = logging.getLogger(__name__)
@@ -25,6 +27,10 @@ TOPIC_STARTERS = {
     'mentor': "I would like to mentor a young innovator through the Innovators' Circle.",
     'circle-partner': "I would like to partner with the Innovators' Circle.",
 }
+
+# Shown only after a story has been stored, or after the spam trap has
+# silently swallowed the submission
+STORY_SUCCESS_MESSAGE = 'Thank you for sharing your story. We will read it and may contact you before anything is published.'
 
 
 # Create your views here.
@@ -100,7 +106,47 @@ def shop(request):
     return render(request, 'shop.html', {'products': PRODUCTS})
 
 def impact(request):
-    return render(request, 'impact.html')
+    """The impact page, with approved stories grouped by category."""
+    stories_by_category = {key: [] for key, _label in Story.CATEGORY_CHOICES}
+    try:
+        # Evaluated inside the try, so an unreachable database leaves the
+        # page rendering with the empty state instead of a server error
+        approved_stories = list(Story.objects.filter(approved=True).order_by('-created_at'))
+    except (DatabaseError, ImproperlyConfigured):
+        logger.exception('Approved stories could not be read for the impact page')
+        approved_stories = []
+    for story in approved_stories:
+        if story.category in stories_by_category:
+            stories_by_category[story.category].append(story)
+    return render(request, 'impact.html', {'stories_by_category': stories_by_category})
+
+def share_story(request):
+    if request.method == 'POST':
+        # Spam trap: humans never see this field, so pretend it worked
+        # and store nothing at all
+        if request.POST.get('website', '').strip():
+            messages.success(request, STORY_SUCCESS_MESSAGE)
+            return redirect('share_story')
+        form = StoryForm(request.POST)
+        if form.is_valid():
+            # Keep the story so the team can read it and approve it in the admin
+            try:
+                story = form.save()
+            except Exception:
+                # Saving failed, so keep the typed text and ask to retry
+                messages.error(request, "Sorry, we could not send your story. Please try again in a moment.")
+            else:
+                # Notify the team, but never let the email change the outcome above
+                admin_url = request.build_absolute_uri('/admin/core/story/')
+                try:
+                    send_contact_notification(story, admin_url)
+                except Exception:
+                    logger.exception("Failed to send story notification")
+                messages.success(request, STORY_SUCCESS_MESSAGE)
+                return redirect('share_story')
+    else:
+        form = StoryForm()
+    return render(request, 'share_story.html', {'form': form})
 
 def blog(request):
     posts = Post.objects.filter(published=True)

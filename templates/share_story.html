@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Share your story | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Share your story | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Tell us how Mindset Coders made a difference for you, your child, your school or your community. We read every story and publish nothing without permission.{% endblock %}
+{% block og_description %}Tell us how Mindset Coders made a difference for you, your child, your school or your community. We read every story and publish nothing without permission.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Impact and Stories</span>
+    <h1>Share your story</h1>
+    <p>Tell us how Mindset Coders has made a difference for you, your child, your school or your community. We read every story.</p>
+</section>
+
+<section class="contact-section">
+    <div class="contact-form-wrap story-form-wrap reveal reveal-delay-1">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-success{% if message.tags == 'error' %} form-error{% endif %}">{{ message }}</div>
+                {% if message.tags == 'success' %}
+                <script>
+                    window.addEventListener('load', function () {
+                        if (window.umami) {
+                            window.umami.track('story-form-sent');
+                        }
+                    });
+                </script>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                {{ form.name.errors }}
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email.errors }}
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.role.id_for_label }}">{{ form.role.label }}</label>
+                {{ form.role.errors }}
+                {{ form.role }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                {{ form.category.errors }}
+                {{ form.category }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.story.id_for_label }}">{{ form.story.label }}</label>
+                {{ form.story.errors }}
+                {{ form.story }}
+                <p class="field-hint">{{ form.story.help_text }}</p>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.display_as.id_for_label }}">{{ form.display_as.label }}</label>
+                {{ form.display_as.errors }}
+                {{ form.display_as }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.consent.id_for_label }}" class="consent-label">{{ form.consent }} {{ form.consent.label }}</label>
+                {{ form.consent.errors }}
+            </div>
+            {# Spam trap: hidden by CSS, and never listed in the form's Meta.fields #}
+            <div class="honeypot-field" aria-hidden="true">
+                {{ form.website }}
+            </div>
+            <p class="photos-note">Please do not send photos here. If you have photos, we will ask you to send them by email once we have been in touch, and we only use photos with permission.</p>
+            <button type="submit" class="btn btn-green">Send my story</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

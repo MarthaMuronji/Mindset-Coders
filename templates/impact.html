@@ -43,46 +43,47 @@
     <h2>Stories</h2>
     <p class="section-subtitle">Stories will be added here as they are shared, with permission from the learners, schools and teachers involved.</p>
     <div class="build-cards-grid">
+        {% for story in stories_by_category.learner %}
+        {% include 'story_card.html' with story=story category_label='Learner stories' delay_class='reveal-delay-1' only %}
+        {% empty %}
         <article class="build-card reveal reveal-delay-1">
             <h3>Learner stories</h3>
             <p>What learners build, try and achieve.</p>
             <p class="story-card-placeholder">Stories coming soon</p>
         </article>
+        {% endfor %}
+        {% for story in stories_by_category.school %}
+        {% include 'story_card.html' with story=story category_label='School stories' delay_class='reveal-delay-2' only %}
+        {% empty %}
         <article class="build-card reveal reveal-delay-2">
             <h3>School stories</h3>
             <p>How schools bring STEAM to their learners.</p>
             <p class="story-card-placeholder">Stories coming soon</p>
         </article>
+        {% endfor %}
+        {% for story in stories_by_category.teacher %}
+        {% include 'story_card.html' with story=story category_label='Teacher stories' delay_class='reveal-delay-3' only %}
+        {% empty %}
         <article class="build-card reveal reveal-delay-3">
             <h3>Teacher stories</h3>
             <p>How teachers lead STEAM in the classroom.</p>
             <p class="story-card-placeholder">Stories coming soon</p>
         </article>
+        {% endfor %}
+        {% for story in stories_by_category.competition %}
+        {% include 'story_card.html' with story=story category_label='Competition stories' delay_class='reveal-delay-4' only %}
+        {% empty %}
         <article class="build-card reveal reveal-delay-4">
             <h3>Competition stories</h3>
             <p>Learners on the national and global stage.</p>
             <p class="story-card-placeholder">Stories coming soon</p>
         </article>
+        {% endfor %}
     </div>
-    <!--
-    Ready to use story card. Copy one of these into the grid above when a real story
-    is ready to publish, then fill in the placeholders. The story photo goes in the
-    img-slot block below: swap the placeholder div for the photo when the asset exists.
-
-    <div class="build-cards-grid">
-        <article class="build-card reveal reveal-delay-1">
-            <div class="img-slot img-slot--story">
-                <div class="img-slot__placeholder" aria-hidden="true"></div>
-            </div>
-            <span class="mv-label">Story category</span>
-            <h3>{{ story.headline }}</h3>
-            <p>{{ story.summary }}</p>
-            <p class="story-card-placeholder">{{ story.quote }}</p>
-            <p class="mv-label">{{ story.who }}</p>
-            <a href="{% url 'contact' %}?topic=story" class="btn btn-green btn-sm" data-umami-event="contact-story" data-umami-event-from="impact">Share a story</a>
-        </article>
+    <div class="section-cta-wrap">
+        <a href="{% url 'share_story' %}" class="btn btn-green" data-umami-event="share-story-click" data-umami-event-from="impact">Share your story</a>
+        <p class="story-share-note">Every story is read by our team and nothing is published without permission.</p>
     </div>
-    -->
 </section>
 
 <section class="cta-banner reveal">
