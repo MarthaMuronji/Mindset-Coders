@@ -17,6 +17,7 @@ class StaticViewSitemap(Sitemap):
             'partners',
             'shop',
             'impact',
+            'share_story',
             'contact',
         ]
 

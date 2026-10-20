@@ -37,6 +37,7 @@ urlpatterns = [
     path('university-preparation/', views.university_preparation, name='university_preparation'),
     path('shop/', views.shop, name='shop'),
     path('impact/', views.impact, name='impact'),
+    path('share-your-story/', views.share_story, name='share_story'),
     path('resources/', _redirect_to('shop'), name='resources'),
     path('blog/', views.blog, name='blog'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),

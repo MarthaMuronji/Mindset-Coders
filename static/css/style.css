@@ -2293,3 +2293,85 @@ a.build-card:focus-visible {
     aspect-ratio: 3 / 2;
     margin-top: 32px;
 }
+
+/* ===== Share your story page ===== */
+
+/* The form is the only column in its row, so it is capped and centred
+   instead of stretching across the whole contact section */
+.story-form-wrap {
+    flex: 1;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+/* Spam trap: one pixel off screen, outside the tab order */
+.honeypot-field {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Field problems use the same navy box as the form error message */
+.errorlist {
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 6px 12px 6px 30px;
+    margin: 0 0 8px;
+    font-size: 13.5px;
+}
+
+/* Small grey helper line under a field */
+.field-hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 6px 0 0;
+}
+
+/* Consent: the tick sits beside its long label instead of stretching to
+   the full field width, which the shared input rule above would give it */
+.form-group input[type="checkbox"] {
+    width: auto;
+}
+
+.form-group .consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.consent-label input[type="checkbox"] {
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+/* Story paragraphs keep a gap between them (the card rule sets paragraph
+   margins to 0) and long unbroken words cannot push the page sideways */
+.story-text {
+    overflow-wrap: anywhere;
+}
+
+.story-text p {
+    margin-bottom: 10px;
+}
+
+.story-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Photos note above the submit button */
+.photos-note {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+/* Short reassurance line under the Share your story button */
+.story-share-note {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 12px;
+}
