@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -66,6 +67,16 @@ class Story(models.Model):
     consent = models.BooleanField()
     approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    # Review state: a story is waiting while both approved and rejected are False
+    rejected = models.BooleanField(default=False)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='reviewed_stories',
+    )
 
     class Meta:
         ordering = ['-created_at']

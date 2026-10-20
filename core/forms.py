@@ -58,3 +58,23 @@ class StoryForm(forms.ModelForm):
         widgets = {
             'story': forms.Textarea(attrs={'rows': 8}),
         }
+
+
+class ReviewStoryForm(forms.ModelForm):
+    """The parts of a story the team may edit, validated like the share form.
+
+    name, email and consent are never editable here: they belong to the
+    person who sent the story in.
+    """
+
+    class Meta:
+        model = Story
+        fields = ('story', 'category', 'display_as')
+        labels = {
+            'story': 'Your story',
+            'category': 'What is your story about?',
+            'display_as': 'How should we show your name if we publish your story?',
+        }
+        widgets = {
+            'story': forms.Textarea(attrs={'rows': 8}),
+        }
