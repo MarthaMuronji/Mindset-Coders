@@ -23,6 +23,7 @@ DATABASES = {
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
         ssl_require=True,
+        conn_health_checks=True,
     )
 }
 # Quick-start development settings - unsuitable for production
@@ -130,3 +131,34 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Render's proxy sets this header so Django knows requests are https.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+# Logging
+# Warnings and errors go to the console (stderr), which is where Render
+# reads its logs from, so a 500 error shows its traceback there. Only
+# levels are configured here: no request bodies and no settings.
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stderr',
+        },
+    },
+    'loggers': {
+        # 500 errors from the request handlers, with their traceback
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            # The root logger would print the very same record again
+            'propagate': False,
+        },
+    },
+    # Everything else, at WARNING and above
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
