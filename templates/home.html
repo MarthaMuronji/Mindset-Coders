@@ -8,6 +8,13 @@
 
 {% block content %}
 
+{% if steam_public %}
+<div class="steam-strip" role="status">
+    The STEAM Experience holiday program is open for interest
+    <a href="{% url 'steam_experience' %}" data-umami-event="steam-strip-link" data-umami-event-from="home">Learn more</a>
+</div>
+{% endif %}
+
 <section class="hero">
     <div class="hero-content reveal">
         <a href="https://www.wrouganda.org/" target="_blank" rel="noopener noreferrer" class="badge" data-umami-event="wro-uganda-link" data-umami-event-from="home">Uganda's official WRO affiliate</a>

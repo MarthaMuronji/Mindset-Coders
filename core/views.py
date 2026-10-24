@@ -1,7 +1,9 @@
 import logging
 from functools import wraps
+from typing import ClassVar
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
@@ -45,7 +47,7 @@ STORY_SUCCESS_MESSAGE = 'Thank you for sharing your story. We will read it and m
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'steam_public': settings.STEAM_EXPERIENCE_PUBLIC})
 
 def mindset_learn(request):
     return render(request, 'mindset_learn.html')
@@ -100,6 +102,53 @@ def innovators_circle(request):
 
 def university_preparation(request):
     return render(request, 'university_preparation.html')
+
+
+# Everything the STEAM Experience page can say beyond the copy that is
+# already part of the page itself. Every key stays empty until the team
+# fills it in, and the page hides any section whose value is still empty,
+# so it always looks finished while the details are being prepared.
+STEAM_EXPERIENCE = {
+    'age_range': 'Ages 8 to 19',
+    'start_date': '16 November 2026',
+    'end_date': '29 January 2027',
+    'schedule': None,
+    'duration': 'Discover runs for 2 weeks, Build for 4 weeks and Innovate for 3 to 4 weeks, with a two-week break over Christmas.',
+    'venues': [],
+    'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
+    'payment_options': None,
+    'discount_note': None,
+    'inclusions': [
+        'Kits for use during the Build stage',
+        'A kit to take home in the Innovate stage',
+        'Snacks provided',
+        'A showcase at the end of each level',
+    ],
+    'registration_url': None,
+    'contact_hours': None,
+    'contact_phone': '+256 752 064343',
+    'safety_note': None,
+    'passport_note': None,
+}
+
+
+def steam_experience(request):
+    """The STEAM Experience holiday program landing page."""
+    is_public = settings.STEAM_EXPERIENCE_PUBLIC
+    response = render(request, 'steam_experience.html', {
+        'content': STEAM_EXPERIENCE,
+        'is_public': is_public,
+        # Analytics stay off while the page is not public yet
+        'hide_umami': not is_public,
+        # Until the team sets a registration link, the buttons on the
+        # page point at the existing contact page
+        'registration_url': STEAM_EXPERIENCE['registration_url'] or reverse('contact'),
+    })
+    if not is_public:
+        # Hidden until launch, so search engines leave it alone
+        response['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
+
 
 # Shop page products: adding one entry here adds one product tile on the page.
 PRODUCTS = [
@@ -206,7 +255,7 @@ def _denied_or_login(request):
 class ReviewLoginForm(AuthenticationForm):
     """The team login form, with this site's wording for a wrong try."""
 
-    error_messages = {
+    error_messages: ClassVar[dict] = {
         **AuthenticationForm.error_messages,
         'invalid_login': 'That username and password did not match. Please try again.',
     }
