@@ -34,6 +34,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-p3lly!$zr(bx@&gp%^=e-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
+# The STEAM Experience holiday program page. While this is False the page
+# still loads at its own address, but it is not indexed, not in the
+# sitemap, not tracked, and not linked from anywhere on the site.
+STEAM_EXPERIENCE_PUBLIC = os.environ.get('STEAM_EXPERIENCE_PUBLIC', 'False') == 'True'
+
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 

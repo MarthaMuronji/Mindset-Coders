@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}The STEAM Experience | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}The STEAM Experience | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}The STEAM Experience is a holiday learning pathway where your child discovers what they love, builds with technology, and innovates.{% endblock %}
+{% block og_description %}The STEAM Experience is a holiday learning pathway where your child discovers what they love, builds with technology, and innovates.{% endblock %}
+
+{% block content %}
+
+{% if not is_public %}
+{# While the program is not public yet, tell crawlers to skip this page.
+   The view also sends an X-Robots-Tag header with the same instruction. #}
+<meta name="robots" content="noindex, nofollow">
+{% endif %}
+
+<section class="about-hero reveal">
+    <span class="badge">Holiday program</span>
+    <h1>The STEAM Experience</h1>
+    <p>A holiday learning pathway where your child discovers what they love, builds with technology, and innovates.</p>
+    <p class="section-cta-wrap"><a href="{{ registration_url }}" class="btn btn-primary" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a></p>
+</section>
+
+<section class="home-section reveal">
+    <h2>Learning that moves</h2>
+    <div class="build-cards-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <h3>Discover</h3>
+            <p>We start with your child's interests and passions, not in the middle.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <h3>Build</h3>
+            <p>Based on those passions and interests, learners build with technology.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <h3>Innovate</h3>
+            <p>Learners come together as a team. They use design thinking to come up with ideas, take on challenges and build a project to showcase, exhibit or compete with.</p>
+        </div>
+    </div>
+    {% comment %}Photo slot: when a photo for this page is ready, remove the
+    comment marks around this block and point the src at the new image.
+    It must be a picture that is not used on any other page.
+    <div class="img-slot img-slot--wide">
+        <img src="{% static 'images/steam-experience.jpg' %}" alt="Learners building a project together during the STEAM Experience" width="1200" height="600" loading="lazy" onerror="this.remove()">
+    </div>
+    {% endcomment %}
+</section>
+
+<section class="home-section section-tint reveal">
+    <h2>Why this pathway</h2>
+    <p class="section-subtitle">The pathway builds step by step. Each stage grows out of the one before it, so learners always have something real to build on.</p>
+    <p class="section-subtitle">They begin with what already interests them, build skills around it, and then bring those skills together on bigger challenges as a team.</p>
+</section>
+
+{% if content.age_range %}
+<section class="home-section reveal">
+    <h2>Who it is for</h2>
+    <p class="section-subtitle">{{ content.age_range }}</p>
+</section>
+{% endif %}
+
+{% if content.start_date or content.schedule %}
+<section class="home-section reveal">
+    <h2>Dates and schedule</h2>
+    {% if content.start_date %}<p class="section-subtitle">Starts {{ content.start_date }}</p>{% endif %}
+    {% if content.end_date %}<p class="section-subtitle">Ends {{ content.end_date }}</p>{% endif %}
+    {% if content.schedule %}<p>{{ content.schedule }}</p>{% endif %}
+    {% if content.duration %}<p>{{ content.duration }}</p>{% endif %}
+</section>
+{% endif %}
+
+{% if content.venues %}
+<section class="home-section reveal">
+    <h2>Where</h2>
+    {% for venue in content.venues %}
+    <p class="section-subtitle">{{ venue }}</p>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% if content.price %}
+<section class="home-section reveal">
+    <h2>Price and payment</h2>
+    <p class="section-subtitle">{{ content.price }}</p>
+    {% if content.payment_options %}<p>{{ content.payment_options }}</p>{% endif %}
+    {% if content.discount_note %}<p>{{ content.discount_note }}</p>{% endif %}
+    {% if content.inclusions %}
+    <h3>What is included</h3>
+    <ul class="tick-list-compact">
+        {% for item in content.inclusions %}
+        <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</section>
+{% endif %}
+
+{% if content.passport_note %}
+<section class="home-section reveal">
+    <h2>Their journey is recorded</h2>
+    <p class="section-subtitle">{{ content.passport_note }}</p>
+    <p class="section-cta-wrap"><a href="{% url 'mindset_learn' %}" class="btn btn-outline" data-umami-event="steam-mindset-learn-link" data-umami-event-from="steam-experience">See how Mindset Learn works</a></p>
+</section>
+{% endif %}
+
+{% if content.safety_note %}
+<section class="home-section reveal">
+    <h2>Safety and your child's information</h2>
+    <p class="section-subtitle">{{ content.safety_note }}</p>
+</section>
+{% endif %}
+
+<section class="home-section reveal">
+    <h2>How to register and get in touch</h2>
+    <p class="section-cta-wrap"><a href="{{ registration_url }}" class="btn btn-primary" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a></p>
+    {% if content.contact_hours %}<p>Opening hours: {{ content.contact_hours }}</p>{% endif %}
+    {% if content.contact_phone %}<p>Phone: {{ content.contact_phone }}</p>{% endif %}
+    <p class="section-cta-wrap"><a href="{% url 'contact' %}" class="btn btn-outline" data-umami-event="steam-contact-link" data-umami-event-from="steam-experience">Contact Mindset Coders</a></p>
+</section>
+
+<section class="home-section section-tint reveal">
+    <p class="section-subtitle">Learners can keep building on <a href="{% url 'mindset_learn' %}">Mindset Learn</a>, our platform for lessons, projects and challenges.</p>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Build it, code it, test it, and see your ideas come to life.</h2>
+    <p>Creating the next generation of Africa's greatest innovators.</p>
+</section>
+
+{% endblock %}

@@ -36,6 +36,7 @@ urlpatterns = [
     path('innovators-circle/', views.innovators_circle, name='innovators_circle'),
     path('university-preparation/', views.university_preparation, name='university_preparation'),
     path('shop/', views.shop, name='shop'),
+    path('steam-experience/', views.steam_experience, name='steam_experience'),
     path('impact/', views.impact, name='impact'),
     path('share-your-story/', views.share_story, name='share_story'),
     path('review/', views.review_list, name='review_list'),
