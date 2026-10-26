@@ -9,8 +9,9 @@
 {% block content %}
 
 {% if not is_public %}
-{# While the program is not public yet, tell crawlers to skip this page.
-   The view also sends an X-Robots-Tag header with the same instruction. #}
+{% comment %}
+While the program is not public yet, tell crawlers to skip this page. The view also sends an X-Robots-Tag header with the same instruction.
+{% endcomment %}
 <meta name="robots" content="noindex, nofollow">
 {% endif %}
 
