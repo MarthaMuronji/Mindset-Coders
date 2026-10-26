@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Privacy | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}How Mindset Coders looks after the information people share on this website, with extra care for children's information.{% endblock %}
+{% block og_description %}How Mindset Coders looks after the information people share on this website, with extra care for children's information.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <span class="badge">Privacy</span>
+    <h1>Your privacy</h1>
+    <p>At Mindset Coders we take care with the information people share with us, and we take extra care with information about children. This page explains what this website collects and what we do with it.</p>
+</section>
+
+<section class="home-section reveal">
+    <h2>What this website collects</h2>
+    <p class="section-subtitle">If you use the contact form, we receive your name, your email address, your role and your message. We use them to reply to you.</p>
+    <p class="section-subtitle">If you share a story with us, we receive your name, your email address, your role, the story you write, the category you choose, how you would like your name to appear, and your consent. We read every story before anything is published. We do not publish a story, or any child's name or photo, without permission.</p>
+    {% comment %}
+    Unconfirmed, so it stays off the page until the team confirms it.
+    [Confirm: permission comes from a parent or guardian for anyone under 18.]
+    {% endcomment %}
+    <p class="section-subtitle">We also count visits to the site, such as which pages are visited and which buttons are used, so we can see what is helpful.</p>
+    {% comment %}
+    Unconfirmed, so it stays off the page until the team confirms it.
+    [Confirm: this does not follow you from site to site, and does not collect your name or email.]
+    {% endcomment %}
+</section>
+
+<section class="home-section section-tint reveal">
+    <h2>Children's information</h2>
+    <p class="section-subtitle">When families register a child for a programme, we will collect only what we need to run it safely, such as the learner's name, age and a guardian's contact details.</p>
+    {% comment %}
+    Unconfirmed, so it stays off the page until the team confirms it.
+    [Confirm: we ask for a parent or guardian's consent first.]
+    {% endcomment %}
+    {% comment %}
+    Unconfirmed, so it stays off the page until the team confirms it.
+    [Confirm: only the people who need the information to run the programme can see it, and our reports use learner ID numbers instead of names.]
+    {% endcomment %}
+</section>
+
+<section class="home-section reveal">
+    <h2>How long we keep information</h2>
+    {% comment %}
+    Unconfirmed, so it stays off the page until the team confirms it.
+    [Retention period to be confirmed.]
+    {% endcomment %}
+    <p class="section-subtitle">You can ask us to correct or delete your information at any time by writing to <a href="mailto:info@mindset-group.org">info@mindset-group.org</a>.</p>
+</section>
+
+<section class="home-section section-tint reveal">
+    <h2>Who looks after your information</h2>
+    {% comment %}
+    Unconfirmed, so it stays off the page until the team confirms it.
+    [Confirm: messages and stories are stored securely with our hosting and database providers, and emails to our team go through an email service.]
+    {% endcomment %}
+    <p class="section-subtitle">We do not sell your information.</p>
+</section>
+
+<section class="home-section reveal">
+    <h2>Questions</h2>
+    <p class="section-subtitle">Write to <a href="mailto:info@mindset-group.org">info@mindset-group.org</a> or call <a href="tel:+256752064343">+256 752 064343</a>.</p>
+</section>
+
+{% endblock %}
