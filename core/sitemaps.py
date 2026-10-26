@@ -16,6 +16,7 @@ class StaticViewSitemap(Sitemap):
             'innovators_circle',
             'university_preparation',
             'partners',
+            'privacy',
             'shop',
             'impact',
             'share_story',

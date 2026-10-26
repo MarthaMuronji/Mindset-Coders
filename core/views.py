@@ -103,6 +103,10 @@ def innovators_circle(request):
 def university_preparation(request):
     return render(request, 'university_preparation.html')
 
+def privacy(request):
+    """The privacy page. It reads from settings and the environment only, so it needs no database."""
+    return render(request, 'privacy.html')
+
 
 # Everything the STEAM Experience page can say beyond the copy that is
 # already part of the page itself. Every key stays empty until the team

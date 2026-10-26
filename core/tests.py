@@ -12,6 +12,21 @@ EXPECTED_INCLUSIONS = [
     'A showcase at the end of each level',
 ]
 
+# Fragments from the unconfirmed, bracketed sentences on the privacy page.
+# They are kept in {% comment %} blocks in the template, so none of these
+# may ever appear in the rendered HTML.
+UNCONFIRMED_SNIPPETS = [
+    'permission comes from a parent or guardian for anyone under 18',
+    'this does not follow you from site to site',
+    'does not collect your name or email',
+    "we ask for a parent or guardian's consent first",
+    'only the people who need the information to run the programme can see it',
+    'our reports use learner ID numbers instead of names',
+    'Retention period to be confirmed',
+    'messages and stories are stored securely with our hosting and database providers',
+    'emails to our team go through an email service',
+]
+
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
 class SteamExperiencePageTests(SimpleTestCase):
@@ -63,3 +78,42 @@ class SteamExperiencePublicTests(SimpleTestCase):
         response = self.client.get('/steam-experience/')
         self.assertContains(response, 'What is included')
         self.assertContains(response, EXPECTED_INCLUSIONS[0])
+
+
+class PrivacyPageTests(SimpleTestCase):
+    """The privacy page needs no database to render."""
+
+    def get_page(self):
+        return self.client.get('/privacy/')
+
+    def test_page_renders_without_a_database(self):
+        # SimpleTestCase fails any test that touches the database, so a
+        # successful 200 here proves the page renders without one.
+        response = self.get_page()
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_appears_in_the_sitemap(self):
+        response = self.client.get('/sitemap.xml')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '/privacy/')
+
+    def test_footer_links_to_the_privacy_page(self):
+        # The footer lives on every page, so check the link on the home page.
+        response = self.client.get('/')
+        self.assertContains(response, 'Privacy')
+
+    def test_no_unconfirmed_text_is_rendered(self):
+        # Every bracketed, unconfirmed sentence must stay in a comment block
+        # and never reach the rendered page.
+        response = self.get_page()
+        self.assertEqual(response.status_code, 200)
+        for fragment in UNCONFIRMED_SNIPPETS:
+            self.assertNotContains(response, fragment)
+
+    def test_confirmed_copy_is_rendered(self):
+        response = self.get_page()
+        self.assertContains(response, 'What this website collects')
+        self.assertContains(response, "Children's information")
+        self.assertContains(response, 'How long we keep information')
+        self.assertContains(response, 'Who looks after your information')
+        self.assertContains(response, 'Questions')
