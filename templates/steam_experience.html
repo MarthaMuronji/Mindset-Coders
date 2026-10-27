@@ -65,8 +65,8 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     <h2>Dates and schedule</h2>
     {% if content.start_date %}<p class="section-subtitle">Starts {{ content.start_date }}</p>{% endif %}
     {% if content.end_date %}<p class="section-subtitle">Ends {{ content.end_date }}</p>{% endif %}
-    {% if content.schedule %}<p>{{ content.schedule }}</p>{% endif %}
-    {% if content.duration %}<p>{{ content.duration }}</p>{% endif %}
+    {% if content.schedule %}<p class="section-subtitle">{{ content.schedule }}</p>{% endif %}
+    {% if content.duration %}<p class="section-subtitle">{{ content.duration }}</p>{% endif %}
 </section>
 {% endif %}
 
@@ -83,10 +83,10 @@ While the program is not public yet, tell crawlers to skip this page. The view a
 <section class="home-section reveal">
     <h2>Price and payment</h2>
     <p class="section-subtitle">{{ content.price }}</p>
-    {% if content.payment_options %}<p>{{ content.payment_options }}</p>{% endif %}
-    {% if content.discount_note %}<p>{{ content.discount_note }}</p>{% endif %}
+    {% if content.payment_options %}<p class="section-subtitle">{{ content.payment_options }}</p>{% endif %}
+    {% if content.discount_note %}<p class="section-subtitle">{{ content.discount_note }}</p>{% endif %}
     {% if content.inclusions %}
-    <h3>What is included</h3>
+    <h3 class="section-cta-wrap">What is included</h3>
     <ul class="tick-list-compact">
         {% for item in content.inclusions %}
         <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
