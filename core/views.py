@@ -112,29 +112,30 @@ def privacy(request):
 # already part of the page itself. Every key stays empty until the team
 # fills it in, and the page hides any section whose value is still empty,
 # so it always looks finished while the details are being prepared.
+
 STEAM_EXPERIENCE = {
     'age_range': 'Ages 8 to 19',
     'start_date': '16 November 2026',
     'end_date': '29 January 2027',
-    'schedule': None,
-    'duration': 'Discover runs for 2 weeks, Build for 4 weeks and Innovate for 3 to 4 weeks, with a two-week break over Christmas.',
-    'venues': [],
+    'schedule': 'Monday to Friday, 8:00 am to 1:00 pm',
+    'duration': 'Discover runs for 2 weeks (16 to 27 November), Build for 3 weeks (30 November to 18 December) and Innovate for 4 weeks (4 to 29 January). There is a break from 21 December to 2 January, and classes resume on Monday 4 January.',
+    'venues': ['Mindset Coders Headquarters, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
-    'payment_options': None,
-    'discount_note': None,
+    'payment_options': 'Pay online by Mobile Money or by card through Merchant Pay.',
+    'discount_note': 'Siblings registering together for the same stage get 10% off the fee for each additional child.',
+    'registration_url': None,
+    'contact_hours': 'Monday to Saturday, 8:00 am to 6:00 pm',
+    'contact_phone': '+256 752 064343',
+    'safety_note': None,
+    'passport_note': None,
     'inclusions': [
         'Kits for use during the Build stage',
         'A kit to take home in the Innovate stage',
         'Snacks provided',
         'A showcase at the end of each level',
+        'A certificate for each level completed',
     ],
-    'registration_url': None,
-    'contact_hours': None,
-    'contact_phone': '+256 752 064343',
-    'safety_note': None,
-    'passport_note': None,
 }
-
 
 def steam_experience(request):
     """The STEAM Experience holiday program landing page."""

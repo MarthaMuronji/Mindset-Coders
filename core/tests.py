@@ -4,12 +4,13 @@ from django.test import SimpleTestCase, override_settings
 
 from . import views
 
-# The four items the price section shows under "What is included".
+# The five items the price section shows under "What is included".
 EXPECTED_INCLUSIONS = [
     'Kits for use during the Build stage',
     'A kit to take home in the Innovate stage',
     'Snacks provided',
     'A showcase at the end of each level',
+    'A certificate for each level completed',
 ]
 
 # Fragments from the unconfirmed, bracketed sentences on the privacy page.
@@ -49,14 +50,14 @@ class SteamExperiencePageTests(SimpleTestCase):
         self.assertNotContains(response, 'What is included')
         self.assertNotContains(response, EXPECTED_INCLUSIONS[0])
 
-    def test_inclusions_filled_list_renders_four_items(self):
+    def test_inclusions_filled_list_renders_five_items(self):
         response = self.get_page()
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'What is included')
         for item in EXPECTED_INCLUSIONS:
             self.assertContains(response, item)
-        # Exactly four tick marks are rendered for the four inclusions.
-        self.assertContains(response, 'fa-solid fa-check', count=4)
+        # Exactly five tick marks are rendered for the five inclusions.
+        self.assertContains(response, 'fa-solid fa-check', count=5)
 
     def test_noindex_still_applies_when_not_public(self):
         response = self.get_page()
