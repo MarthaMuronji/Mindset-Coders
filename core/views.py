@@ -135,6 +135,47 @@ STEAM_EXPERIENCE = {
         'A showcase at the end of each level',
         'A certificate for each level completed',
     ],
+    # The three stages of the holiday journey, in order. The page draws one
+    # card per stage and one week block per week, so weeks must stay a number.
+    'stages': [
+        {
+            'name': 'Discover',
+            'weeks': 2,
+            'dates': '16 to 27 November',
+            'fee': 'UGX 300,000',
+            'blurb': "We start with your child's interests and passions, not in the middle.",
+            'note': None,
+        },
+        {
+            'name': 'Build',
+            'weeks': 3,
+            'dates': '30 November to 18 December',
+            'fee': 'UGX 400,000',
+            'blurb': 'Based on those passions and interests, learners build with technology.',
+            'note': 'Kits for use during the Build stage',
+        },
+        {
+            'name': 'Innovate',
+            'weeks': 4,
+            'dates': '4 to 29 January',
+            'fee': 'UGX 500,000',
+            'blurb': 'Learners come together as a team. They use design thinking to come up with ideas, take on challenges and build a project to showcase, exhibit or compete with.',
+            'note': 'A kit to take home in the Innovate stage',
+        },
+    ],
+    # The pause between two stages. The page places the marker right after
+    # the stage whose name matches "after", and leaves a gap in the week bar.
+    'break': {
+        'label': 'Christmas break',
+        'dates': '21 December to 2 January',
+        'after': 'Build',
+    },
+    # The price for taking the whole pathway in one payment.
+    'full_journey': {
+        'fee': 'UGX 1,100,000',
+        'note': 'when paid upfront',
+        'saving': 'Save UGX 100,000',
+    },
 }
 
 def steam_experience(request):

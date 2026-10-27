@@ -22,6 +22,81 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     <p class="section-cta-wrap"><a href="{{ registration_url }}" class="btn btn-primary" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a></p>
 </section>
 
+{% if content.age_range or content.start_date or content.end_date or content.schedule or content.venues %}
+<section class="home-section steam-glance reveal" aria-label="At a glance">
+    <h2 class="steam-glance-title">At a glance</h2>
+    <div class="steam-glance-list">
+        {% if content.age_range %}
+        <span class="steam-chip"><i class="fa-solid fa-user-group" aria-hidden="true"></i> {{ content.age_range }}</span>
+        {% endif %}
+        {% if content.start_date or content.end_date %}
+        <span class="steam-chip"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {% if content.start_date and content.end_date %}{{ content.start_date }} to {{ content.end_date }}{% else %}{{ content.start_date }}{{ content.end_date }}{% endif %}</span>
+        {% endif %}
+        {% if content.schedule %}
+        <span class="steam-chip"><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ content.schedule }}</span>
+        {% endif %}
+        {% if content.venues %}
+        <span class="steam-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ content.venues.0 }}</span>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+{% if content.stages %}
+<section class="home-section steam-journey reveal">
+    <h2>Your holiday journey</h2>
+    <div class="steam-stage-grid">
+        {% for stage in content.stages %}
+        <article class="build-card steam-stage-card steam-stage-card--{{ forloop.counter }} reveal reveal-delay-{{ forloop.counter }}">
+            <span class="steam-stage-number" aria-hidden="true">{{ forloop.counter }}</span>
+            <h3>{{ stage.name }}</h3>
+            <p class="steam-stage-meta">
+                {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.dates }}</span>{% endif %}
+                {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} weeks</span>{% endif %}
+            </p>
+            {% if stage.fee %}<p class="steam-stage-fee">{{ stage.fee }}</p>{% endif %}
+            {% if stage.blurb %}<p>{{ stage.blurb }}</p>{% endif %}
+            {% if stage.note %}<p class="steam-stage-note"><i class="fa-solid fa-box-open" aria-hidden="true"></i> {{ stage.note }}</p>{% endif %}
+        </article>
+        {% if content.break and content.break.after == stage.name %}
+        <div class="steam-break">
+            <span class="steam-break-label">{{ content.break.label }}{% if content.break.dates %} ({{ content.break.dates }}){% endif %}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    {% comment %}Photo slot: when a photo for this page is ready, remove the
+    comment marks around this block and point the src at the new image.
+    It must be a picture that is not used on any other page.
+    <div class="img-slot img-slot--wide">
+        <img src="{% static 'images/steam-experience.jpg' %}" alt="Learners building a project together during the STEAM Experience" width="1200" height="600" loading="lazy" onerror="this.remove()">
+    </div>
+    {% endcomment %}
+
+    <div class="steam-weeks">
+        <p class="steam-weeks-title">Nine teaching weeks</p>
+        <div class="steam-weeks-bar" aria-hidden="true">
+            {% for stage in content.stages %}
+            {% for w in ""|ljust:stage.weeks %}<span class="steam-week steam-week--{{ stage.name|lower }}"></span>{% endfor %}
+            {% if content.break and content.break.after == stage.name %}<span class="steam-week-gap"></span>{% endif %}
+            {% endfor %}
+        </div>
+        <p class="steam-sr-only">{% for stage in content.stages %}{{ stage.weeks }} weeks of {{ stage.name }}{% if content.break and content.break.after == stage.name %}, then the {{ content.break.label }}{% if content.break.dates %} from {{ content.break.dates }}{% endif %}{% endif %}{% if not forloop.last %}, then {% endif %}{% endfor %}.</p>
+    </div>
+
+    {% if content.full_journey and content.full_journey.fee %}
+    <div class="steam-full-journey reveal">
+        <div class="steam-full-journey-main">
+            <h3>The complete holiday journey</h3>
+            <p class="steam-full-journey-price">{{ content.full_journey.fee }}{% if content.full_journey.note %} <span class="steam-full-journey-note">{{ content.full_journey.note }}</span>{% endif %}</p>
+        </div>
+        {% if content.full_journey.saving %}<span class="steam-saving-badge">{{ content.full_journey.saving }}</span>{% endif %}
+        {% if content.discount_note %}<p class="steam-discount-note"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i> {{ content.discount_note }}</p>{% endif %}
+    </div>
+    {% endif %}
+</section>
+{% else %}
 <section class="home-section reveal">
     <h2>Learning that moves</h2>
     <div class="build-cards-grid">
@@ -47,38 +122,53 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     {% endcomment %}
 </section>
 
+{% comment %}The strip above already shows the full date span and the
+schedule, so this section only carries the duration sentence, and only
+when there is one.{% endcomment %}
+{% if content.duration %}
+<section class="home-section reveal">
+    <h2>Dates and schedule</h2>
+    <p class="section-subtitle">{{ content.duration }}</p>
+</section>
+{% endif %}
+{% endif %}
+
 <section class="home-section section-tint reveal">
     <h2>Why this pathway</h2>
     <p class="section-subtitle">The pathway builds step by step. Each stage grows out of the one before it, so learners always have something real to build on.</p>
     <p class="section-subtitle">They begin with what already interests them, build skills around it, and then bring those skills together on bigger challenges as a team.</p>
 </section>
 
-{% if content.age_range %}
-<section class="home-section reveal">
-    <h2>Who it is for</h2>
-    <p class="section-subtitle">{{ content.age_range }}</p>
-</section>
-{% endif %}
-
-{% if content.start_date or content.schedule %}
-<section class="home-section reveal">
-    <h2>Dates and schedule</h2>
-    {% if content.start_date %}<p class="section-subtitle">Starts {{ content.start_date }}</p>{% endif %}
-    {% if content.end_date %}<p class="section-subtitle">Ends {{ content.end_date }}</p>{% endif %}
-    {% if content.schedule %}<p class="section-subtitle">{{ content.schedule }}</p>{% endif %}
-    {% if content.duration %}<p class="section-subtitle">{{ content.duration }}</p>{% endif %}
-</section>
-{% endif %}
-
-{% if content.venues %}
+{% comment %}The at a glance strip above already carries the age range, the
+full date span, the schedule and the first venue, so this section only
+appears when there are more venues to list.{% endcomment %}
+{% if content.venues|length > 1 %}
 <section class="home-section reveal">
     <h2>Where</h2>
     {% for venue in content.venues %}
-    <p class="section-subtitle">{{ venue }}</p>
+    {% if not forloop.first %}<p class="section-subtitle">{{ venue }}</p>{% endif %}
     {% endfor %}
 </section>
 {% endif %}
 
+{% if content.stages %}
+{% if content.payment_options or content.inclusions %}
+<section class="home-section reveal">
+    <h2>Price and payment</h2>
+    {% if content.payment_options %}<p class="section-subtitle">{{ content.payment_options }}</p>{% endif %}
+    {% if content.inclusions %}
+    <div class="steam-included">
+        <h3>What is included</h3>
+        <ul class="tick-list-compact">
+            {% for item in content.inclusions %}
+            <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+{% else %}
 {% if content.price %}
 <section class="home-section reveal">
     <h2>Price and payment</h2>
@@ -86,14 +176,17 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     {% if content.payment_options %}<p class="section-subtitle">{{ content.payment_options }}</p>{% endif %}
     {% if content.discount_note %}<p class="section-subtitle">{{ content.discount_note }}</p>{% endif %}
     {% if content.inclusions %}
-    <h3 class="section-cta-wrap">What is included</h3>
-    <ul class="tick-list-compact">
-        {% for item in content.inclusions %}
-        <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
-        {% endfor %}
-    </ul>
+    <div class="steam-included">
+        <h3>What is included</h3>
+        <ul class="tick-list-compact">
+            {% for item in content.inclusions %}
+            <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
 </section>
+{% endif %}
 {% endif %}
 
 {% if content.passport_note %}
@@ -127,5 +220,13 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     <h2>Build it, code it, test it, and see your ideas come to life.</h2>
     <p>Creating the next generation of Africa's greatest innovators.</p>
 </section>
+
+{% comment %}A single registration button that stays within thumb reach on a
+phone. The bar is hidden by CSS from 768px up, so it never shows on a
+desktop, and the page gets bottom padding so it never covers the footer
+or the closing banner.{% endcomment %}
+<div class="steam-sticky-bar">
+    <a href="{{ registration_url }}" class="btn btn-green" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a>
+</div>
 
 {% endblock %}
