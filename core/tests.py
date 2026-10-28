@@ -3,6 +3,7 @@ from unittest import mock
 from django.test import SimpleTestCase, override_settings
 
 from . import views
+from .views import STEAM_EXPERIENCE
 
 # The five items the price section shows under "What is included".
 EXPECTED_INCLUSIONS = [
@@ -43,12 +44,12 @@ class SteamExperiencePageTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_inclusions_empty_list_renders_nothing(self):
-        # With an empty list the section must not appear at all.
+        # With an empty list the inclusions card must not appear.
         with mock.patch.dict(views.STEAM_EXPERIENCE, {'inclusions': []}):
             response = self.get_page()
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'What is included')
-        self.assertNotContains(response, EXPECTED_INCLUSIONS[0])
+        self.assertNotContains(response, '<h3>What is included</h3>')
+        self.assertNotContains(response, '<ul class="tick-list-compact">')
 
     def test_inclusions_filled_list_renders_five_items(self):
         response = self.get_page()
@@ -118,3 +119,48 @@ class PrivacyPageTests(SimpleTestCase):
         self.assertContains(response, 'How long we keep information')
         self.assertContains(response, 'Who looks after your information')
         self.assertContains(response, 'Questions')
+
+
+class SteamJourneyTests(SimpleTestCase):
+    url = '/steam-experience/'
+
+    def test_three_stage_cards_render(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'steam-stage-card steam-stage-card--', count=3)
+
+    def test_break_marker_sits_between_build_and_innovate(self):
+        html = self.client.get(self.url).content.decode()
+        build = html.index('<h3>Build</h3>')
+        marker = html.index('steam-break-label')
+        innovate = html.index('<h3>Innovate</h3>')
+        self.assertLess(build, marker)
+        self.assertLess(marker, innovate)
+
+    def test_week_bar_has_nine_weeks(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'class="steam-week steam-week--', count=9)
+
+    def test_full_journey_card_renders(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'The complete holiday journey')
+        self.assertContains(response, 'UGX 1,100,000')
+
+    def test_staged_payment_cards_render(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'What is included and how to pay')
+        self.assertContains(response, 'class="steam-payment-card', count=2)
+        self.assertContains(response, 'How to pay')
+        self.assertNotContains(response, 'Price and payment')
+
+    def test_payment_options_card_is_hidden_when_empty(self):
+        with mock.patch.dict(STEAM_EXPERIENCE, {'payment_options': ''}):
+            response = self.client.get(self.url)
+        self.assertNotContains(response, 'class="steam-payment-card steam-payment-options"')
+
+    def test_empty_stages_fall_back_to_old_sections(self):
+        with mock.patch.dict(STEAM_EXPERIENCE, {'stages': [], 'break': {}, 'full_journey': {}}):
+            response = self.client.get(self.url)
+        self.assertNotContains(response, 'steam-stage-card steam-stage-card--')
+        self.assertContains(response, 'Dates and schedule')
+        self.assertContains(response, 'Price and payment')
+        self.assertNotContains(response, 'What is included and how to pay')
