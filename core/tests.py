@@ -208,7 +208,14 @@ class SteamPopupTests(SimpleTestCase):
         self.assertContains(response, 'Ages 8 to 19')
         self.assertContains(response, 'Mindset Coders Headquarters, Kyanja Ring Road')
         self.assertContains(response, 'Stages from UGX 300,000')
+        self.assertContains(response, 'class="steam-popup-extra"', count=2)
+        self.assertContains(response, 'class="steam-popup-price steam-popup-extra"')
         self.assertContains(response, 'Register your interest')
+
+    def test_shared_script_uses_per_visit_state(self):
+        response = self.client.get('/')
+        self.assertContains(response, "'steam-promo-visit'")
+        self.assertNotContains(response, 'popupSeen')
 
     def test_register_button_links_to_the_steam_experience_page(self):
         response = self.client.get('/')
@@ -279,6 +286,7 @@ class SteamChipTests(SimpleTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, url)
             self.assertContains(response, 'id="steam-chip-corner"', msg_prefix=url)
+            self.assertContains(response, 'data-umami-event="steam-chip-click"', msg_prefix=url)
             self.assertNotContains(response, '<dialog', msg_prefix=url)
 
     def test_excluded_pages_carry_no_promo(self):

@@ -3865,3 +3865,60 @@ a.build-card:focus-visible {
         transform: none;
     }
 }
+
+.steam-popup-stage-labels {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(4, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.steam-popup-stage-labels span {
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.steam-popup-stage-labels span:nth-child(1) {
+    grid-column: 1 / span 2;
+}
+
+.steam-popup-stage-labels span:nth-child(2) {
+    grid-column: 3 / span 3;
+}
+
+.steam-popup-stage-labels span:nth-child(3) {
+    grid-column: 7 / span 4;
+    margin-left: 0;
+}
+
+.steam-popup-price {
+    margin-top: 24px;
+}
+
+@media (max-width: 599px), (max-height: 699px) {
+    .steam-popup {
+        max-height: 85vh;
+        max-height: 85dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .steam-popup-top {
+        padding: 16px 18px 14px;
+    }
+
+    .steam-popup-countdown-value {
+        font-size: 40px;
+    }
+
+    .steam-popup h2 {
+        font-size: 20px;
+    }
+
+    .steam-popup-details {
+        padding: 14px 16px 16px;
+    }
+
+    .steam-popup-extra {
+        display: none !important;
+    }
+}
