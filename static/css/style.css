@@ -3241,3 +3241,627 @@ a.build-card:focus-visible {
         grid-column: auto;
     }
 }
+
+/* ===== STEAM Experience pop up (Home only) ===== */
+/* Rendered only while STEAM_EXPERIENCE_PUBLIC is True */
+.steam-popup {
+    width: min(440px, calc(100% - 40px));
+    max-width: 440px;
+    padding: 0;
+    border: none;
+    border-radius: 18px;
+    background: #FFFFFF;
+    color: #16324F;
+    box-shadow: 0 18px 48px rgba(15, 36, 56, 0.35);
+    /* The site-wide * { margin: 0 } reset overrides the UA margin: auto
+       that centers a modal dialog, so restore it here. */
+    margin: auto;
+}
+
+.steam-popup::backdrop {
+    background: rgba(15, 36, 56, 0.55);
+}
+
+.steam-popup-body {
+    position: relative;
+    padding: 28px;
+}
+
+.steam-popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #16324F;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.steam-popup-close:hover {
+    background: #E8F7EA;
+}
+
+.steam-popup .badge {
+    margin-bottom: 12px;
+}
+
+.steam-popup h2 {
+    margin: 0 0 10px;
+    /* Keep the heading clear of the close button */
+    padding-right: 36px;
+    color: #16324F;
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    line-height: 1.3;
+}
+
+.steam-popup p {
+    margin: 0 0 20px;
+    color: #16324F;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.steam-popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.steam-popup-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    border: 1.5px solid #1E7A38;
+    background: #1E7A38;
+    color: #FFFFFF;
+}
+
+.steam-popup-primary:hover {
+    background: #18622D;
+    color: #FFFFFF;
+}
+
+.steam-popup-secondary {
+    width: 100%;
+    min-height: 44px;
+}
+
+@keyframes steam-popup-rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.steam-popup[open] {
+    animation: steam-popup-rise 0.28s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .steam-popup[open] {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .steam-popup {
+        width: 100%;
+        max-width: none;
+        /* Anchor the card to the bottom edge as a sheet */
+        margin: auto 0 0;
+        border-radius: 18px 18px 0 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+}
+
+/* ===== STEAM pop up stage pills and corner chip ===== */
+/* Both render only while STEAM_EXPERIENCE_PUBLIC is True. The bare
+   .steam-chip rules above belong to the STEAM page meta chips, so the
+   corner reminder uses its own steam-chip-corner name. */
+
+.steam-popup-steps {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+}
+
+.steam-popup-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #E8F7EA;
+    color: #1E7A38;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.steam-popup-steps i {
+    color: #2FA84F;
+    font-size: 11px;
+}
+
+.steam-chip-corner {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    /* Above the page and its header, but modal dialogs always sit on
+       the browser's top layer, so the pop up stays above the chip. */
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 320px;
+    padding: 10px 12px 10px 14px;
+    border-radius: 12px;
+    background: #16324F;
+    color: #FFFFFF;
+    box-shadow: 0 12px 32px rgba(15, 36, 56, 0.35);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.steam-chip-dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2FA84F;
+}
+
+.steam-chip-link {
+    color: #FFFFFF;
+}
+
+/* The link stretches across the whole card, the close button sits
+   above it through its own z-index. */
+.steam-chip-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+.steam-chip-link:hover {
+    text-decoration: underline;
+}
+
+.steam-chip-close {
+    position: relative;
+    z-index: 2;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -8px -10px -8px 0;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #FFFFFF;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.steam-chip-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+@keyframes steam-chip-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.steam-chip-in {
+    animation: steam-chip-in 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .steam-chip-in {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .steam-chip-corner {
+        /* Full width minus the 16px margins on each side */
+        right: 16px;
+        max-width: none;
+        margin-bottom: env(safe-area-inset-bottom, 0px);
+    }
+}
+
+/* ===== STEAM Experience popup refresh ===== */
+.steam-popup[hidden],
+.steam-chip-corner[hidden] {
+    display: none !important;
+}
+
+.steam-popup {
+    box-sizing: border-box;
+    width: min(440px, calc(100vw - 32px));
+    max-width: 440px;
+    max-height: min(90vh, 760px);
+    max-height: min(90dvh, 760px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0;
+    border-radius: 18px;
+    background: #FFFFFF;
+    color: #0F2438;
+}
+
+.steam-popup-body {
+    padding: 0;
+}
+
+.steam-popup-top {
+    position: relative;
+    padding: 28px;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(135deg, #0F2438, #16324F);
+    color: #FFFFFF;
+}
+
+.steam-popup-close {
+    z-index: 3;
+    color: #FFFFFF;
+}
+
+.steam-popup-close:hover,
+.steam-popup-close:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.steam-popup-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: 12px;
+    padding: 4px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    background: #E8F7EA;
+    color: #1E7A38;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.steam-popup-countdown {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 10px;
+    margin: 0 42px 10px 0;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    line-height: 1.08;
+}
+
+.steam-popup-countdown-value {
+    color: #2FA84F;
+    font-size: 56px;
+    overflow-wrap: anywhere;
+}
+
+.steam-popup-countdown-label {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.steam-popup-countdown-label[hidden] {
+    display: none;
+}
+
+.steam-popup h2 {
+    margin: 0;
+    padding: 0;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.steam-popup-details {
+    padding: 22px 28px 24px;
+    background: #FFFFFF;
+    color: #0F2438;
+}
+
+.steam-popup-weeks {
+    margin-bottom: 18px;
+}
+
+.steam-popup-weeks-bar {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+    min-height: 18px;
+}
+
+.steam-popup-week {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 18px;
+    border-radius: 4px;
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.steam-popup-week--discover {
+    background: #7CCB8F;
+}
+
+.steam-popup-week--build {
+    background: #2FA84F;
+}
+
+.steam-popup-week--innovate {
+    background: #16324F;
+}
+
+.steam-popup-week-gap {
+    flex: 0 0 10px;
+    min-height: 18px;
+    border: 1px solid #5A6B7A;
+    border-radius: 3px;
+    background: repeating-linear-gradient(135deg, #FFFFFF 0 3px, #AAB7C2 3px 5px);
+}
+
+.steam-popup-stage-labels {
+    display: flex;
+    gap: 4px;
+    margin-top: 7px;
+    color: #16324F;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.steam-popup-stage-labels span:nth-child(1) {
+    flex: 2 1 0;
+}
+
+.steam-popup-stage-labels span:nth-child(2) {
+    flex: 3 1 0;
+}
+
+.steam-popup-stage-labels span:nth-child(3) {
+    flex: 4 1 0;
+    margin-left: 10px;
+}
+
+.steam-popup-facts {
+    display: grid;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.steam-popup-facts li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #0F2438;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.steam-popup-facts i {
+    flex: 0 0 18px;
+    margin-top: 3px;
+    color: #1E7A38;
+    text-align: center;
+}
+
+.steam-popup-price {
+    margin: 16px 0 14px;
+    color: #16324F;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.steam-popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.steam-popup-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid #1E7A38;
+    border-radius: 8px;
+    background: #1E7A38;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.steam-popup-primary:hover,
+.steam-popup-primary:focus-visible {
+    background: #18622D;
+    color: #FFFFFF;
+}
+
+.steam-popup-primary i {
+    font-size: 13px;
+}
+
+.steam-popup-secondary {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px;
+    border: 0;
+    background: transparent;
+    color: #16324F;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.steam-popup-secondary:hover,
+.steam-popup-secondary:focus-visible {
+    color: #16324F;
+    text-decoration: underline;
+}
+
+.steam-popup[open] .steam-popup-week {
+    animation: steam-popup-week-fill 0.24s ease-out both;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(2) {
+    animation-delay: 0.07s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(3) {
+    animation-delay: 0.14s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(4) {
+    animation-delay: 0.21s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(5) {
+    animation-delay: 0.28s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(7) {
+    animation-delay: 0.35s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(8) {
+    animation-delay: 0.42s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(9) {
+    animation-delay: 0.49s;
+}
+
+.steam-popup[open] .steam-popup-week:nth-child(10) {
+    animation-delay: 0.56s;
+}
+
+@keyframes steam-popup-week-fill {
+    to {
+        transform: scaleX(1);
+    }
+}
+
+.steam-chip-corner {
+    box-sizing: border-box;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    max-width: min(320px, calc(100vw - 32px));
+    max-height: calc(100vh - 100px);
+    max-height: calc(100dvh - 100px);
+    overflow: auto;
+    overflow-wrap: anywhere;
+}
+
+.steam-chip-corner .steam-chip-link {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.steam-chip-corner .steam-chip-link::after {
+    z-index: 1;
+}
+
+.steam-chip-corner .steam-chip-link i {
+    position: relative;
+    z-index: 2;
+    font-size: 10px;
+}
+
+.steam-chip-close {
+    z-index: 3;
+}
+
+@media (max-width: 600px) {
+    .steam-popup {
+        width: 100%;
+        max-width: none;
+        max-height: 90vh;
+        max-height: 90dvh;
+        margin: auto 0 0;
+        border-radius: 18px 18px 0 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .steam-popup-top {
+        padding: 22px 20px 20px;
+    }
+
+    .steam-popup-countdown-value {
+        font-size: 44px;
+    }
+
+    .steam-popup-countdown-label {
+        font-size: 16px;
+    }
+
+    .steam-popup h2 {
+        font-size: 21px;
+    }
+
+    .steam-popup-details {
+        padding: 18px 20px 22px;
+    }
+
+    .steam-chip-corner {
+        right: 16px;
+        max-width: none;
+        margin-bottom: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .steam-popup[open] .steam-popup-week {
+        animation: none;
+        transform: none;
+    }
+}

@@ -95,6 +95,251 @@
         </div>
     </footer>
 
+    {% if steam_promo %}
+    {% comment %}A quiet reminder in the corner, shared by every page the
+    context processor allows. It stays hidden until the script below
+    decides this visitor should see it, and it carries the one inline
+    script that drives both the chip and the Home pop up.{% endcomment %}
+    <aside class="steam-chip-corner" id="steam-chip-corner" hidden>
+        <span class="steam-chip-dot" aria-hidden="true"></span>
+        <a href="{% url 'steam_experience' %}" class="steam-chip-link" data-umami-event="steam-chip-click" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">STEAM Experience starts <span id="steam-chip-days" data-steam-start="{{ steam_start_date }}"></span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        <button type="button" class="steam-chip-close" aria-label="Close" data-umami-event="steam-chip-close" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">&times;</button>
+    </aside>
+    <script>
+    (function () {
+        'use strict';
+
+        var KEY = 'steam-promo';
+        var OLD_KEY = 'steam-popup-dismissed';
+        var WEEK = 7 * 24 * 60 * 60 * 1000;
+
+        var chip = document.getElementById('steam-chip-corner');
+        var chipDays = document.getElementById('steam-chip-days');
+        var dialog = document.querySelector('.steam-popup');
+        var footer = document.querySelector('.site-footer');
+
+        /* Nothing to drive, and no dialog support means no pop up at all. */
+        if (!chip && !dialog) return;
+        if (dialog && typeof dialog.showModal !== 'function') {
+            dialog.remove();
+            dialog = null;
+        }
+
+        /* One storage record for both reminders. Every storage call sits
+           inside a try/catch, and the memory copy keeps the current page
+           working when storage is unavailable. */
+        var memory = null;
+        var storageOk = true;
+
+        function loadState() {
+            if (memory) return memory;
+            var state = {};
+            try {
+                var raw = window.localStorage.getItem(KEY);
+                if (raw) state = JSON.parse(raw) || {};
+                /* The old single-purpose key counts as popupSeen once. */
+                var legacy = window.localStorage.getItem(OLD_KEY);
+                if (legacy) {
+                    if (!state.popupSeen) state.popupSeen = parseInt(legacy, 10) || null;
+                    window.localStorage.removeItem(OLD_KEY);
+                }
+            } catch (err) {
+                storageOk = false;
+            }
+            if (!state || typeof state !== 'object') state = {};
+            memory = state;
+            return state;
+        }
+
+        function saveState() {
+            if (!storageOk) return;
+            try {
+                window.localStorage.setItem(KEY, JSON.stringify(memory));
+            } catch (err) {
+                storageOk = false;
+            }
+        }
+
+        var startRaw = '';
+        if (chipDays) startRaw = chipDays.getAttribute('data-steam-start') || '';
+        if (!startRaw && dialog) {
+            var startSource = dialog.querySelector('[data-steam-start]');
+            if (startSource) startRaw = startSource.getAttribute('data-steam-start') || '';
+        }
+
+        /* Whole calendar days from local midnight, so the time of day
+           never shifts the countdown by one day. */
+        function daysLeft() {
+            var parts = startRaw.split('-');
+            if (parts.length !== 3) return null;
+            var now = new Date();
+            var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var start = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            if (isNaN(start.getTime())) return null;
+            return Math.round((start.getTime() - today.getTime()) / 86400000);
+        }
+
+        /* The corner card uses a compact countdown. */
+        function countdown(days) {
+            if (days === 1) return 'tomorrow';
+            if (days === 0) return 'today';
+            return 'in ' + days + ' days';
+        }
+
+        function fillCountdown(days) {
+            if (chipDays) chipDays.textContent = countdown(days);
+            if (dialog) {
+                var countdownValue = dialog.querySelector('.steam-popup-countdown-value');
+                var countdownLabel = dialog.querySelector('.steam-popup-countdown-label');
+                if (countdownValue && countdownLabel) {
+                    if (days === 1) {
+                        countdownValue.textContent = 'Starts tomorrow';
+                        countdownLabel.hidden = true;
+                    } else if (days === 0) {
+                        countdownValue.textContent = 'Starts today';
+                        countdownLabel.hidden = true;
+                    } else {
+                        countdownValue.textContent = String(days);
+                        countdownLabel.hidden = false;
+                    }
+                }
+            }
+        }
+
+        function menuOpen() {
+            return !!document.querySelector('.nav-collapse.open');
+        }
+
+        var state = loadState();
+        /* What the storage held when this page load began: the chip only
+           trusts a popupSeen that this very load never touched, so it can
+           never share a page with the pop up. */
+        var seenAtLoad = state.popupSeen;
+        var opener = null;
+        var chipShown = false;
+
+        function chipDismissedRecently() {
+            return !!state.chipClosed && (Date.now() - state.chipClosed) <= WEEK;
+        }
+
+        /* -------- The pop up: Home only, once the page has settled -------- */
+        if (dialog) {
+            function closePopup() {
+                state.popupSeen = Date.now();
+                saveState();
+                if (dialog.open) dialog.close();
+            }
+
+            /* Escape: the native cancel event, handled like any close. */
+            dialog.addEventListener('cancel', function (event) {
+                event.preventDefault();
+                closePopup();
+            });
+
+            /* Clicks that land on the dialog itself come from the backdrop. */
+            dialog.addEventListener('click', function (event) {
+                if (event.target === dialog) closePopup();
+            });
+
+            dialog.addEventListener('close', function () {
+                if (opener && typeof opener.focus === 'function') opener.focus();
+                opener = null;
+            });
+
+            var closeButton = dialog.querySelector('.steam-popup-close');
+            if (closeButton) closeButton.addEventListener('click', closePopup);
+
+            var laterButton = dialog.querySelector('.steam-popup-secondary');
+            if (laterButton) laterButton.addEventListener('click', closePopup);
+
+            /* After the main call to action, never show any promo again. */
+            var registerLink = dialog.querySelector('.steam-popup-primary');
+            if (registerLink) registerLink.addEventListener('click', function () {
+                state.registered = true;
+                saveState();
+            });
+
+            window.setTimeout(function () {
+                var days = daysLeft();
+                if (days === null || days < 1) return;
+                if (state.registered) return;
+                if (state.popupSeen && (Date.now() - state.popupSeen) <= WEEK) return;
+                if (menuOpen()) return;
+                var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (reducedMotion && window.pageYOffset > 0) return;
+                fillCountdown(days);
+                state.popupSeen = Date.now();
+                saveState();
+                opener = document.activeElement;
+                dialog.showModal();
+            }, 1500);
+        }
+
+        /* -------- The corner chip: any page the processor allows -------- */
+        if (chip) {
+            var chipClose = chip.querySelector('.steam-chip-close');
+            if (chipClose) chipClose.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                state.chipClosed = Date.now();
+                saveState();
+                chip.hidden = true;
+            });
+
+            chip.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    state.chipClosed = Date.now();
+                    saveState();
+                    chip.hidden = true;
+                }
+            });
+
+            var chipLink = chip.querySelector('.steam-chip-link');
+            if (chipLink) chipLink.addEventListener('click', function () {
+                state.registered = true;
+                saveState();
+            });
+
+            window.setTimeout(function () {
+                var days = daysLeft();
+                if (days === null || days < 1) return;
+                if (state.registered) return;
+                if (!state.popupSeen || state.popupSeen !== seenAtLoad) return;
+                if (chipDismissedRecently()) return;
+                if (menuOpen()) return;
+                if (dialog && dialog.open) return;
+                fillCountdown(days);
+                chip.hidden = false;
+                chip.classList.add('steam-chip-in');
+                chipShown = true;
+                watchFooter();
+            }, 4000);
+        }
+
+        /* The footer fills the bottom of a finished page, so the chip
+           steps aside while the footer is on screen and returns once it
+           scrolls away. The slide-in class is added only the first time,
+           so the reminder never animates twice. */
+        function watchFooter() {
+            if (!footer || typeof IntersectionObserver !== 'function') return;
+            var observer = new IntersectionObserver(function (entries) {
+                var footerVisible = false;
+                for (var i = 0; i < entries.length; i++) {
+                    if (entries[i].isIntersecting) footerVisible = true;
+                }
+                if (footerVisible) {
+                    chip.hidden = true;
+                } else if (chipShown && !state.registered && !chipDismissedRecently()) {
+                    chip.hidden = false;
+                }
+            });
+            observer.observe(footer);
+        }
+    }());
+    </script>
+    {% endif %}
+
     <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
