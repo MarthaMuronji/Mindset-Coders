@@ -1,8 +1,10 @@
 from unittest import mock
 
-from django.test import SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.urls import resolve
 
 from . import views
+from .context_processors import steam_promo
 from .views import STEAM_EXPERIENCE
 
 # The four pages that must never carry the Home pop up.
@@ -196,7 +198,7 @@ class SteamPopupTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<dialog class="steam-popup"')
         self.assertContains(response, 'id="steam-popup-title"')
-        self.assertContains(response, 'Join the STEAM Experience this holiday')
+        self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
 
     def test_register_button_links_to_the_steam_experience_page(self):
         response = self.client.get('/')
@@ -204,7 +206,8 @@ class SteamPopupTests(SimpleTestCase):
 
     def test_two_close_controls(self):
         response = self.client.get('/')
-        self.assertContains(response, 'aria-label="Close"', count=1)
+        # One on the pop up, one on the corner chip
+        self.assertContains(response, 'aria-label="Close"', count=2)
         self.assertContains(response, 'Maybe later')
         self.assertContains(response, 'data-umami-event="steam-popup-close"', count=2)
 
@@ -212,9 +215,82 @@ class SteamPopupTests(SimpleTestCase):
         for url in OTHER_PAGES:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, url)
-            self.assertNotContains(response, 'steam-popup', msg_prefix=url)
+            # The shared promo script names the dialog with a selector,
+            # so only the dialog markup itself is checked here.
+            self.assertNotContains(response, '<dialog', msg_prefix=url)
 
     def test_announcement_strip_still_renders(self):
         response = self.client.get('/')
         self.assertContains(response, 'steam-strip')
         self.assertContains(response, 'Learn more')
+
+
+@override_settings(STEAM_EXPERIENCE_PUBLIC=False)
+class SteamPromoHiddenTests(SimpleTestCase):
+    """While the program is private no page carries any promo at all."""
+
+    def test_no_promo_markup_on_home_about_or_schools(self):
+        # The bare steam-chip name also belongs to the STEAM page meta
+        # chips, so the corner reminder is checked by its own name.
+        for url in ('/', '/about/', '/for-schools/'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, url)
+            self.assertNotContains(response, 'steam-popup', msg_prefix=url)
+            self.assertNotContains(response, 'steam-chip-corner', msg_prefix=url)
+            self.assertNotContains(response, '<dialog', msg_prefix=url)
+
+
+@override_settings(STEAM_EXPERIENCE_PUBLIC=True)
+class SteamChipTests(SimpleTestCase):
+    """The corner chip follows the visitor around the public site."""
+
+    def test_home_has_the_chip_and_the_dialog(self):
+        response = self.client.get('/')
+        self.assertContains(response, 'id="steam-chip-corner"')
+        self.assertContains(response, 'data-umami-event="steam-chip-click"')
+        self.assertContains(response, '<dialog class="steam-popup"')
+        self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
+        self.assertContains(response, 'class="steam-popup-pill"', count=3)
+
+    def test_about_and_schools_have_the_chip_but_no_dialog(self):
+        for url in ('/about/', '/for-schools/'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, url)
+            self.assertContains(response, 'id="steam-chip-corner"', msg_prefix=url)
+            self.assertNotContains(response, '<dialog', msg_prefix=url)
+
+    def test_excluded_pages_carry_no_promo(self):
+        for url in ('/steam-experience/', '/contact/', '/privacy/',
+                    '/share-your-story/', '/review/login/'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, url)
+            self.assertNotContains(response, 'steam-chip-corner', msg_prefix=url)
+            self.assertNotContains(response, 'steam-chip-click', msg_prefix=url)
+            self.assertNotContains(response, 'steam-popup', msg_prefix=url)
+
+
+@override_settings(STEAM_EXPERIENCE_PUBLIC=True)
+class SteamPromoContextTests(SimpleTestCase):
+    """The context processor gates the chip by page and by setting."""
+
+    def promo_for(self, path):
+        request = RequestFactory().get(path)
+        request.resolver_match = resolve(path)
+        return steam_promo(request)
+
+    def test_about_is_offered_the_promo(self):
+        result = self.promo_for('/about/')
+        self.assertTrue(result['steam_promo'])
+        self.assertEqual(result['steam_start_date'], '2026-11-16')
+
+    def test_excluded_pages_get_no_promo(self):
+        for path in ('/steam-experience/', '/contact/', '/privacy/',
+                     '/share-your-story/', '/review/login/'):
+            self.assertFalse(self.promo_for(path)['steam_promo'], path)
+
+    def test_admin_gets_no_promo(self):
+        self.assertFalse(self.promo_for('/admin/')['steam_promo'])
+
+    def test_private_program_turns_the_promo_off(self):
+        with override_settings(STEAM_EXPERIENCE_PUBLIC=False):
+            self.assertFalse(self.promo_for('/about/')['steam_promo'])

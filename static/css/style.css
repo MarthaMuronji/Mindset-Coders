@@ -3369,3 +3369,130 @@ a.build-card:focus-visible {
         padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 }
+
+/* ===== STEAM pop up stage pills and corner chip ===== */
+/* Both render only while STEAM_EXPERIENCE_PUBLIC is True. The bare
+   .steam-chip rules above belong to the STEAM page meta chips, so the
+   corner reminder uses its own steam-chip-corner name. */
+
+.steam-popup-steps {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+}
+
+.steam-popup-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #E8F7EA;
+    color: #1E7A38;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.steam-popup-steps i {
+    color: #2FA84F;
+    font-size: 11px;
+}
+
+.steam-chip-corner {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    /* Above the page and its header, but modal dialogs always sit on
+       the browser's top layer, so the pop up stays above the chip. */
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 320px;
+    padding: 10px 12px 10px 14px;
+    border-radius: 12px;
+    background: #16324F;
+    color: #FFFFFF;
+    box-shadow: 0 12px 32px rgba(15, 36, 56, 0.35);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.steam-chip-dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2FA84F;
+}
+
+.steam-chip-link {
+    color: #FFFFFF;
+}
+
+/* The link stretches across the whole card, the close button sits
+   above it through its own z-index. */
+.steam-chip-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+.steam-chip-link:hover {
+    text-decoration: underline;
+}
+
+.steam-chip-close {
+    position: relative;
+    z-index: 2;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -8px -10px -8px 0;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #FFFFFF;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.steam-chip-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+@keyframes steam-chip-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.steam-chip-in {
+    animation: steam-chip-in 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .steam-chip-in {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .steam-chip-corner {
+        /* Full width minus the 16px margins on each side */
+        right: 16px;
+        max-width: none;
+        margin-bottom: env(safe-area-inset-bottom, 0px);
+    }
+}
