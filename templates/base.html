@@ -109,9 +109,8 @@
     (function () {
         'use strict';
 
-        var KEY = 'steam-promo';
-        var OLD_KEY = 'steam-popup-dismissed';
-        var WEEK = 7 * 24 * 60 * 60 * 1000;
+        var REGISTERED_KEY = 'steam-promo';
+        var VISIT_KEY = 'steam-promo-visit';
 
         var chip = document.getElementById('steam-chip-corner');
         var chipDays = document.getElementById('steam-chip-days');
@@ -125,40 +124,81 @@
             dialog = null;
         }
 
-        /* One storage record for both reminders. Every storage call sits
-           inside a try/catch, and the memory copy keeps the current page
-           working when storage is unavailable. */
-        var memory = null;
-        var storageOk = true;
+        var visitMemory = { popupShown: false, chipClosed: false };
+        var registeredMemory = false;
+        var registered = false;
+        var visitStorageOk = true;
+        var registeredStorageOk = true;
 
-        function loadState() {
-            if (memory) return memory;
-            var state = {};
+        function loadVisitState() {
             try {
-                var raw = window.localStorage.getItem(KEY);
-                if (raw) state = JSON.parse(raw) || {};
-                /* The old single-purpose key counts as popupSeen once. */
-                var legacy = window.localStorage.getItem(OLD_KEY);
-                if (legacy) {
-                    if (!state.popupSeen) state.popupSeen = parseInt(legacy, 10) || null;
-                    window.localStorage.removeItem(OLD_KEY);
+                var raw = window.sessionStorage.getItem(VISIT_KEY);
+                if (raw) {
+                    var stored = JSON.parse(raw);
+                    if (stored && typeof stored === 'object') {
+                        visitMemory.popupShown = stored.popupShown === true;
+                        visitMemory.chipClosed = stored.chipClosed === true;
+                    }
                 }
             } catch (err) {
-                storageOk = false;
+                visitStorageOk = false;
             }
-            if (!state || typeof state !== 'object') state = {};
-            memory = state;
-            return state;
+            return visitMemory;
         }
 
-        function saveState() {
-            if (!storageOk) return;
+        function saveVisitState() {
+            if (!visitStorageOk) return;
             try {
-                window.localStorage.setItem(KEY, JSON.stringify(memory));
+                window.sessionStorage.setItem(VISIT_KEY, JSON.stringify(visitMemory));
             } catch (err) {
-                storageOk = false;
+                visitStorageOk = false;
             }
         }
+
+        function loadRegistered() {
+            try {
+                var raw = window.localStorage.getItem(REGISTERED_KEY);
+                if (raw) {
+                    var stored = JSON.parse(raw);
+                    registeredMemory = !!(stored && typeof stored === 'object' && stored.registered === true);
+                }
+            } catch (err) {
+                registeredStorageOk = false;
+            }
+            return registeredMemory;
+        }
+
+        function registerInterest() {
+            registeredMemory = true;
+            registered = true;
+            if (registeredStorageOk) {
+                try {
+                    window.localStorage.setItem(REGISTERED_KEY, JSON.stringify({ registered: true }));
+                } catch (err) {
+                    registeredStorageOk = false;
+                }
+            }
+            stopPromos();
+        }
+
+        function stopPromos() {
+            if (dialog && dialog.open) dialog.close();
+            if (chip) chip.hidden = true;
+        }
+
+        window.addEventListener('storage', function (event) {
+            if (event.key !== REGISTERED_KEY || !event.newValue) return;
+            var stored;
+            try {
+                stored = JSON.parse(event.newValue);
+            } catch (err) {
+                return;
+            }
+            if (!stored || typeof stored !== 'object' || stored.registered !== true) return;
+            registeredMemory = true;
+            registered = true;
+            stopPromos();
+        });
 
         var startRaw = '';
         if (chipDays) startRaw = chipDays.getAttribute('data-steam-start') || '';
@@ -210,23 +250,14 @@
             return !!document.querySelector('.nav-collapse.open');
         }
 
-        var state = loadState();
-        /* What the storage held when this page load began: the chip only
-           trusts a popupSeen that this very load never touched, so it can
-           never share a page with the pop up. */
-        var seenAtLoad = state.popupSeen;
+        var visitState = loadVisitState();
+        registered = loadRegistered();
         var opener = null;
         var chipShown = false;
-
-        function chipDismissedRecently() {
-            return !!state.chipClosed && (Date.now() - state.chipClosed) <= WEEK;
-        }
 
         /* -------- The pop up: Home only, once the page has settled -------- */
         if (dialog) {
             function closePopup() {
-                state.popupSeen = Date.now();
-                saveState();
                 if (dialog.open) dialog.close();
             }
 
@@ -254,24 +285,20 @@
 
             /* After the main call to action, never show any promo again. */
             var registerLink = dialog.querySelector('.steam-popup-primary');
-            if (registerLink) registerLink.addEventListener('click', function () {
-                state.registered = true;
-                saveState();
-            });
+            if (registerLink) registerLink.addEventListener('click', registerInterest);
 
             window.setTimeout(function () {
                 var days = daysLeft();
                 if (days === null || days < 1) return;
-                if (state.registered) return;
-                if (state.popupSeen && (Date.now() - state.popupSeen) <= WEEK) return;
+                if (registered || visitState.popupShown) return;
                 if (menuOpen()) return;
                 var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 if (reducedMotion && window.pageYOffset > 0) return;
                 fillCountdown(days);
-                state.popupSeen = Date.now();
-                saveState();
                 opener = document.activeElement;
                 dialog.showModal();
+                visitState.popupShown = true;
+                saveVisitState();
             }, 1500);
         }
 
@@ -281,32 +308,27 @@
             if (chipClose) chipClose.addEventListener('click', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                state.chipClosed = Date.now();
-                saveState();
+                visitState.chipClosed = true;
+                saveVisitState();
                 chip.hidden = true;
             });
 
             chip.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
                     event.preventDefault();
-                    state.chipClosed = Date.now();
-                    saveState();
+                    visitState.chipClosed = true;
+                    saveVisitState();
                     chip.hidden = true;
                 }
             });
 
             var chipLink = chip.querySelector('.steam-chip-link');
-            if (chipLink) chipLink.addEventListener('click', function () {
-                state.registered = true;
-                saveState();
-            });
+            if (chipLink) chipLink.addEventListener('click', registerInterest);
 
             window.setTimeout(function () {
                 var days = daysLeft();
                 if (days === null || days < 1) return;
-                if (state.registered) return;
-                if (!state.popupSeen || state.popupSeen !== seenAtLoad) return;
-                if (chipDismissedRecently()) return;
+                if (registered || !visitState.popupShown || visitState.chipClosed) return;
                 if (menuOpen()) return;
                 if (dialog && dialog.open) return;
                 fillCountdown(days);
@@ -330,7 +352,7 @@
                 }
                 if (footerVisible) {
                     chip.hidden = true;
-                } else if (chipShown && !state.registered && !chipDismissedRecently()) {
+                } else if (chipShown && !registered && !visitState.chipClosed) {
                     chip.hidden = false;
                 }
             });
