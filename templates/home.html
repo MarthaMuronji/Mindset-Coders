@@ -289,21 +289,46 @@ page loads, driven by the shared promo script in base.html. It is only
 ever rendered while the program is public.{% endcomment %}
 <dialog class="steam-popup" aria-labelledby="steam-popup-title">
     <div class="steam-popup-body">
-        <button type="button" class="steam-popup-close" aria-label="Close" data-umami-event="steam-popup-close" data-umami-event-from="home">&times;</button>
-        <span class="badge" data-steam-start="{{ steam_start_date }}">Starts 16 November</span>
-        <h2 id="steam-popup-title">Build it, code it, test it, and see your ideas come to life.</h2>
-        <p>Join the STEAM Experience this holiday. Ages 8 to 19, at Mindset Coders Headquarters, Kyanja Ring Road.</p>
-        <div class="steam-popup-steps">
-            <span class="steam-popup-pill">Discover</span>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-            <span class="steam-popup-pill">Build</span>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-            <span class="steam-popup-pill">Innovate</span>
-        </div>
-        <div class="steam-popup-actions">
-            <a href="{% url 'steam_experience' %}" class="btn steam-popup-primary" data-umami-event="steam-popup-register" data-umami-event-from="home">Register your interest</a>
-            <button type="button" class="btn btn-outline steam-popup-secondary" data-umami-event="steam-popup-close" data-umami-event-from="home">Maybe later</button>
-        </div>
+        <section class="steam-popup-top">
+            <button type="button" class="steam-popup-close" aria-label="Close" data-umami-event="steam-popup-close" data-umami-event-from="home">&times;</button>
+            <span class="steam-popup-kicker">Holiday program</span>
+            <div class="steam-popup-countdown" data-steam-start="{{ steam_start_date }}" role="status" aria-live="polite">
+                <span class="steam-popup-countdown-value">Starts 16 November</span>
+                <span class="steam-popup-countdown-label" hidden>days to go</span>
+            </div>
+            <h2 id="steam-popup-title">Build it, code it, test it, and see your ideas come to life.</h2>
+        </section>
+        <section class="steam-popup-details">
+            <div class="steam-popup-weeks">
+                <div class="steam-popup-weeks-bar" aria-hidden="true">
+                    <span class="steam-popup-week steam-popup-week--discover"></span>
+                    <span class="steam-popup-week steam-popup-week--discover"></span>
+                    <span class="steam-popup-week steam-popup-week--build"></span>
+                    <span class="steam-popup-week steam-popup-week--build"></span>
+                    <span class="steam-popup-week steam-popup-week--build"></span>
+                    <span class="steam-popup-week-gap"></span>
+                    <span class="steam-popup-week steam-popup-week--innovate"></span>
+                    <span class="steam-popup-week steam-popup-week--innovate"></span>
+                    <span class="steam-popup-week steam-popup-week--innovate"></span>
+                    <span class="steam-popup-week steam-popup-week--innovate"></span>
+                </div>
+                <div class="steam-popup-stage-labels">
+                    <span>Discover</span>
+                    <span>Build</span>
+                    <span>Innovate</span>
+                </div>
+            </div>
+            <ul class="steam-popup-facts">
+                <li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>16 November 2026 to 29 January 2027</span></li>
+                <li><i class="fa-solid fa-users" aria-hidden="true"></i><span>Ages 8 to 19</span></li>
+                <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>Mindset Coders Headquarters, Kyanja Ring Road</span></li>
+            </ul>
+            <p class="steam-popup-price">Stages from UGX 300,000</p>
+            <div class="steam-popup-actions">
+                <a href="{% url 'steam_experience' %}" class="btn steam-popup-primary" data-umami-event="steam-popup-register" data-umami-event-from="home">Register your interest <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                <button type="button" class="btn steam-popup-secondary" data-umami-event="steam-popup-close" data-umami-event-from="home">Maybe later</button>
+            </div>
+        </section>
     </div>
 </dialog>
 {% endif %}

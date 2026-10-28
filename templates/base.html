@@ -102,7 +102,7 @@
     script that drives both the chip and the Home pop up.{% endcomment %}
     <aside class="steam-chip-corner" id="steam-chip-corner" hidden>
         <span class="steam-chip-dot" aria-hidden="true"></span>
-        <a href="{% url 'steam_experience' %}" class="steam-chip-link" data-umami-event="steam-chip-click" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">STEAM Experience starts <span id="steam-chip-days" data-steam-start="{{ steam_start_date }}"></span></a>
+        <a href="{% url 'steam_experience' %}" class="steam-chip-link" data-umami-event="steam-chip-click" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">STEAM Experience starts <span id="steam-chip-days" data-steam-start="{{ steam_start_date }}"></span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         <button type="button" class="steam-chip-close" aria-label="Close" data-umami-event="steam-chip-close" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">&times;</button>
     </aside>
     <script>
@@ -179,7 +179,7 @@
             return Math.round((start.getTime() - today.getTime()) / 86400000);
         }
 
-        /* One wording feeds both reminders. */
+        /* The corner card uses a compact countdown. */
         function countdown(days) {
             if (days === 1) return 'tomorrow';
             if (days === 0) return 'today';
@@ -189,8 +189,20 @@
         function fillCountdown(days) {
             if (chipDays) chipDays.textContent = countdown(days);
             if (dialog) {
-                var badge = dialog.querySelector('.badge');
-                if (badge) badge.textContent = 'Starts ' + countdown(days);
+                var countdownValue = dialog.querySelector('.steam-popup-countdown-value');
+                var countdownLabel = dialog.querySelector('.steam-popup-countdown-label');
+                if (countdownValue && countdownLabel) {
+                    if (days === 1) {
+                        countdownValue.textContent = 'Starts tomorrow';
+                        countdownLabel.hidden = true;
+                    } else if (days === 0) {
+                        countdownValue.textContent = 'Starts today';
+                        countdownLabel.hidden = true;
+                    } else {
+                        countdownValue.textContent = String(days);
+                        countdownLabel.hidden = false;
+                    }
+                }
             }
         }
 
@@ -266,10 +278,21 @@
         /* -------- The corner chip: any page the processor allows -------- */
         if (chip) {
             var chipClose = chip.querySelector('.steam-chip-close');
-            if (chipClose) chipClose.addEventListener('click', function () {
+            if (chipClose) chipClose.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
                 state.chipClosed = Date.now();
                 saveState();
                 chip.hidden = true;
+            });
+
+            chip.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    state.chipClosed = Date.now();
+                    saveState();
+                    chip.hidden = true;
+                }
             });
 
             var chipLink = chip.querySelector('.steam-chip-link');

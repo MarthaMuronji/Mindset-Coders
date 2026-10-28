@@ -199,6 +199,16 @@ class SteamPopupTests(SimpleTestCase):
         self.assertContains(response, '<dialog class="steam-popup"')
         self.assertContains(response, 'id="steam-popup-title"')
         self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
+        self.assertContains(response, 'Starts 16 November')
+        self.assertContains(response, 'class="steam-popup-week ', count=9)
+        self.assertContains(response, 'class="steam-popup-week-gap"', count=1)
+        for stage in ('Discover', 'Build', 'Innovate'):
+            self.assertContains(response, f'<span>{stage}</span>')
+        self.assertContains(response, '16 November 2026 to 29 January 2027')
+        self.assertContains(response, 'Ages 8 to 19')
+        self.assertContains(response, 'Mindset Coders Headquarters, Kyanja Ring Road')
+        self.assertContains(response, 'Stages from UGX 300,000')
+        self.assertContains(response, 'Register your interest')
 
     def test_register_button_links_to_the_steam_experience_page(self):
         response = self.client.get('/')
@@ -210,6 +220,15 @@ class SteamPopupTests(SimpleTestCase):
         self.assertContains(response, 'aria-label="Close"', count=2)
         self.assertContains(response, 'Maybe later')
         self.assertContains(response, 'data-umami-event="steam-popup-close"', count=2)
+
+    def test_corner_close_is_a_button_outside_the_link(self):
+        response = self.client.get('/')
+        html = response.content.decode()
+        link_start = html.index('<a href="/steam-experience/" class="steam-chip-link"')
+        link_end = html.index('</a>', link_start)
+        close_start = html.index('<button type="button" class="steam-chip-close"', link_end)
+        close_end = html.index('>', close_start)
+        self.assertIn('aria-label="Close"', html[close_start:close_end])
 
     def test_other_pages_have_no_popup_markup(self):
         for url in OTHER_PAGES:
@@ -250,7 +269,10 @@ class SteamChipTests(SimpleTestCase):
         self.assertContains(response, 'data-umami-event="steam-chip-click"')
         self.assertContains(response, '<dialog class="steam-popup"')
         self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
-        self.assertContains(response, 'class="steam-popup-pill"', count=3)
+        self.assertContains(response, 'class="steam-popup-week ', count=9)
+        self.assertContains(response, 'class="steam-popup-week-gap"', count=1)
+        for stage in ('Discover', 'Build', 'Innovate'):
+            self.assertContains(response, f'<span>{stage}</span>')
 
     def test_about_and_schools_have_the_chip_but_no_dialog(self):
         for url in ('/about/', '/for-schools/'):
