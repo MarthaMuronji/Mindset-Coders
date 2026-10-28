@@ -283,4 +283,96 @@
     </div>
 </section>
 
+{% if steam_public %}
+{% comment %}A holiday invitation that opens on its own a moment after the
+page loads. It is only ever rendered while the program is public, and the
+script below removes it again in browsers without dialog support.{% endcomment %}
+<dialog class="steam-popup" aria-labelledby="steam-popup-title">
+    <div class="steam-popup-body">
+        <button type="button" class="steam-popup-close" aria-label="Close" data-umami-event="steam-popup-close" data-umami-event-from="home">&times;</button>
+        <span class="badge">Holiday program</span>
+        <h2 id="steam-popup-title">Join the STEAM Experience this holiday</h2>
+        <p>Discover, Build, Innovate. A holiday learning pathway for ages 8 to 19, starting 16 November 2026 at Mindset Coders Headquarters, Kyanja Ring Road.</p>
+        <div class="steam-popup-actions">
+            <a href="{% url 'steam_experience' %}" class="btn steam-popup-primary" data-umami-event="steam-popup-register" data-umami-event-from="home">Register your interest</a>
+            <button type="button" class="btn btn-outline steam-popup-secondary" data-umami-event="steam-popup-close" data-umami-event-from="home">Maybe later</button>
+        </div>
+    </div>
+</dialog>
+<script>
+(function () {
+    'use strict';
+    var dialog = document.querySelector('.steam-popup');
+    if (!dialog) return;
+    if (typeof dialog.showModal !== 'function') {
+        dialog.remove();
+        return;
+    }
+
+    var KEY = 'steam-popup-dismissed';
+    var THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+    var dismissedThisLoad = false;
+    var opener = null;
+
+    function isDismissed() {
+        try {
+            var stamp = parseInt(window.localStorage.getItem(KEY), 10);
+            return stamp > 0 && (Date.now() - stamp) < THREE_DAYS;
+        } catch (err) {
+            return dismissedThisLoad;
+        }
+    }
+
+    function remember() {
+        dismissedThisLoad = true;
+        try {
+            window.localStorage.setItem(KEY, String(Date.now()));
+        } catch (err) {
+            /* Storage unavailable: the in-memory flag covers this page load. */
+        }
+    }
+
+    function closePopup() {
+        remember();
+        if (dialog.open) dialog.close();
+    }
+
+    /* Escape: the native cancel event, handled the same as any close. */
+    dialog.addEventListener('cancel', function (event) {
+        event.preventDefault();
+        closePopup();
+    });
+
+    /* Clicks that land on the dialog element itself come from the backdrop. */
+    dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) closePopup();
+    });
+
+    dialog.addEventListener('close', function () {
+        if (opener && typeof opener.focus === 'function') opener.focus();
+        opener = null;
+    });
+
+    var closeButton = dialog.querySelector('.steam-popup-close');
+    if (closeButton) closeButton.addEventListener('click', closePopup);
+
+    var laterButton = dialog.querySelector('.steam-popup-secondary');
+    if (laterButton) laterButton.addEventListener('click', closePopup);
+
+    /* After the main call to action, never show the invitation again. */
+    var registerLink = dialog.querySelector('.steam-popup-primary');
+    if (registerLink) registerLink.addEventListener('click', remember);
+
+    window.setTimeout(function () {
+        if (isDismissed() || dialog.open) return;
+        if (document.querySelector('.nav-collapse.open')) return;
+        var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion && window.pageYOffset > 0) return;
+        opener = document.activeElement;
+        dialog.showModal();
+    }, 1500);
+}());
+</script>
+{% endif %}
+
 {% endblock %}

@@ -5,6 +5,9 @@ from django.test import SimpleTestCase, override_settings
 from . import views
 from .views import STEAM_EXPERIENCE
 
+# The four pages that must never carry the Home pop up.
+OTHER_PAGES = ['/about/', '/contact/', '/for-schools/', '/steam-experience/']
+
 # The five items the price section shows under "What is included".
 EXPECTED_INCLUSIONS = [
     'Kits for use during the Build stage',
@@ -164,3 +167,54 @@ class SteamJourneyTests(SimpleTestCase):
         self.assertContains(response, 'Dates and schedule')
         self.assertContains(response, 'Price and payment')
         self.assertNotContains(response, 'What is included and how to pay')
+
+
+@override_settings(STEAM_EXPERIENCE_PUBLIC=False)
+class SteamPopupHiddenTests(SimpleTestCase):
+    """While the program is private the Home page carries no pop up."""
+
+    def test_home_renders_without_a_database(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_no_popup_markup_when_not_public(self):
+        response = self.client.get('/')
+        self.assertNotContains(response, 'steam-popup')
+        self.assertNotContains(response, '<dialog')
+
+    def test_announcement_strip_hidden_when_not_public(self):
+        response = self.client.get('/')
+        self.assertNotContains(response, 'steam-strip')
+
+
+@override_settings(STEAM_EXPERIENCE_PUBLIC=True)
+class SteamPopupTests(SimpleTestCase):
+    """The Home pop up invites visitors to the STEAM Experience."""
+
+    def test_home_shows_the_dialog(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<dialog class="steam-popup"')
+        self.assertContains(response, 'id="steam-popup-title"')
+        self.assertContains(response, 'Join the STEAM Experience this holiday')
+
+    def test_register_button_links_to_the_steam_experience_page(self):
+        response = self.client.get('/')
+        self.assertContains(response, 'href="/steam-experience/"')
+
+    def test_two_close_controls(self):
+        response = self.client.get('/')
+        self.assertContains(response, 'aria-label="Close"', count=1)
+        self.assertContains(response, 'Maybe later')
+        self.assertContains(response, 'data-umami-event="steam-popup-close"', count=2)
+
+    def test_other_pages_have_no_popup_markup(self):
+        for url in OTHER_PAGES:
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, url)
+            self.assertNotContains(response, 'steam-popup', msg_prefix=url)
+
+    def test_announcement_strip_still_renders(self):
+        response = self.client.get('/')
+        self.assertContains(response, 'steam-strip')
+        self.assertContains(response, 'Learn more')
