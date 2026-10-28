@@ -15,7 +15,8 @@ While the program is not public yet, tell crawlers to skip this page. The view a
 <meta name="robots" content="noindex, nofollow">
 {% endif %}
 
-<section class="about-hero reveal">
+<div class="steam-page">
+<section class="about-hero steam-hero reveal">
     <span class="badge">Holiday program</span>
     <h1>The STEAM Experience</h1>
     <p>A holiday learning pathway where your child discovers what they love, builds with technology, and innovates.</p>
@@ -48,8 +49,10 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     <div class="steam-stage-grid">
         {% for stage in content.stages %}
         <article class="build-card steam-stage-card steam-stage-card--{{ forloop.counter }} reveal reveal-delay-{{ forloop.counter }}">
-            <span class="steam-stage-number" aria-hidden="true">{{ forloop.counter }}</span>
-            <h3>{{ stage.name }}</h3>
+            <div class="steam-stage-head">
+                <span class="steam-stage-number" aria-hidden="true">{{ forloop.counter }}</span>
+                <h3>{{ stage.name }}</h3>
+            </div>
             <p class="steam-stage-meta">
                 {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.dates }}</span>{% endif %}
                 {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} weeks</span>{% endif %}
@@ -60,7 +63,10 @@ While the program is not public yet, tell crawlers to skip this page. The view a
         </article>
         {% if content.break and content.break.after == stage.name %}
         <div class="steam-break">
-            <span class="steam-break-label">{{ content.break.label }}{% if content.break.dates %} ({{ content.break.dates }}){% endif %}</span>
+            <span class="steam-break-label">
+                <span class="steam-break-name">{{ content.break.label }}</span>
+                {% if content.break.dates %}<span class="steam-break-dates">{{ content.break.dates }}</span>{% endif %}
+            </span>
         </div>
         {% endif %}
         {% endfor %}
@@ -133,7 +139,7 @@ when there is one.{% endcomment %}
 {% endif %}
 {% endif %}
 
-<section class="home-section section-tint reveal">
+<section class="home-section section-tint steam-why reveal">
     <h2>Why this pathway</h2>
     <p class="section-subtitle">The pathway builds step by step. Each stage grows out of the one before it, so learners always have something real to build on.</p>
     <p class="section-subtitle">They begin with what already interests them, build skills around it, and then bring those skills together on bigger challenges as a team.</p>
@@ -153,19 +159,26 @@ appears when there are more venues to list.{% endcomment %}
 
 {% if content.stages %}
 {% if content.payment_options or content.inclusions %}
-<section class="home-section reveal">
-    <h2>Price and payment</h2>
-    {% if content.payment_options %}<p class="section-subtitle">{{ content.payment_options }}</p>{% endif %}
-    {% if content.inclusions %}
-    <div class="steam-included">
-        <h3>What is included</h3>
-        <ul class="tick-list-compact">
-            {% for item in content.inclusions %}
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
-            {% endfor %}
-        </ul>
+<section class="home-section steam-payment reveal">
+    <h2>What is included and how to pay</h2>
+    <div class="steam-payment-grid">
+        {% if content.inclusions %}
+        <div class="steam-payment-card steam-included">
+            <h3>What is included</h3>
+            <ul class="tick-list-compact">
+                {% for item in content.inclusions %}
+                <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% if content.payment_options %}
+        <div class="steam-payment-card steam-payment-options">
+            <h3>How to pay</h3>
+            <p>{{ content.payment_options }}</p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </section>
 {% endif %}
 {% else %}
@@ -204,12 +217,20 @@ appears when there are more venues to list.{% endcomment %}
 </section>
 {% endif %}
 
-<section class="home-section reveal">
+<section class="home-section steam-contact reveal">
     <h2>How to register and get in touch</h2>
-    <p class="section-cta-wrap"><a href="{{ registration_url }}" class="btn btn-primary" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a></p>
-    {% if content.contact_hours %}<p class="section-cta-wrap">Opening hours: {{ content.contact_hours }}</p>{% endif %}
-    {% if content.contact_phone %}<p class="section-cta-wrap">Phone: <a href="tel:{{ content.contact_phone|cut:' ' }}">{{ content.contact_phone }}</a></p>{% endif %}
-    <p class="section-cta-wrap"><a href="{% url 'contact' %}" class="btn btn-outline" data-umami-event="steam-contact-link" data-umami-event-from="steam-experience">Contact Mindset Coders</a></p>
+    <div class="steam-contact-grid">
+        <div class="steam-contact-actions">
+            <p><a href="{{ registration_url }}" class="btn btn-primary" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a></p>
+            <p><a href="{% url 'contact' %}" class="btn btn-outline" data-umami-event="steam-contact-link" data-umami-event-from="steam-experience">Contact Mindset Coders</a></p>
+        </div>
+        {% if content.contact_hours or content.contact_phone %}
+        <div class="steam-contact-details">
+            {% if content.contact_hours %}<p>Opening hours: {{ content.contact_hours }}</p>{% endif %}
+            {% if content.contact_phone %}<p>Phone: <a href="tel:{{ content.contact_phone|cut:' ' }}">{{ content.contact_phone }}</a></p>{% endif %}
+        </div>
+        {% endif %}
+    </div>
 </section>
 
 <section class="home-section section-tint reveal">
@@ -227,6 +248,7 @@ desktop, and the page gets bottom padding so it never covers the footer
 or the closing banner.{% endcomment %}
 <div class="steam-sticky-bar">
     <a href="{{ registration_url }}" class="btn btn-green" data-umami-event="steam-register-interest" data-umami-event-from="steam-experience">Register your interest</a>
+</div>
 </div>
 
 {% endblock %}
