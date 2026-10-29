@@ -324,3 +324,48 @@ class SteamPromoContextTests(SimpleTestCase):
     def test_private_program_turns_the_promo_off(self):
         with override_settings(STEAM_EXPERIENCE_PUBLIC=False):
             self.assertFalse(self.promo_for('/about/')['steam_promo'])
+
+class BrandAssetsTests(SimpleTestCase):
+    """The site header, footer and spotlight cards carry the proper brand assets."""
+
+    def test_header_contains_mindset_logo_image(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        logo_start = html.index('class="logo"')
+        logo_end = html.index('</a>', logo_start)
+        logo_html = html[logo_start:logo_end]
+        self.assertIn('<img', logo_html)
+        self.assertIn('mindset-logo.png', logo_html)
+        self.assertIn('alt="Mindset Coders"', logo_html)
+
+    def test_footer_contains_text_wordmark(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            '<div class="footer-brand">mindset<span class="logo-accent">&lt;/&gt;</span></div>',
+        )
+
+    def test_home_spotlight_card_contains_wro_logo(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        card_start = html.index('wro-spotlight')
+        card_end = html.index('</section>', card_start)
+        card_html = html[card_start:card_end]
+        self.assertIn('<img', card_html)
+        self.assertIn('wro-uganda-white.png', card_html)
+        self.assertIn('alt="World Robot Olympiad Uganda"', card_html)
+
+    def test_global_opportunities_spotlight_card_contains_wro_logo(self):
+        response = self.client.get('/global-opportunities/')
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        card_start = html.index('wro-spotlight')
+        card_end = html.index('</section>', card_start)
+        card_html = html[card_start:card_end]
+        self.assertIn('<img', card_html)
+        self.assertIn('wro-uganda-white.png', card_html)
+        self.assertIn('alt="World Robot Olympiad Uganda"', card_html)
+
