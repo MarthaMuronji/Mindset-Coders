@@ -183,6 +183,7 @@ class SteamPopupHiddenTests(SimpleTestCase):
         response = self.client.get('/')
         self.assertNotContains(response, 'steam-popup')
         self.assertNotContains(response, '<dialog')
+        self.assertNotContains(response, 'steam-popup-primary')
 
     def test_announcement_strip_hidden_when_not_public(self):
         response = self.client.get('/')
@@ -217,9 +218,21 @@ class SteamPopupTests(SimpleTestCase):
         self.assertContains(response, "'steam-promo-visit'")
         self.assertNotContains(response, 'popupSeen')
 
-    def test_register_button_links_to_the_steam_experience_page(self):
+    def test_register_button_links_to_holiday_join_form(self):
         response = self.client.get('/')
-        self.assertContains(response, 'href="/steam-experience/"')
+        html = response.content.decode()
+        self.assertRegex(
+            html,
+            r'<a href="/join/\?programme=holiday" class="btn steam-popup-primary"'
+            r'[^>]*data-umami-event="steam-popup-register"',
+        )
+
+    def test_shared_script_ignores_persistent_promo_storage(self):
+        response = self.client.get('/')
+        script = response.content.decode()
+        self.assertNotIn('localStorage', script)
+        self.assertNotRegex(script, r"""['"]steam-promo['"]""")
+        self.assertIn("'steam-promo-visit'", script)
 
     def test_two_close_controls(self):
         response = self.client.get('/')
@@ -368,4 +381,3 @@ class BrandAssetsTests(SimpleTestCase):
         self.assertIn('<img', card_html)
         self.assertIn('wro-uganda-white.png', card_html)
         self.assertIn('alt="World Robot Olympiad Uganda"', card_html)
-

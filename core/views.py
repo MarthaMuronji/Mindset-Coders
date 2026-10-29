@@ -107,6 +107,16 @@ def privacy(request):
     """The privacy page. It reads from settings and the environment only, so it needs no database."""
     return render(request, 'privacy.html')
 
+def refund_policy(request):
+    """Render the refund policy using the STEAM Experience publication setting."""
+    is_public = getattr(settings, 'STEAM_EXPERIENCE_PUBLIC', False)
+    response = render(request, 'refund_policy.html', {
+        'is_public': is_public,
+        'hide_umami': not is_public,
+    })
+    if not is_public:
+        response['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
 
 # Everything the STEAM Experience page can say beyond the copy that is
 # already part of the page itself. Every key stays empty until the team
@@ -118,29 +128,34 @@ STEAM_EXPERIENCE = {
     'start_date': '16 November 2026',
     'end_date': '29 January 2027',
     'schedule': 'Monday to Friday, 8:00 am to 1:00 pm',
-    'duration': 'Discover runs for 2 weeks (16 to 27 November), Build for 3 weeks (30 November to 18 December) and Innovate for 4 weeks (4 to 29 January). There is a break from 21 December to 2 January, and classes resume on Monday 4 January.',
+    'duration': 'Nine teaching weeks',
+    'classes_resume': 'Classes resume on Monday, 4 January 2027.',
+    'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
     'venues': ['Mindset Coders Headquarters, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
     'payment_options': 'Pay online by Mobile Money.',
-    'discount_note': 'Siblings registering together for the same stage get 10% off the fee for each additional child.',
-    'payment_intro': 'Register your child first, then pay with the option you chose.',
+    'discount_note': '',
     'payment_links': [
         {
+            'key': 'discover',
             'label': 'Discover, 2 weeks',
             'amount_text': 'UGX 300,000',
             'url': 'https://kacyberpay.com/pay/f47mjrdxje',
         },
         {
+            'key': 'build',
             'label': 'Build, 3 weeks',
             'amount_text': 'UGX 400,000',
             'url': 'https://kacyberpay.com/pay/ys7azaf25a',
         },
         {
+            'key': 'innovate',
             'label': 'Innovate, 4 weeks',
             'amount_text': 'UGX 500,000',
             'url': 'https://kacyberpay.com/pay/gjuffbu4je',
         },
         {
+            'key': 'full',
             'label': 'Full journey, paid upfront',
             'amount_text': 'UGX 1,100,000',
             'url': 'https://kacyberpay.com/pay/hc6sn7yqxq',
@@ -167,7 +182,7 @@ STEAM_EXPERIENCE = {
         {
             'name': 'Discover',
             'weeks': 2,
-            'dates': '16 to 27 November',
+            'dates': '16 to 27 November 2026',
             'fee': 'UGX 300,000',
             'blurb': "We start with your child's interests and passions, not in the middle.",
             'note': None,
@@ -175,7 +190,7 @@ STEAM_EXPERIENCE = {
         {
             'name': 'Build',
             'weeks': 3,
-            'dates': '30 November to 18 December',
+            'dates': '30 November to 18 December 2026',
             'fee': 'UGX 400,000',
             'blurb': 'Based on those passions and interests, learners build with technology.',
             'note': 'Kits for use during the Build stage',
@@ -183,7 +198,7 @@ STEAM_EXPERIENCE = {
         {
             'name': 'Innovate',
             'weeks': 4,
-            'dates': '4 to 29 January',
+            'dates': '4 to 29 January 2027',
             'fee': 'UGX 500,000',
             'blurb': 'Learners come together as a team. They use design thinking to come up with ideas, take on challenges and build a project to showcase, exhibit or compete with.',
             'note': 'A kit to take home in the Innovate stage',
@@ -193,7 +208,7 @@ STEAM_EXPERIENCE = {
     # the stage whose name matches "after", and leaves a gap in the week bar.
     'break': {
         'label': 'Christmas break',
-        'dates': '21 December to 2 January',
+        'dates': '21 December 2026 to 2 January 2027',
         'after': 'Build',
     },
     # The price for taking the whole pathway in one payment.
@@ -210,6 +225,7 @@ def steam_experience(request):
     response = render(request, 'steam_experience.html', {
         'content': STEAM_EXPERIENCE,
         'is_public': is_public,
+        'steam_payments_enabled': getattr(settings, 'STEAM_PAYMENTS_ENABLED', False),
         # Analytics stay off while the page is not public yet
         'hide_umami': not is_public,
         # Until the team sets a registration link, the buttons on the

@@ -19,24 +19,30 @@ THANKS_URL = '/join/thanks/'
 # The hero, the contact section and the sticky bar at the bottom of the page.
 REGISTER_BUTTONS = 3
 
-# The four KaCyberPay payment links, in order.
+# The four KaCyberPay payment links, in order. Each entry carries the
+# stage key the confirmation page matches against, so these tests never
+# depend on the dictionary in views.
 PAY_LINKS = [
     {
+        'key': 'discover',
         'label': 'Discover, 2 weeks',
         'amount_text': 'UGX 300,000',
         'url': 'https://kacyberpay.com/pay/f47mjrdxje',
     },
     {
+        'key': 'build',
         'label': 'Build, 3 weeks',
         'amount_text': 'UGX 400,000',
         'url': 'https://kacyberpay.com/pay/ys7azaf25a',
     },
     {
+        'key': 'innovate',
         'label': 'Innovate, 4 weeks',
         'amount_text': 'UGX 500,000',
         'url': 'https://kacyberpay.com/pay/gjuffbu4je',
     },
     {
+        'key': 'full',
         'label': 'Full journey, paid upfront',
         'amount_text': 'UGX 1,100,000',
         'url': 'https://kacyberpay.com/pay/hc6sn7yqxq',
@@ -49,7 +55,7 @@ def register_anchors(html, href):
     pattern = r'<a\b[^>]*href="%s"[^>]*>.*?</a>' % re.escape(href)
     return [
         anchor for anchor in re.findall(pattern, html, re.S)
-        if 'Register your interest' in anchor
+        if 'Register your child' in anchor
     ]
 
 
@@ -135,27 +141,13 @@ class PaymentNoteTests(SteamPageTestCase):
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=True)
 class PaymentLinkButtonTests(SteamPageTestCase):
-    """The four pay buttons appear on the STEAM Experience page."""
+    """Payment links are reserved for the confirmation page."""
 
-    def test_all_four_pay_buttons_render(self):
+    def test_payment_addresses_do_not_appear_on_the_steam_page(self):
         response = self.get_page(payment_links=PAY_LINKS)
         html = response.content.decode()
         for link in PAY_LINKS:
-            self.assertIn(link['url'], html)
-            self.assertIn(link['label'], html)
-            self.assertIn(link['amount_text'], html)
-
-    def test_pay_buttons_open_in_new_tab(self):
-        response = self.get_page(payment_links=PAY_LINKS)
-        html = response.content.decode()
-        # Find each pay button anchor and check target and rel.
-        for link in PAY_LINKS:
-            pattern = r'<a\b[^>]*href="%s"[^>]*>' % re.escape(link['url'])
-            matches = re.findall(pattern, html)
-            self.assertTrue(matches, 'No anchor found for %s' % link['url'])
-            for anchor_open in matches:
-                self.assertIn('target="_blank"', anchor_open)
-                self.assertIn('rel="noopener noreferrer"', anchor_open)
+            self.assertNotIn(link['url'], html)
 
     def test_pay_buttons_carry_pay_click_event(self):
         response = self.get_page(payment_links=PAY_LINKS)
@@ -185,23 +177,20 @@ class PaymentLinkButtonTests(SteamPageTestCase):
         self.assertNotIn('sdk.js', html.lower())
         self.assertNotIn('kacyberpay.com/sdk', html.lower())
 
-    def test_each_amount_appears_once_on_the_steam_page(self):
-        response = self.get_page(payment_links=PAY_LINKS)
-        html = response.content.decode()
-        # Each amount_text must appear exactly once in the pay buttons block.
-        # (The price field may repeat them in another section, so we count
-        # occurrences in the pay buttons section only.)
-        pay_section_match = re.search(
-            r'class="steam-pay-buttons".*?</div>', html, re.S
-        )
-        self.assertIsNotNone(pay_section_match, 'steam-pay-buttons div not found')
-        pay_section = pay_section_match.group()
-        for link in PAY_LINKS:
-            self.assertEqual(
-                pay_section.count(link['amount_text']),
-                1,
-                '%s appears more than once in the pay buttons block' % link['amount_text'],
-            )
+    def test_payment_link_data_and_payment_intro_setting(self):
+        links = views.STEAM_EXPERIENCE['payment_links']
+        self.assertEqual(len(links), 4)
+        actual = {
+            entry['key']: (entry['url'], entry['amount_text'])
+            for entry in links
+        }
+        self.assertEqual(actual, {
+            'discover': ('https://kacyberpay.com/pay/f47mjrdxje', 'UGX 300,000'),
+            'build': ('https://kacyberpay.com/pay/ys7azaf25a', 'UGX 400,000'),
+            'innovate': ('https://kacyberpay.com/pay/gjuffbu4je', 'UGX 500,000'),
+            'full': ('https://kacyberpay.com/pay/hc6sn7yqxq', 'UGX 1,100,000'),
+        })
+        self.assertNotIn('payment_intro', views.STEAM_EXPERIENCE)
 
     def test_empty_payment_links_renders_no_pay_block(self):
         response = self.get_page(payment_links=[])
@@ -209,79 +198,141 @@ class PaymentLinkButtonTests(SteamPageTestCase):
         self.assertNotIn('steam-pay-buttons', html)
         self.assertNotIn('kacyberpay', html.lower())
 
-    def test_payment_intro_appears_above_buttons(self):
+    def test_payment_intro_text_does_not_appear_on_steam_page(self):
         response = self.get_page(payment_links=PAY_LINKS)
         html = response.content.decode()
         intro = 'Register your child first, then pay with the option you chose.'
-        self.assertIn(intro, html)
-        # The intro must come before the first pay button.
-        intro_pos = html.index(intro)
-        first_url_pos = html.index(PAY_LINKS[0]['url'])
-        self.assertLess(intro_pos, first_url_pos)
+        self.assertNotIn(intro, html)
 
 
-@override_settings(STEAM_EXPERIENCE_PUBLIC=True)
+@override_settings(STEAM_PAYMENTS_ENABLED=True)
 class JoinThanksPaymentTests(SimpleTestCase):
-    """Pay buttons on the join-thanks page follow programme and public flag."""
+    """The join-thanks confirmation page after a saved registration.
 
-    def _get_thanks(self, programme='', public=True, payment_links=None):
-        links = PAY_LINKS if payment_links is None else payment_links
-        with mock.patch.dict(views.STEAM_EXPERIENCE, {'payment_links': links}):
-            with self.settings(STEAM_EXPERIENCE_PUBLIC=public):
+    The page shows one pay button for the stage the parent picked, and
+    only while STEAM_PAYMENTS_ENABLED is True. In every other case it is
+    the plain thank you page, which still offers a way back to the form.
+    """
+
+    PLAIN_TEXT = (
+        'We have received your registration. Our team will get in touch '
+        'with you about the next steps.'
+    )
+
+    def _get_thanks(self, programme='', stage='', links=None, enabled=True):
+        payment_links = PAY_LINKS if links is None else links
+        with mock.patch.dict(views.STEAM_EXPERIENCE, {'payment_links': payment_links}):
+            with self.settings(STEAM_PAYMENTS_ENABLED=enabled):
                 return self.client.get(
-                    THANKS_URL + ('?programme=%s' % programme if programme else '')
+                    THANKS_URL + '?programme=%s&stage=%s' % (programme, stage)
                 )
 
-    def test_holiday_and_public_shows_pay_buttons(self):
-        response = self._get_thanks(programme='holiday', public=True)
+    def assert_plain_page(self, response):
         html = response.content.decode()
-        self.assertIn('Ready to pay? Choose your option.', html)
-        for link in PAY_LINKS:
-            self.assertIn(link['url'], html)
-
-    def test_holiday_not_public_hides_pay_buttons(self):
-        response = self._get_thanks(programme='holiday', public=False)
-        html = response.content.decode()
-        self.assertNotIn('Ready to pay?', html)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.PLAIN_TEXT, html)
         self.assertNotIn('kacyberpay', html.lower())
+        self.assertNotIn('join-pay', html)
+        self.assertNotIn('Fee:', html)
+        # Even the plain page offers a way back to the form
+        self.assertContains(response, 'Register another child')
+        self.assertContains(response, 'href="/join/?programme=holiday"')
 
-    def test_school_programme_hides_pay_buttons(self):
-        response = self._get_thanks(programme='school', public=True)
+    def test_holiday_with_a_valid_stage_shows_the_confirmation(self):
+        response = self._get_thanks(programme='holiday', stage='build')
         html = response.content.decode()
-        self.assertNotIn('Ready to pay?', html)
-        self.assertNotIn('kacyberpay', html.lower())
+        self.assertIn('Thank you', html)
+        self.assertIn(
+            'We have received your registration for the Holiday STEAM '
+            'Experience, Build (3 weeks).',
+            html,
+        )
+        self.assertIn('Fee: UGX 400,000', html)
+        self.assertIn(
+            'Your registration is confirmed once we receive your payment.',
+            html,
+        )
+        self.assertIn(
+            'Registering more than one child? Contact our team to arrange '
+            'your 10% sibling discount before making payment.',
+            html,
+        )
 
-    def test_no_programme_hides_pay_buttons(self):
-        response = self._get_thanks(programme='', public=True)
+    def test_the_confirmation_carries_the_contact_line(self):
+        response = self._get_thanks(programme='holiday', stage='discover')
+        self.assertContains(response, 'Questions? Call or WhatsApp us on')
+        self.assertContains(response, 'href="tel:+256752064343"')
+        self.assertContains(response, '+256 752 064343')
+        self.assertContains(
+            response, 'href="mailto:info@mindset-group.org"'
+        )
+
+    def test_the_pay_button_matches_the_stage(self):
+        response = self._get_thanks(programme='holiday', stage='innovate')
         html = response.content.decode()
-        self.assertNotIn('Ready to pay?', html)
-        self.assertNotIn('kacyberpay', html.lower())
+        link = PAY_LINKS[2]
+        self.assertIn('class="join-pay"', html)
+        self.assertIn(
+            'Pay %s with Mobile Money' % link['amount_text'], html
+        )
+        pattern = r'<a\b[^>]*href="%s"[^>]*>' % re.escape(link['url'])
+        matches = re.findall(pattern, html)
+        self.assertTrue(matches, 'No pay anchor for %s' % link['url'])
+        for anchor_open in matches:
+            self.assertIn('target="_blank"', anchor_open)
+            self.assertIn('rel="noopener noreferrer"', anchor_open)
+            self.assertIn('data-umami-event="pay-click"', anchor_open)
+            self.assertIn(
+                'data-umami-event-level="%s"' % link['label'], anchor_open
+            )
+        # Only the chosen stage is offered, never the other three
+        for other in PAY_LINKS:
+            if other is not link:
+                self.assertNotIn(other['url'], html)
 
-    def test_empty_payment_links_hides_pay_section(self):
-        response = self._get_thanks(programme='holiday', public=True, payment_links=[])
-        html = response.content.decode()
-        self.assertNotIn('Ready to pay?', html)
+    def test_the_refund_policy_link_is_a_plain_path(self):
+        response = self._get_thanks(programme='holiday', stage='discover')
+        self.assertContains(response, 'href="/refund-policy/"')
+        self.assertContains(
+            response, 'Read our refund and cancellation policy'
+        )
 
-    def test_pay_buttons_open_in_new_tab_on_thanks_page(self):
-        response = self._get_thanks(programme='holiday', public=True)
-        html = response.content.decode()
-        for link in PAY_LINKS:
-            pattern = r'<a\b[^>]*href="%s"[^>]*>' % re.escape(link['url'])
-            matches = re.findall(pattern, html)
-            self.assertTrue(matches, 'No anchor for %s on thanks page' % link['url'])
-            for anchor_open in matches:
-                self.assertIn('target="_blank"', anchor_open)
-                self.assertIn('rel="noopener noreferrer"', anchor_open)
+    def test_switching_the_setting_off_shows_the_plain_page(self):
+        response = self._get_thanks(
+            programme='holiday', stage='discover', enabled=False
+        )
+        self.assert_plain_page(response)
 
-    def test_pay_buttons_carry_pay_click_event_on_thanks_page(self):
-        response = self._get_thanks(programme='holiday', public=True)
-        html = response.content.decode()
-        for link in PAY_LINKS:
-            pattern = r'<a\b[^>]*href="%s"[^>]*>' % re.escape(link['url'])
-            for anchor_open in re.findall(pattern, html):
-                self.assertIn('data-umami-event="pay-click"', anchor_open)
+    def test_a_wrong_stage_shows_the_plain_page(self):
+        response = self._get_thanks(programme='holiday', stage='bronze')
+        self.assert_plain_page(response)
 
-    def test_thank_you_text_always_present(self):
-        response = self._get_thanks(programme='weekend', public=True)
-        self.assertContains(response, 'Thank you')
-        self.assertContains(response, 'We have received your registration.')
+    def test_no_stage_shows_the_plain_page(self):
+        response = self._get_thanks(programme='holiday')
+        self.assert_plain_page(response)
+
+    def test_another_programme_shows_the_plain_page_even_with_a_stage(self):
+        response = self._get_thanks(programme='weekend', stage='discover')
+        self.assert_plain_page(response)
+
+    def test_no_programme_shows_the_plain_page(self):
+        response = self._get_thanks()
+        self.assert_plain_page(response)
+
+    def test_empty_payment_links_shows_the_plain_page(self):
+        response = self._get_thanks(
+            programme='holiday', stage='discover', links=[]
+        )
+        self.assert_plain_page(response)
+
+    def test_links_without_a_matching_key_show_the_plain_page(self):
+        # The dictionary before the team fills in the keys: same links,
+        # but nothing to match the stage against
+        keyless = [
+            {name: value for name, value in link.items() if name != 'key'}
+            for link in PAY_LINKS
+        ]
+        response = self._get_thanks(
+            programme='holiday', stage='discover', links=keyless
+        )
+        self.assert_plain_page(response)

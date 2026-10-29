@@ -22,13 +22,13 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ('learner_name', 'parent_name', 'parent_email', 'programme', 'created_at', 'handled')
-    list_filter = ('handled', 'programme')
+    list_display = ('learner_name', 'parent_name', 'parent_email', 'programme', 'stage', 'created_at', 'handled')
+    list_filter = ('handled', 'programme', 'stage')
     search_fields = ('parent_name', 'learner_name', 'parent_email')
     # Registrations arrive from the form, so nothing but the handled flag is editable
     readonly_fields = (
         'parent_name', 'parent_email', 'parent_phone', 'learner_name',
-        'learner_age', 'school_name', 'programme', 'consent', 'created_at',
+        'learner_age', 'school_name', 'programme', 'stage', 'consent', 'created_at',
     )
 
 

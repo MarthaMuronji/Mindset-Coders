@@ -25,6 +25,7 @@ class StaticViewSitemap(Sitemap):
         # The STEAM Experience page joins the sitemap only once it is public
         if getattr(settings, 'STEAM_EXPERIENCE_PUBLIC', False):
             pages.append('steam_experience')
+            pages.append('refund_policy')
         return pages
 
     def location(self, item):

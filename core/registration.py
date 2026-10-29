@@ -9,11 +9,13 @@ import logging
 import os
 import urllib.error
 import urllib.request
+from urllib.parse import urlencode
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from . import views
 from .models import Registration
@@ -24,6 +26,13 @@ logger = logging.getLogger(__name__)
 # The programme values the team shares as links. Only these preselect a
 # programme when the page is opened with ?programme= in the address.
 PRESELECTABLE_PROGRAMMES = ('holiday', 'weekend', 'school')
+
+# The stage values the team shares as links, taken from the model itself,
+# so they can never drift apart. Only these preselect a stage when the
+# page is opened with ?stage= in the address.
+PRESELECTABLE_STAGES = tuple(
+    value for value, _label in Registration.STAGE_CHOICES
+)
 
 # Shown on the Join page when saving fails, so the visitor can retry
 SAVE_FAILED_MESSAGE = 'Sorry, we could not send your registration. Please try again in a moment.'
@@ -71,6 +80,17 @@ class RegistrationForm(forms.ModelForm):
         }),
     )
 
+    # The stage belongs to the Holiday STEAM Experience only, so the
+    # field itself is never required on its own. clean() below asks for
+    # it when the programme is holiday, and clears it for every other
+    # programme, which keeps one rule in one place.
+    stage = forms.ChoiceField(
+        choices=Registration.STAGE_CHOICES,
+        required=False,
+        label='Stage',
+        help_text='Choose a stage if you picked the Holiday STEAM Experience.',
+    )
+
     class Meta:
         model = Registration
         # consent and learner_age are declared above but stay in the field
@@ -78,7 +98,7 @@ class RegistrationForm(forms.ModelForm):
         # out on purpose, and created_at and handled belong to the admin.
         fields = (
             'parent_name', 'parent_email', 'parent_phone', 'learner_name',
-            'learner_age', 'school_name', 'programme', 'consent',
+            'learner_age', 'school_name', 'programme', 'stage', 'consent',
         )
         labels = {
             'parent_name': 'Your name',
@@ -89,25 +109,32 @@ class RegistrationForm(forms.ModelForm):
             'programme': 'Programme',
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        programme = cleaned_data.get('programme')
+        if programme == 'holiday':
+            if not cleaned_data.get('stage'):
+                self.add_error(
+                    'stage',
+                    'Please choose a stage for the Holiday STEAM Experience.',
+                )
+        else:
+            # The stage only describes the Holiday STEAM Experience, so
+            # any other programme stores it empty
+            cleaned_data['stage'] = ''
+        return cleaned_data
+
 
 def _build_registration_text(registration, admin_url):
-    """Plain text body for one saved registration, listing every field."""
-    return '\n'.join([
-        'You have a new registration from the website Join form.',
-        '',
-        'Parent name: {}'.format(registration.parent_name),
-        'Parent email: {}'.format(registration.parent_email),
-        'Parent phone: {}'.format(registration.parent_phone),
-        'Learner name: {}'.format(registration.learner_name),
-        'Learner age: {}'.format(registration.learner_age),
-        'School: {}'.format(registration.school_name or 'Not given'),
-        'Programme: {}'.format(registration.get_programme_display()),
-        'Consent: {}'.format('Yes' if registration.consent else 'No'),
-        'Sent: {}'.format(registration.created_at),
-        'Handled: {}'.format('Yes' if registration.handled else 'No'),
-        '',
-        'All registrations are in the admin: {}'.format(admin_url),
-    ])
+    """One line of plain text for one saved registration.
+
+    The team can open the entry in the admin, so the email itself never
+    needs a name, an age, a phone number or an address.
+    """
+    return 'A new registration was received for the {}. Open it here: {}'.format(
+        registration.get_programme_display(),
+        admin_url,
+    )
 
 
 def send_registration_notification(registration, admin_url):
@@ -133,14 +160,9 @@ def send_registration_notification(registration, admin_url):
                 'email': from_email,
             },
             'to': [{'email': address} for address in recipients],
-            'replyTo': {
-                'email': registration.parent_email,
-                'name': registration.parent_name,
-            },
-            'subject': 'New registration: {} ({})'.format(
-                registration.learner_name,
-                registration.get_programme_display(),
-            ),
+            # No reply-to on purpose: the email carries no personal
+            # details, so a reply could never reach the parent
+            'subject': 'New registration received',
             'textContent': _build_registration_text(registration, admin_url),
         }
         request = urllib.request.Request(
@@ -182,37 +204,63 @@ def join(request):
                 messages.error(request, SAVE_FAILED_MESSAGE)
             else:
                 # Notify the team, but never let the email change the outcome above
-                admin_url = request.build_absolute_uri('/admin/core/registration/')
+                change_url = reverse(
+                    'admin:core_registration_change', args=[registration.pk]
+                )
+                admin_url = request.build_absolute_uri(change_url)
                 try:
                     send_registration_notification(registration, admin_url)
                 except Exception:
                     logger.exception('Failed to send registration notification')
-                return redirect('join_thanks')
+                # Only the programme and the stage travel in the address,
+                # so no name, age or contact detail ever lands in a link
+                query = urlencode({
+                    'programme': registration.programme,
+                    'stage': registration.stage,
+                })
+                return redirect('{}?{}'.format(reverse('join_thanks'), query))
     else:
         programme = request.GET.get('programme', '')
+        stage = request.GET.get('stage', '')
         initial = {}
         if programme in PRESELECTABLE_PROGRAMMES:
             # Only ever preselect a programme the form actually offers
-            initial = {'programme': programme}
+            initial['programme'] = programme
+        if stage in PRESELECTABLE_STAGES:
+            # Only ever preselect a stage the form actually offers
+            initial['stage'] = stage
         form = RegistrationForm(initial=initial)
     return render(request, 'join.html', {'form': form})
 
 
 def join_thanks(request):
-    """The page shown after a registration has been stored."""
+    """The page shown after a registration has been stored.
+
+    The Holiday STEAM Experience registration shows its payment button
+    only when the stage is one of ours and payments are switched on. The
+    matching link comes from the STEAM Experience dictionary, whose
+    entries carry a key for each stage. Every other registration lands
+    on the plain thank you page.
+    """
     programme = request.GET.get('programme', '')
-    is_public = settings.STEAM_EXPERIENCE_PUBLIC
-    payment_links = views.STEAM_EXPERIENCE.get('payment_links', [])
-    show_pay_buttons = (
+    stage = request.GET.get('stage', '')
+    stage_labels = dict(Registration.STAGE_CHOICES)
+    stage_label = stage_labels.get(stage, '')
+    payment_link = None
+    if (
         programme == 'holiday'
-        and is_public
-        and bool(payment_links)
-    )
+        and stage_label
+        and settings.STEAM_PAYMENTS_ENABLED
+    ):
+        for link in views.STEAM_EXPERIENCE.get('payment_links', []):
+            if link.get('key') == stage:
+                payment_link = link
+                break
     return render(request, 'join_thanks.html', {
         # The button to the STEAM Experience page only appears once that
         # page is public, the same rule the rest of the site follows
-        'steam_public': is_public,
+        'steam_public': settings.STEAM_EXPERIENCE_PUBLIC,
         'programme': programme,
-        'payment_links': payment_links,
-        'show_pay_buttons': show_pay_buttons,
+        'stage_label': stage_label,
+        'payment_link': payment_link,
     })

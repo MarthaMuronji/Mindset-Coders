@@ -122,10 +122,6 @@ img {
         flex-wrap: wrap;
     }
 
-    .btn-login {
-        align-self: center;
-    }
-
     .hero-content h1 {
         font-size: 30px;
     }
@@ -136,6 +132,17 @@ img {
 
     section h2 {
         font-size: 26px;
+    }
+
+    .join-pay {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .join-pay .btn {
+        width: 100%;
+        text-align: center;
     }
 
     .home-section {
@@ -272,16 +279,6 @@ img {
 
 .btn:hover {
     transform: translateY(-2px);
-}
-
-.btn-login {
-    background: var(--green);
-    color: var(--white);
-    box-shadow: 0 4px 14px rgba(47, 168, 79, 0.3);
-}
-
-.btn-login:hover {
-    background: var(--green-dark);
 }
 
 .btn-primary {
@@ -599,8 +596,10 @@ section h2 {
 .footer-socials a {
     color: var(--green);
     font-size: 18px;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     border-radius: 50%;
     border: 1.5px solid rgba(47, 168, 79, 0.3);
     display: flex;
@@ -1970,9 +1969,9 @@ section h2 {
 /* ===== Header nav below 1000px =====
    The two-row wrap band that used to cover 769px to 960px has been removed
    and replaced by a single break point: below 1000px the nav collapses into
-   the hamburger (Login stays inside the collapsed panel), and from 1000px up
-   the nav is one single row. Same declarations as the mobile block at the
-   top of the file, just applied over the wider band. */
+   the hamburger, and from 1000px up the nav is one single row. Same
+   declarations as the mobile block at the top of the file, just applied
+   over the wider band. */
 @media (max-width: 999px) {
     .nav-toggle {
         display: flex;
@@ -2000,9 +1999,6 @@ section h2 {
         flex-wrap: wrap;
     }
 
-    .btn-login {
-        align-self: center;
-    }
 }
 
 /* ===== Colour contrast =====
@@ -2015,12 +2011,10 @@ section h2 {
     --green-btn-hover: #18622D;
 }
 
-.btn-login,
 .cta-banner .btn-primary {
     background: var(--green-btn);
 }
 
-.btn-login:hover,
 .cta-banner .btn-primary:hover {
     background: var(--green-btn-hover);
 }
@@ -2283,8 +2277,6 @@ a.build-card:focus-visible {
 #how-competitions-work .build-cards-grid {
     margin-top: 36px;
 }
-
-/* ===== Login text link on the dark CTA banner ===== */
 
 /* The see-all-link green is for light backgrounds and only reaches about
    2.4:1 on the navy gradient, so white is used instead (about 13:1). */

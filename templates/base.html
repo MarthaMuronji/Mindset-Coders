@@ -64,7 +64,6 @@
     <li><a href="{% url 'partners' %}">Our Ecosystem</a></li>
     <li><a href="{% url 'contact' %}">Contact</a></li>
 </ul>
-                <a href="https://www.mindsetlearn.org/" target="_blank" rel="noopener noreferrer" class="btn btn-login" data-umami-event="login-click">Login</a>
             </div>
         </nav>
     </header>
@@ -88,10 +87,10 @@
 
         <p class="footer-copy">&copy; {% now "Y" %} Mindset Coders Uganda. Think. Code. Create. Solve.</p>
         <div class="footer-socials">
-            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://www.facebook.com/mindsetcoders/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" data-umami-event="social-click" data-umami-event-network="facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/mindsetcoders/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" data-umami-event="social-click" data-umami-event-network="instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://x.com/mindsetcoder" target="_blank" rel="noopener noreferrer" aria-label="X" data-umami-event="social-click" data-umami-event-network="x"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="https://ug.linkedin.com/company/mindsetcoders" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" data-umami-event="social-click" data-umami-event-network="linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
         </div>
     </footer>
 
@@ -109,7 +108,6 @@
     (function () {
         'use strict';
 
-        var REGISTERED_KEY = 'steam-promo';
         var VISIT_KEY = 'steam-promo-visit';
 
         var chip = document.getElementById('steam-chip-corner');
@@ -125,10 +123,7 @@
         }
 
         var visitMemory = { popupShown: false, chipClosed: false };
-        var registeredMemory = false;
-        var registered = false;
         var visitStorageOk = true;
-        var registeredStorageOk = true;
 
         function loadVisitState() {
             try {
@@ -154,51 +149,6 @@
                 visitStorageOk = false;
             }
         }
-
-        function loadRegistered() {
-            try {
-                var raw = window.localStorage.getItem(REGISTERED_KEY);
-                if (raw) {
-                    var stored = JSON.parse(raw);
-                    registeredMemory = !!(stored && typeof stored === 'object' && stored.registered === true);
-                }
-            } catch (err) {
-                registeredStorageOk = false;
-            }
-            return registeredMemory;
-        }
-
-        function registerInterest() {
-            registeredMemory = true;
-            registered = true;
-            if (registeredStorageOk) {
-                try {
-                    window.localStorage.setItem(REGISTERED_KEY, JSON.stringify({ registered: true }));
-                } catch (err) {
-                    registeredStorageOk = false;
-                }
-            }
-            stopPromos();
-        }
-
-        function stopPromos() {
-            if (dialog && dialog.open) dialog.close();
-            if (chip) chip.hidden = true;
-        }
-
-        window.addEventListener('storage', function (event) {
-            if (event.key !== REGISTERED_KEY || !event.newValue) return;
-            var stored;
-            try {
-                stored = JSON.parse(event.newValue);
-            } catch (err) {
-                return;
-            }
-            if (!stored || typeof stored !== 'object' || stored.registered !== true) return;
-            registeredMemory = true;
-            registered = true;
-            stopPromos();
-        });
 
         var startRaw = '';
         if (chipDays) startRaw = chipDays.getAttribute('data-steam-start') || '';
@@ -251,7 +201,6 @@
         }
 
         var visitState = loadVisitState();
-        registered = loadRegistered();
         var opener = null;
         var chipShown = false;
 
@@ -283,14 +232,10 @@
             var laterButton = dialog.querySelector('.steam-popup-secondary');
             if (laterButton) laterButton.addEventListener('click', closePopup);
 
-            /* After the main call to action, never show any promo again. */
-            var registerLink = dialog.querySelector('.steam-popup-primary');
-            if (registerLink) registerLink.addEventListener('click', registerInterest);
-
             window.setTimeout(function () {
                 var days = daysLeft();
                 if (days === null || days < 1) return;
-                if (registered || visitState.popupShown) return;
+                if (visitState.popupShown) return;
                 if (menuOpen()) return;
                 var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 if (reducedMotion && window.pageYOffset > 0) return;
@@ -322,13 +267,10 @@
                 }
             });
 
-            var chipLink = chip.querySelector('.steam-chip-link');
-            if (chipLink) chipLink.addEventListener('click', registerInterest);
-
             window.setTimeout(function () {
                 var days = daysLeft();
                 if (days === null || days < 1) return;
-                if (registered || !visitState.popupShown || visitState.chipClosed) return;
+                if (!visitState.popupShown || visitState.chipClosed) return;
                 if (menuOpen()) return;
                 if (dialog && dialog.open) return;
                 fillCountdown(days);
@@ -352,7 +294,7 @@
                 }
                 if (footerVisible) {
                     chip.hidden = true;
-                } else if (chipShown && !registered && !visitState.chipClosed) {
+                } else if (chipShown && !visitState.chipClosed) {
                     chip.hidden = false;
                 }
             });
