@@ -92,6 +92,10 @@ img {
 }
 
 @media (max-width: 768px) {
+    .logo img {
+        height: 40px;
+    }
+
     .nav-toggle {
         display: flex;
     }
@@ -201,11 +205,16 @@ img {
 }
 
 .logo {
-    font-family: 'Poppins', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--navy);
-    letter-spacing: -0.5px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+}
+
+.logo img {
+    height: 48px;
+    width: auto;
+    display: block;
 }
 
 .logo-accent {
@@ -665,6 +674,11 @@ section h2 {
         text-align: center;
     }
 
+    .wro-spotlight-logo {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .home-global .wro-spotlight-content h2 {
         text-align: center;
     }
@@ -745,6 +759,13 @@ section h2 {
 }
 
 /* ===== WRO Spotlight ===== */
+.wro-spotlight-logo {
+    width: 180px;
+    height: auto;
+    display: block;
+    margin-bottom: 20px;
+}
+
 .wro-spotlight {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
     border-radius: 20px;
