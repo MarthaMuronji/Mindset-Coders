@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
-from .models import Post, ContactMessage, Story
+from .models import Post, ContactMessage, Registration, Story
 
 
 @admin.register(Post)
@@ -18,6 +18,18 @@ class ContactMessageAdmin(admin.ModelAdmin):
     search_fields = ('name', 'email', 'message')
     # Messages arrive from the form, so nothing but the handled flag is editable
     readonly_fields = ('name', 'email', 'role', 'message', 'created_at')
+
+
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    list_display = ('learner_name', 'parent_name', 'parent_email', 'programme', 'created_at', 'handled')
+    list_filter = ('handled', 'programme')
+    search_fields = ('parent_name', 'learner_name', 'parent_email')
+    # Registrations arrive from the form, so nothing but the handled flag is editable
+    readonly_fields = (
+        'parent_name', 'parent_email', 'parent_phone', 'learner_name',
+        'learner_age', 'school_name', 'programme', 'consent', 'created_at',
+    )
 
 
 @admin.register(Story)

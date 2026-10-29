@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # Starting text for the message box when someone arrives from a route card.
 # Any other topic value is ignored, and the value is never printed anywhere.
 TOPIC_STARTERS = {
-    'learner': 'I am interested in Mindset Learn.',
+    'learner': 'I am interested in joining a Mindset Coders programme.',
     'school': 'I would like to bring STEAM to our school.',
     'global': 'I would like to know more about global opportunities.',
     'university': 'I would like to know more about University Preparation.',
@@ -121,18 +121,39 @@ STEAM_EXPERIENCE = {
     'duration': 'Discover runs for 2 weeks (16 to 27 November), Build for 3 weeks (30 November to 18 December) and Innovate for 4 weeks (4 to 29 January). There is a break from 21 December to 2 January, and classes resume on Monday 4 January.',
     'venues': ['Mindset Coders Headquarters, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
-    'payment_options': 'Pay online by Mobile Money or by card.',
+    'payment_options': 'Pay online by Mobile Money.',
     'discount_note': 'Siblings registering together for the same stage get 10% off the fee for each additional child.',
-    # The link every Register button on the page opens in a new tab. While it
-    # is empty the buttons keep pointing at the contact page, as before.
-    'registration_url': 'https://kacyberpay.com/pay/f47mjrdxje',
+    'payment_intro': 'Register your child first, then pay with the option you chose.',
+    'payment_links': [
+        {
+            'label': 'Discover, 2 weeks',
+            'amount_text': 'UGX 300,000',
+            'url': 'https://kacyberpay.com/pay/f47mjrdxje',
+        },
+        {
+            'label': 'Build, 3 weeks',
+            'amount_text': 'UGX 400,000',
+            'url': 'https://kacyberpay.com/pay/ys7azaf25a',
+        },
+        {
+            'label': 'Innovate, 4 weeks',
+            'amount_text': 'UGX 500,000',
+            'url': 'https://kacyberpay.com/pay/gjuffbu4je',
+        },
+        {
+            'label': 'Full journey, paid upfront',
+            'amount_text': 'UGX 1,100,000',
+            'url': 'https://kacyberpay.com/pay/hc6sn7yqxq',
+        },
+    ],
+    'registration_url': '',
     # One short line under the Register button, for anything the team needs to
     # say about paying. Empty means nothing is rendered there.
     'payment_note': None,
     'contact_hours': 'Monday to Saturday, 8:00 am to 6:00 pm',
     'contact_phone': '+256 752 064343',
     'safety_note': None,
-    'passport_note': None,
+    'passport_note': 'M-Pass is the learner passport that accompanies this journey, helping children document projects, reflect on what they learn, and build evidence of their developing competencies.',
     'inclusions': [
         'Kits for use during the Build stage',
         'A kit to take home in the Innovate stage',

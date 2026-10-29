@@ -20,7 +20,7 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     <span class="badge">Holiday program</span>
     <h1>The STEAM Experience</h1>
     <p>A holiday learning pathway where your child discovers what they love, builds with technology, and innovates.</p>
-    <p class="section-cta-wrap"><a href="{{ registration_url }}" class="btn btn-primary"{% if content.registration_url %} target="_blank" rel="noopener noreferrer"{% endif %} data-umami-event="{% if content.registration_url %}register-payment-click{% else %}steam-register-interest{% endif %}" data-umami-event-from="steam-experience">Register your interest</a></p>
+    <p class="section-cta-wrap"><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your interest</a></p>
     {% if content.payment_note %}<p class="steam-payment-note">{{ content.payment_note }}</p>{% endif %}
 </section>
 
@@ -182,6 +182,18 @@ appears when there are more venues to list.{% endcomment %}
     </div>
 </section>
 {% endif %}
+
+{% if content.payment_links %}
+<section class="home-section steam-pay reveal">
+    {% if content.payment_intro %}<p class="section-subtitle">{{ content.payment_intro }}</p>{% endif %}
+    <div class="steam-pay-buttons">
+        {% for link in content.payment_links %}
+        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-umami-event="pay-click" data-umami-event-level="{{ link.label }}" data-umami-event-from="steam-experience">{{ link.label }} - {{ link.amount_text }}</a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
 {% else %}
 {% if content.price %}
 <section class="home-section reveal">
@@ -207,7 +219,6 @@ appears when there are more venues to list.{% endcomment %}
 <section class="home-section reveal">
     <h2>Their journey is recorded</h2>
     <p class="section-subtitle">{{ content.passport_note }}</p>
-    <p class="section-cta-wrap"><a href="{% url 'mindset_learn' %}" class="btn btn-outline" data-umami-event="steam-mindset-learn-link" data-umami-event-from="steam-experience">See how Mindset Learn works</a></p>
 </section>
 {% endif %}
 
@@ -222,7 +233,7 @@ appears when there are more venues to list.{% endcomment %}
     <h2>How to register and get in touch</h2>
     <div class="steam-contact-grid">
         <div class="steam-contact-actions">
-            <p><a href="{{ registration_url }}" class="btn btn-primary"{% if content.registration_url %} target="_blank" rel="noopener noreferrer"{% endif %} data-umami-event="{% if content.registration_url %}register-payment-click{% else %}steam-register-interest{% endif %}" data-umami-event-from="steam-experience">Register your interest</a></p>
+            <p><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your interest</a></p>
             <p><a href="{% url 'contact' %}" class="btn btn-outline" data-umami-event="steam-contact-link" data-umami-event-from="steam-experience">Contact Mindset Coders</a></p>
         </div>
         {% if content.contact_hours or content.contact_phone %}
@@ -235,7 +246,7 @@ appears when there are more venues to list.{% endcomment %}
 </section>
 
 <section class="home-section section-tint reveal">
-    <p class="section-subtitle">Learners can keep building on <a href="{% url 'mindset_learn' %}">Mindset Learn</a>, our platform for lessons, projects and challenges.</p>
+    <p class="section-subtitle">Learners can keep documenting their projects and tracking their growth on M-Pass.</p>
 </section>
 
 <section class="cta-banner reveal">
@@ -248,7 +259,7 @@ phone. The bar is hidden by CSS from 768px up, so it never shows on a
 desktop, and the page gets bottom padding so it never covers the footer
 or the closing banner.{% endcomment %}
 <div class="steam-sticky-bar">
-    <a href="{{ registration_url }}" class="btn btn-green"{% if content.registration_url %} target="_blank" rel="noopener noreferrer"{% endif %} data-umami-event="{% if content.registration_url %}register-payment-click{% else %}steam-register-interest{% endif %}" data-umami-event-from="steam-experience">Register your interest</a>
+    <a href="{% url 'join' %}?programme=holiday" class="btn btn-green" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your interest</a>
 </div>
 </div>
 

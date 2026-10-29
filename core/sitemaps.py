@@ -10,7 +10,7 @@ class StaticViewSitemap(Sitemap):
         pages = [
             'home',
             'about',
-            'mindset_learn',
+            'join',
             'for_schools',
             'global_opportunities',
             'innovators_circle',

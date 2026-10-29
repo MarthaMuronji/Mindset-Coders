@@ -95,6 +95,39 @@ class Story(models.Model):
         return 'Anonymous'
 
 
+class Registration(models.Model):
+    """A parent's registration for a Mindset Coders programme.
+
+    It arrives through the Join form, is read in the admin, and is never
+    shown on the website.
+    """
+
+    # The four ways a family can describe the programme they are interested in
+    PROGRAMME_CHOICES = [
+        ('holiday', 'Holiday STEAM Experience'),
+        ('weekend', 'Weekend classes'),
+        ('school', 'Through a participating school'),
+        ('unsure', 'Not sure yet'),
+    ]
+
+    parent_name = models.CharField(max_length=100)
+    parent_email = models.EmailField()
+    parent_phone = models.CharField(max_length=30)
+    learner_name = models.CharField(max_length=100)
+    learner_age = models.PositiveSmallIntegerField()
+    school_name = models.CharField(max_length=200, blank=True)
+    programme = models.CharField(max_length=20, choices=PROGRAMME_CHOICES)
+    consent = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    handled = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.learner_name} ({self.parent_name})'
+
+
 class ContactMessage(models.Model):
     """A message sent through the contact form, shown in the Django admin."""
     name = models.CharField(max_length=100)
