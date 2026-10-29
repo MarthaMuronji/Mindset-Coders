@@ -38,14 +38,13 @@ class MPassMenuTests(SimpleTestCase):
         self.assertNotIn('/mindset-learn/', nav_html)
         self.assertNotIn('Mindset Learn</a>', nav_html)
 
-    def test_login_button_remains_unchanged(self):
+    def test_login_link_is_absent_and_mpass_link_remains(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         html = response.content.decode('utf-8')
-        self.assertIn('https://www.mindsetlearn.org/', html)
-        self.assertIn('class="btn btn-login"', html)
-        self.assertIn('data-umami-event="login-click"', html)
-        self.assertIn('>Login</a>', html)
+        self.assertNotIn('https://www.mindsetlearn.org/', html)
+        self.assertNotRegex(html, r'<[^>]+\bclass="[^"]*\bbtn-login\b')
+        self.assertIn('href="https://mpass.mindsetlearn.org/auth"', html)
 
     def test_mindset_learn_redirects_to_join(self):
         response = self.client.get('/mindset-learn/')

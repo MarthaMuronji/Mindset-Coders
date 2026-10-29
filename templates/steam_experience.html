@@ -20,7 +20,7 @@ While the program is not public yet, tell crawlers to skip this page. The view a
     <span class="badge">Holiday program</span>
     <h1>The STEAM Experience</h1>
     <p>A holiday learning pathway where your child discovers what they love, builds with technology, and innovates.</p>
-    <p class="section-cta-wrap"><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your interest</a></p>
+    <p class="section-cta-wrap"><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a></p>
     {% if content.payment_note %}<p class="steam-payment-note">{{ content.payment_note }}</p>{% endif %}
 </section>
 
@@ -55,7 +55,7 @@ While the program is not public yet, tell crawlers to skip this page. The view a
                 <h3>{{ stage.name }}</h3>
             </div>
             <p class="steam-stage-meta">
-                {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.dates }}</span>{% endif %}
+                {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.name }}: {{ stage.dates }}</span>{% endif %}
                 {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} weeks</span>{% endif %}
             </p>
             {% if stage.fee %}<p class="steam-stage-fee">{{ stage.fee }}</p>{% endif %}
@@ -65,8 +65,7 @@ While the program is not public yet, tell crawlers to skip this page. The view a
         {% if content.break and content.break.after == stage.name %}
         <div class="steam-break">
             <span class="steam-break-label">
-                <span class="steam-break-name">{{ content.break.label }}</span>
-                {% if content.break.dates %}<span class="steam-break-dates">{{ content.break.dates }}</span>{% endif %}
+                <span class="steam-break-name">{{ content.break.label }}: {{ content.break.dates }}</span>
             </span>
         </div>
         {% endif %}
@@ -90,6 +89,8 @@ While the program is not public yet, tell crawlers to skip this page. The view a
             {% endfor %}
         </div>
         <p class="steam-sr-only">{% for stage in content.stages %}{{ stage.weeks }} weeks of {{ stage.name }}{% if content.break and content.break.after == stage.name %}, then the {{ content.break.label }}{% if content.break.dates %} from {{ content.break.dates }}{% endif %}{% endif %}{% if not forloop.last %}, then {% endif %}{% endfor %}.</p>
+        <p>{{ content.classes_resume }}</p>
+        <p>{{ content.pathway_note }}</p>
     </div>
 
     {% if content.full_journey and content.full_journey.fee %}
@@ -183,16 +184,17 @@ appears when there are more venues to list.{% endcomment %}
 </section>
 {% endif %}
 
-{% if content.payment_links %}
 <section class="home-section steam-pay reveal">
-    {% if content.payment_intro %}<p class="section-subtitle">{{ content.payment_intro }}</p>{% endif %}
-    <div class="steam-pay-buttons">
-        {% for link in content.payment_links %}
-        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-umami-event="pay-click" data-umami-event-level="{{ link.label }}" data-umami-event-from="steam-experience">{{ link.label }} - {{ link.amount_text }}</a>
-        {% endfor %}
-    </div>
+    {% if steam_payments_enabled %}
+    <p class="section-subtitle">Register your child first. You will see your fee and the payment button on the next page.</p>
+    {% else %}
+    <p class="section-subtitle">Register your child first. Our team will tell you how to pay.</p>
+    {% endif %}
+    <p class="section-subtitle">Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.</p>
+    <p><strong>Email:</strong> <a href="mailto:info@mindset-group.org">info@mindset-group.org</a></p>
+    <p><strong>Phone:</strong> <a href="tel:+256752064343">+256 752 064343</a></p>
+    <p><a href="{% url 'refund_policy' %}">Read the refund and cancellation policy</a></p>
 </section>
-{% endif %}
 
 {% else %}
 {% if content.price %}
@@ -233,7 +235,7 @@ appears when there are more venues to list.{% endcomment %}
     <h2>How to register and get in touch</h2>
     <div class="steam-contact-grid">
         <div class="steam-contact-actions">
-            <p><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your interest</a></p>
+            <p><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a></p>
             <p><a href="{% url 'contact' %}" class="btn btn-outline" data-umami-event="steam-contact-link" data-umami-event-from="steam-experience">Contact Mindset Coders</a></p>
         </div>
         {% if content.contact_hours or content.contact_phone %}
@@ -259,7 +261,7 @@ phone. The bar is hidden by CSS from 768px up, so it never shows on a
 desktop, and the page gets bottom padding so it never covers the footer
 or the closing banner.{% endcomment %}
 <div class="steam-sticky-bar">
-    <a href="{% url 'join' %}?programme=holiday" class="btn btn-green" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your interest</a>
+    <a href="{% url 'join' %}?programme=holiday" class="btn btn-green" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a>
 </div>
 </div>
 

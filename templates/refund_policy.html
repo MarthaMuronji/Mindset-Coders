@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Refund and cancellation policy{% endblock %}
+{% block meta_title_og %}Refund and cancellation policy{% endblock %}
+{% block meta_description %}Refund and cancellation policy{% endblock %}
+{% block og_description %}Refund and cancellation policy{% endblock %}
+
+{% block content %}
+
+{% if not is_public %}
+<meta name="robots" content="noindex, nofollow">
+{% endif %}
+
+<section class="about-hero reveal">
+    <h1>Refund and cancellation policy</h1>
+</section>
+
+<section class="home-section reveal">
+    <ul>
+        <li>Registration is confirmed once payment has been received.</li>
+        <li>Cancellations requested at least seven days before the registered stage begins may qualify for a refund, subject to any reasonable administrative deductions disclosed before payment.</li>
+        <li>Cancellations requested less than seven days before a stage begins are generally non-refundable, except where an exception is approved.</li>
+        <li>Once a stage has started, fees are generally non-refundable.</li>
+        <li>If Mindset Coders cancels a programme, parents will be offered a full refund or the option to transfer their payment to another programme.</li>
+        <li>Exceptional circumstances will be considered individually.</li>
+    </ul>
+</section>
+
+{% endblock %}

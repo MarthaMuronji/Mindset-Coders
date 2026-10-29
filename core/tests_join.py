@@ -25,12 +25,16 @@ VALID_POST = {
     'learner_age': '10',
     'school_name': '',
     'programme': 'holiday',
+    'stage': 'discover',
     'consent': 'on',
     'website': '',
 }
 
 # The four programme values the select offers
 PROGRAMMES = ('holiday', 'weekend', 'school', 'unsure')
+
+# The four stage values the select offers
+STAGES = ('discover', 'build', 'innovate', 'full')
 
 
 class JoinPageTests(SimpleTestCase):
@@ -46,6 +50,8 @@ class JoinPageTests(SimpleTestCase):
         notified = []
 
         def fake_save(instance, *args, **kwargs):
+            # A made up key, so the view can build the admin link
+            instance.pk = 42
             saved.append(instance)
 
         def fake_notify(registration, admin_url):
@@ -105,6 +111,7 @@ class JoinPageTests(SimpleTestCase):
             'learner_age': "Learner's age",
             'school_name': 'School (optional)',
             'programme': 'Programme',
+            'stage': 'Stage',
             'consent': 'I am the parent or guardian of this learner, and I agree '
                        'to Mindset Coders contacting me about this registration.',
         }
@@ -115,7 +122,9 @@ class JoinPageTests(SimpleTestCase):
     def test_valid_post_saves_and_redirects(self):
         response, saved, notified = self.post_form(VALID_POST)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/join/thanks/')
+        self.assertEqual(
+            response['Location'], '/join/thanks/?programme=holiday&stage=discover'
+        )
 
         self.assertEqual(len(saved), 1)
         registration = saved[0]
@@ -126,14 +135,17 @@ class JoinPageTests(SimpleTestCase):
         self.assertEqual(registration.learner_age, 10)
         self.assertEqual(registration.school_name, '')
         self.assertEqual(registration.programme, 'holiday')
+        self.assertEqual(registration.stage, 'discover')
         self.assertTrue(registration.consent)
         self.assertFalse(registration.handled)
 
-        # The team is emailed about it, with a link to the admin entry
+        # The team is emailed about it, with a link to this record in the
+        # admin, and never with any personal details
         self.assertEqual(len(notified), 1)
         self.assertIs(notified[0][0], registration)
         self.assertEqual(
-            notified[0][1], 'http://testserver/admin/core/registration/'
+            notified[0][1],
+            'http://testserver/admin/core/registration/42/change/',
         )
 
     def test_missing_consent_fails(self):
@@ -201,7 +213,9 @@ class JoinPageTests(SimpleTestCase):
         # The registration was saved and the visitor is simply sent on
         save_mock.assert_called()
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/join/thanks/')
+        self.assertEqual(
+            response['Location'], '/join/thanks/?programme=holiday&stage=discover'
+        )
         # No message is waiting for them, so nothing can be shown as an error
         self.assertEqual(list(get_messages(response.wsgi_request)), [])
 
@@ -224,6 +238,74 @@ class JoinPageTests(SimpleTestCase):
         for value in PROGRAMMES:
             with self.subTest(value=value):
                 self.assertNotIn('selected', self.option_tag(response, value))
+
+    def test_stage_is_required_for_the_holiday_programme_only(self):
+        data = dict(VALID_POST)
+        data.pop('stage')
+        with mock.patch.object(Registration, 'save') as save_mock:
+            response = self.client.post('/join/', data)
+        save_mock.assert_not_called()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'errorlist')
+        self.assertContains(
+            response, 'Please choose a stage for the Holiday STEAM Experience.'
+        )
+
+        # Every other programme saves with no stage at all
+        for programme in ('weekend', 'school', 'unsure'):
+            with self.subTest(programme=programme):
+                data = dict(VALID_POST, programme=programme)
+                data.pop('stage')
+                response, saved, notified = self.post_form(data)
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(len(saved), 1)
+
+    def test_a_stage_on_another_programme_is_cleared(self):
+        data = dict(VALID_POST, programme='weekend', stage='discover')
+        response, saved, notified = self.post_form(data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(saved[0].programme, 'weekend')
+        self.assertEqual(saved[0].stage, '')
+
+    def test_the_redirect_carries_only_the_programme_and_the_stage(self):
+        data = dict(VALID_POST, learner_name='A Name That Must Not Travel')
+        response, saved, notified = self.post_form(data)
+        location = response['Location']
+        self.assertEqual(
+            location, '/join/thanks/?programme=holiday&stage=discover'
+        )
+        # No name, age or contact detail ever lands in the address
+        for value in (
+            'A Name That Must Not Travel',
+            'Test Parent',
+            'parent@example.com',
+            '+256 700 000000',
+            '10',
+        ):
+            with self.subTest(value=value):
+                self.assertNotIn(value, location)
+
+    def test_stage_query_param_preselects(self):
+        response = self.client.get('/join/?stage=innovate')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('selected', self.option_tag(response, 'innovate'))
+        for value in STAGES:
+            if value != 'innovate':
+                with self.subTest(value=value):
+                    self.assertNotIn('selected', self.option_tag(response, value))
+
+    def test_an_unknown_stage_is_not_preselected(self):
+        response = self.client.get('/join/?stage=party')
+        for value in STAGES:
+            with self.subTest(value=value):
+                self.assertNotIn('selected', self.option_tag(response, value))
+
+    def test_the_stage_field_shows_its_hint(self):
+        response = self.client.get('/join/')
+        self.assertContains(
+            response,
+            'Choose a stage if you picked the Holiday STEAM Experience.',
+        )
 
     @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
     def test_no_steam_link_while_the_page_is_not_public(self):
@@ -265,6 +347,20 @@ class JoinThanksPageTests(SimpleTestCase):
         response = self.client.get('/join/thanks/')
         self.assertContains(response, "window.umami.track('join-form-sent')")
 
+    def test_register_another_child_always_offered(self):
+        # On the plain page and on any programme, there is always a way
+        # back to the form for the next child
+        for url in (
+            '/join/thanks/',
+            '/join/thanks/?programme=weekend&stage=',
+            '/join/thanks/?programme=holiday&stage=discover',
+        ):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'Register another child')
+                self.assertContains(response, 'href="/join/?programme=holiday"')
+
 
 class RegistrationNotificationTests(SimpleTestCase):
     """The Brevo email the team receives about a new registration."""
@@ -282,7 +378,7 @@ class RegistrationNotificationTests(SimpleTestCase):
             consent=True,
         )
 
-    def send(self, registration):
+    def send(self, registration, admin_url='http://testserver/admin/core/registration/1/change/'):
         """Send with the three environment variables set and the API stubbed."""
         environment = {
             'BREVO_API_KEY': 'test-key',
@@ -291,41 +387,38 @@ class RegistrationNotificationTests(SimpleTestCase):
         }
         with mock.patch.dict(os.environ, environment):
             with mock.patch('core.registration.urllib.request.urlopen') as send:
-                send_registration_notification(
-                    registration, 'http://testserver/admin/core/registration/'
-                )
+                send_registration_notification(registration, admin_url)
         self.assertEqual(send.call_count, 1)
         request = send.call_args.args[0]
         return json.loads(request.data.decode('utf-8'))
 
-    def test_subject_and_reply_to(self):
+    def test_subject_and_no_reply_to(self):
         payload = self.send(self.build_registration())
-        self.assertEqual(
-            payload['subject'],
-            'New registration: Test Learner (Holiday STEAM Experience)',
-        )
-        self.assertEqual(
-            payload['replyTo'],
-            {'email': 'parent@example.com', 'name': 'Test Parent'},
-        )
+        self.assertEqual(payload['subject'], 'New registration received')
+        # The email carries no personal details, so a reply could never
+        # reach the parent
+        self.assertNotIn('replyTo', payload)
 
-    def test_body_lists_every_field(self):
+    def test_body_is_one_line_with_the_programme_and_the_admin_link(self):
         payload = self.send(self.build_registration())
         body = payload['textContent']
-        for line in (
-            'Parent name: Test Parent',
-            'Parent email: parent@example.com',
-            'Parent phone: +256 700 000000',
-            'Learner name: Test Learner',
-            'Learner age: 10',
-            'School: Not given',
-            'Programme: Holiday STEAM Experience',
-            'Consent: Yes',
-            'Handled: No',
-            'http://testserver/admin/core/registration/',
+        self.assertNotIn('\n', body)
+        self.assertIn('A new registration was received', body)
+        self.assertIn('Holiday STEAM Experience', body)
+        self.assertIn('http://testserver/admin/core/registration/1/change/', body)
+
+    def test_body_carries_no_personal_details(self):
+        payload = self.send(self.build_registration())
+        body = payload['textContent']
+        for value in (
+            'Test Parent',
+            'parent@example.com',
+            '+256 700 000000',
+            'Test Learner',
+            '10',
         ):
-            with self.subTest(line=line):
-                self.assertIn(line, body)
+            with self.subTest(value=value):
+                self.assertNotIn(value, body)
 
     def test_nothing_is_sent_without_the_environment(self):
         # Without the three variables the feature is off and the function

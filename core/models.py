@@ -110,6 +110,15 @@ class Registration(models.Model):
         ('unsure', 'Not sure yet'),
     ]
 
+    # The four stages of the Holiday STEAM Experience. A stage only ever
+    # belongs to that programme, so the field stays blank for the others.
+    STAGE_CHOICES = [
+        ('discover', 'Discover (2 weeks)'),
+        ('build', 'Build (3 weeks)'),
+        ('innovate', 'Innovate (4 weeks)'),
+        ('full', 'Full journey (paid upfront)'),
+    ]
+
     parent_name = models.CharField(max_length=100)
     parent_email = models.EmailField()
     parent_phone = models.CharField(max_length=30)
@@ -117,6 +126,7 @@ class Registration(models.Model):
     learner_age = models.PositiveSmallIntegerField()
     school_name = models.CharField(max_length=200, blank=True)
     programme = models.CharField(max_length=20, choices=PROGRAMME_CHOICES)
+    stage = models.CharField(max_length=20, choices=STAGE_CHOICES, blank=True)
     consent = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     handled = models.BooleanField(default=False)

@@ -39,6 +39,11 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # sitemap, not tracked, and not linked from anywhere on the site.
 STEAM_EXPERIENCE_PUBLIC = os.environ.get('STEAM_EXPERIENCE_PUBLIC', 'False') == 'True'
 
+# The join-thanks confirmation page shows the payment button for the
+# Holiday STEAM Experience only while this is True. While it is False
+# every registration lands on the plain thank you page.
+STEAM_PAYMENTS_ENABLED = os.environ.get('STEAM_PAYMENTS_ENABLED', 'False') == 'True'
+
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 

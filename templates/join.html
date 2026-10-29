@@ -58,6 +58,14 @@
                 {{ form.programme }}
             </div>
             <div class="form-group">
+                <label for="{{ form.stage.id_for_label }}">{{ form.stage.label }}</label>
+                {{ form.stage.errors }}
+                {{ form.stage }}
+                {% if form.stage.help_text %}
+                <p class="field-hint">{{ form.stage.help_text }}</p>
+                {% endif %}
+            </div>
+            <div class="form-group">
                 <label for="{{ form.consent.id_for_label }}" class="consent-label">{{ form.consent }} {{ form.consent.label }}</label>
                 {{ form.consent.errors }}
             </div>
