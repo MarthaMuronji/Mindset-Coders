@@ -47,6 +47,7 @@ class MPassMenuTests(SimpleTestCase):
         self.assertIn('data-umami-event="login-click"', html)
         self.assertIn('>Login</a>', html)
 
-    def test_mindset_learn_page_still_exists_and_renders(self):
+    def test_mindset_learn_redirects_to_join(self):
         response = self.client.get('/mindset-learn/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/join/')

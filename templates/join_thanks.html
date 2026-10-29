@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Thank you | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Thank you | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}We have received your registration. Our team will get in touch with you about the next steps.{% endblock %}
+{% block og_description %}We have received your registration. Our team will get in touch with you about the next steps.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <h1>Thank you</h1>
+    <p>We have received your registration. Our team will get in touch with you about the next steps.</p>
+    <p>Questions? Call or WhatsApp us on <a href="tel:+256752064343">+256 752 064343</a>, Monday to Saturday, 8:00 am to 6:00 pm.</p>
+    {% if steam_public %}
+    <p class="section-cta-wrap"><a href="{% url 'steam_experience' %}" class="btn btn-green" data-umami-event="join-steam-link" data-umami-event-from="join">See the STEAM Experience</a></p>
+    {% endif %}
+</section>
+
+{% if show_pay_buttons %}
+<section class="home-section steam-pay reveal">
+    <h2>Ready to pay? Choose your option.</h2>
+    <div class="steam-pay-buttons">
+        {% for link in payment_links %}
+        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-umami-event="pay-click" data-umami-event-level="{{ link.label }}" data-umami-event-from="join-thanks">{{ link.label }} - {{ link.amount_text }}</a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% comment %}The form has been stored by the time this page loads, so the
+sent event is fired the same way the Contact page fires its own.{% endcomment %}
+<script>
+    window.addEventListener('load', function () {
+        if (window.umami) {
+            window.umami.track('join-form-sent');
+        }
+    });
+</script>
+
+{% endblock %}

@@ -3,8 +3,8 @@
 
 {% block title %}Mindset Coders Uganda | STEAM education, coding and robotics{% endblock %}
 {% block meta_title_og %}Mindset Coders Uganda | STEAM education, coding and robotics{% endblock %}
-{% block meta_description %}Mindset Coders builds the tools, resources and systems that enable STEAM education in Uganda, from Mindset Learn to schools, kits and global opportunities.{% endblock %}
-{% block og_description %}Mindset Coders builds the tools, resources and systems that enable STEAM education in Uganda, from Mindset Learn to schools, kits and global opportunities.{% endblock %}
+{% block meta_description %}Mindset Coders builds the tools, resources and systems that enable STEAM education in Uganda, from M-Pass to schools, kits and global opportunities.{% endblock %}
+{% block og_description %}Mindset Coders builds the tools, resources and systems that enable STEAM education in Uganda, from M-Pass to schools, kits and global opportunities.{% endblock %}
 
 {% block content %}
 
@@ -21,7 +21,7 @@
         <h1>We build <span class="hero-steam">STEAM</span> learning pathways</h1>
         <p>We build the tools, resources and systems that enable STEAM education, from curiosity to creation.</p>
         <div class="hero-actions">
-            <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
+            <a href="{% url 'join' %}" class="btn btn-primary" data-umami-event="join-click" data-umami-event-from="home">Join</a>
             <a href="{% url 'for_schools' %}" class="btn btn-outline">Bring STEAM to Your School</a>
         </div>
     </div>
@@ -40,7 +40,7 @@
     <div class="build-cards-grid">
         <div class="build-card reveal reveal-delay-1">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
-            <h3>Mindset Learn</h3>
+            <h3>M-Pass</h3>
             <p>A digital platform with a clear learning pathway.</p>
         </div>
         <div class="build-card reveal reveal-delay-2">
@@ -91,13 +91,14 @@
     <div class="dot-grid dot-grid--section dot-grid--section-bl" aria-hidden="true"></div>
     <div class="section-split">
         <div class="section-split-text">
-            <h2>A learning pathway for the next generation of innovators</h2>
-            <p>Students join Mindset Learn and move through six levels, with lessons, projects, challenges and a community of other learners.</p>
-            <div class="pricing-chips">
-                <span class="pricing-chip">Registration: UGX 5,000</span>
-                <span class="pricing-chip">Six levels: UGX 20,000 each</span>
+            <h2>M-Pass, the Mindset STEAM Learning Passport</h2>
+            <p>Mindset Coders delivers practical STEAM learning experiences. M-Pass helps learners document their projects, showcase their work, and track their competency development.</p>
+            <p>M-Pass is the Mindset STEAM Learning Passport, helping learners document their projects, showcase their work, and track their growth in practical STEAM competencies.</p>
+            <p>It combines a learner portfolio with evidence-based competency tracking, making each learner's progress visible and giving them a record of what they can do.</p>
+            <div class="hero-actions">
+                <a href="{% url 'join' %}" class="btn btn-primary" data-umami-event="join-click" data-umami-event-from="home">Join</a>
+                <a href="https://mpass.mindsetlearn.org/auth" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-umami-event="go-mpass" data-umami-event-from="home">Sign in to M-Pass</a>
             </div>
-            <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
         </div>
         <div class="img-slot img-slot--mindset-learn">
             <img src="{% static 'images/mindset-learn.jpg' %}" alt="Learners working together at computers during a coding session, with a teacher helping" width="900" height="600" loading="lazy" onerror="this.remove()">
@@ -109,7 +110,7 @@
     <div class="section-split section-split--reverse">
         <div class="section-split-text">
             <h2>Bring STEAM to your school</h2>
-            <p>A workshop is a start, but your school can adopt the whole thing: coding and robotics, AI education, STEAM clubs, teacher training, competition preparation, learning kits and access to Mindset Learn.</p>
+            <p>A workshop is a start, but your school can adopt the whole thing: coding and robotics, AI education, STEAM clubs, teacher training, competition preparation, learning kits and access to M-Pass.</p>
             <ul class="tick-list-compact">
                 <li><i class="fa-solid fa-check" aria-hidden="true"></i> Coding and robotics</li>
                 <li><i class="fa-solid fa-check" aria-hidden="true"></i> AI education</li>
@@ -276,7 +277,7 @@
 <section class="cta-banner reveal">
     <h2>Ready to be part of it?</h2>
     <div class="cta-banner-actions">
-        <a href="{% url 'mindset_learn' %}" class="btn btn-primary" data-umami-event="join-mindset-learn" data-umami-event-from="home">Join Mindset Learn</a>
+        <a href="{% url 'join' %}" class="btn btn-primary" data-umami-event="join-click" data-umami-event-from="home">Join</a>
         <a href="{% url 'for_schools' %}" class="btn btn-outline btn-outline-light">Bring STEAM to Your School</a>
         <!-- TODO: link to Shop page when built -->
         <a href="{% url 'shop' %}" class="btn btn-outline btn-outline-light" data-umami-event="go-shop" data-umami-event-from="home">Shop</a>

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Join Mindset Coders | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Join Mindset Coders | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Tell us about your child and the programme you are interested in. Our team will get in touch with the next steps.{% endblock %}
+{% block og_description %}Tell us about your child and the programme you are interested in. Our team will get in touch with the next steps.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <h1>Join Mindset Coders</h1>
+    <p>Tell us about your child and the programme you are interested in. Our team will get in touch with the next steps.</p>
+</section>
+
+<section class="contact-section">
+    <div class="contact-form-wrap reveal reveal-delay-1">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-success{% if message.tags == 'error' %} form-error{% endif %}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.parent_name.id_for_label }}">{{ form.parent_name.label }}</label>
+                {{ form.parent_name.errors }}
+                {{ form.parent_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.parent_email.id_for_label }}">{{ form.parent_email.label }}</label>
+                {{ form.parent_email.errors }}
+                {{ form.parent_email }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.parent_phone.id_for_label }}">{{ form.parent_phone.label }}</label>
+                {{ form.parent_phone.errors }}
+                {{ form.parent_phone }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.learner_name.id_for_label }}">{{ form.learner_name.label }}</label>
+                {{ form.learner_name.errors }}
+                {{ form.learner_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.learner_age.id_for_label }}">{{ form.learner_age.label }}</label>
+                {{ form.learner_age.errors }}
+                {{ form.learner_age }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.school_name.id_for_label }}">{{ form.school_name.label }}</label>
+                {{ form.school_name.errors }}
+                {{ form.school_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.programme.id_for_label }}">{{ form.programme.label }}</label>
+                {{ form.programme.errors }}
+                {{ form.programme }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.consent.id_for_label }}" class="consent-label">{{ form.consent }} {{ form.consent.label }}</label>
+                {{ form.consent.errors }}
+            </div>
+            {# Spam trap: hidden by CSS, and never listed in the form's Meta.fields #}
+            <div class="honeypot-field" aria-hidden="true">
+                {{ form.website }}
+            </div>
+            <button type="submit" class="btn btn-green">Send my registration</button>
+        </form>
+        <p class="story-share-note">Read how we handle your information on our <a href="{% url 'privacy' %}">privacy page</a>.</p>
+    </div>
+</section>
+
+{% endblock %}

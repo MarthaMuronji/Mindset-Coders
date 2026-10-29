@@ -1,6 +1,7 @@
 from django.http import HttpResponsePermanentRedirect
 from django.urls import path, reverse
 
+from . import registration
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -22,7 +23,11 @@ def _redirect_to(target_name, fragment=''):
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('mindset-learn/', views.mindset_learn, name='mindset_learn'),
+    # Mindset Learn now leads straight to the Join form, so the old address
+    # keeps working as a permanent redirect for every link already out there
+    path('mindset-learn/', _redirect_to('join'), name='mindset_learn'),
+    path('join/', registration.join, name='join'),
+    path('join/thanks/', registration.join_thanks, name='join_thanks'),
     path('about/', views.about, name='about'),
     path('programs/', _redirect_to('for_schools', 'programs'), name='programs'),
     path('contact/', views.contact, name='contact'),
@@ -31,7 +36,7 @@ urlpatterns = [
     path('for-schools/', views.for_schools, name='for_schools'),
     path('for-educators/', _redirect_to('for_schools', 'teacher-training'), name='for_educators'),
     path('events/', _redirect_to('global_opportunities'), name='events'),
-    path('for-learners/', _redirect_to('mindset_learn'), name='for_learners'),
+    path('for-learners/', _redirect_to('join'), name='for_learners'),
     path('partners/', views.partners, name='partners'),
     path('innovators-circle/', views.innovators_circle, name='innovators_circle'),
     path('university-preparation/', views.university_preparation, name='university_preparation'),
