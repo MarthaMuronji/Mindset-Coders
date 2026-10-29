@@ -8,20 +8,23 @@
 {% block content %}
 
 {% if payment_link %}
-<section class="about-hero reveal">
+<section class="about-hero reveal join-thanks-hero">
     <h1>Thank you</h1>
     <p>We have received your registration for the Holiday STEAM Experience, {{ stage_label }}.</p>
-    <p>Fee: {{ payment_link.amount_text }}</p>
+    <p class="join-thanks-fee">Fee: {{ payment_link.amount_text }}</p>
     <p>Your registration is confirmed once we receive your payment.</p>
     <p>Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.</p>
     <p>Questions? Call or WhatsApp us on <a href="tel:+256752064343">+256 752 064343</a>, Monday to Saturday, 8:00 am to 6:00 pm, or email <a href="mailto:info@mindset-group.org">info@mindset-group.org</a>.</p>
 </section>
 
-<section class="home-section reveal">
+<section class="home-section reveal join-thanks-payment">
     <div class="join-pay">
         <a href="{{ payment_link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-green" data-umami-event="pay-click" data-umami-event-level="{{ payment_link.label }}" data-umami-event-from="join-thanks">Pay {{ payment_link.amount_text }} with Mobile Money</a>
+        <a href="/refund-policy/" class="story-share-note join-refund-link">Read our refund and cancellation policy</a>
+        <div class="join-pay-secondary">
+            <a href="/join/?programme=holiday" class="btn btn-outline">Register another child</a>
+        </div>
     </div>
-    <p class="story-share-note"><a href="/refund-policy/">Read our refund and cancellation policy</a></p>
 </section>
 {% else %}
 <section class="about-hero reveal">
@@ -34,9 +37,11 @@
 </section>
 {% endif %}
 
-<section class="home-section reveal">
-    <p><a href="/join/?programme=holiday" class="btn btn-green">Register another child</a></p>
+{% if not payment_link %}
+<section class="home-section reveal join-thanks-actions">
+    <p><a href="/join/?programme=holiday" class="btn btn-outline">Register another child</a></p>
 </section>
+{% endif %}
 
 {% comment %}The form has been stored by the time this page loads, so the
 sent event is fired the same way the Contact page fires its own.{% endcomment %}

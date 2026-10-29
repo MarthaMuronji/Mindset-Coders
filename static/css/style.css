@@ -870,6 +870,54 @@ section h2 {
     color: var(--text-muted);
 }
 
+.join-thanks-hero {
+    padding-bottom: 32px;
+}
+
+.join-thanks-hero p {
+    margin-bottom: 12px;
+}
+
+.join-thanks-hero p:last-child {
+    margin-bottom: 0;
+}
+
+.join-thanks-hero .join-thanks-fee {
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.join-thanks-payment,
+.join-thanks-actions {
+    padding-top: 24px;
+    padding-bottom: 48px;
+}
+
+.join-thanks-payment {
+    max-width: 700px;
+}
+
+.join-pay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.join-pay .btn {
+    align-self: center;
+}
+
+.join-refund-link {
+    margin-top: 0;
+    text-align: center;
+}
+
+.join-pay-secondary {
+    margin-top: 20px;
+}
+
 /* ===== Mission / Vision ===== */
 .mission-vision {
     display: grid;
