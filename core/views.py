@@ -133,7 +133,7 @@ STEAM_EXPERIENCE = {
     'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
     'venues': ['Mindset Coders Headquarters, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
-    'payment_options': 'Pay online by Mobile Money.',
+    'payment_options': 'Pay online by Mobile Money. You can also pay in cash.',
     'discount_note': '',
     'payment_links': [
         {

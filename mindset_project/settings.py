@@ -44,7 +44,7 @@ STEAM_EXPERIENCE_PUBLIC = os.environ.get('STEAM_EXPERIENCE_PUBLIC', 'False') == 
 # every registration lands on the plain thank you page.
 STEAM_PAYMENTS_ENABLED = os.environ.get('STEAM_PAYMENTS_ENABLED', 'False') == 'True'
 
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['.onrender.com', '.vercel.app', 'localhost', '127.0.0.1']
 
 
 # Application definition

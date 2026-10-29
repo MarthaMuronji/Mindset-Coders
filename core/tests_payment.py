@@ -103,7 +103,9 @@ class RegisterLinkTests(SteamPageTestCase):
         html = response.content.decode()
         self.assertNotContains(response, 'Merchant Pay')
         self.assertIsNone(re.search(r'merchant\s+pay', html, re.I))
-        self.assertContains(response, 'Pay online by Mobile Money')
+        self.assertContains(
+            response, 'Pay online by Mobile Money. You can also pay in cash.'
+        )
 
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
@@ -260,8 +262,9 @@ class JoinThanksPaymentTests(SimpleTestCase):
 
     def test_the_confirmation_carries_the_contact_line(self):
         response = self._get_thanks(programme='holiday', stage='discover')
-        self.assertContains(response, 'Questions? Call or WhatsApp us on')
+        self.assertContains(response, 'Questions? Call')
         self.assertContains(response, 'href="tel:+256752064343"')
+        self.assertContains(response, 'href="https://wa.me/256752064343"')
         self.assertContains(response, '+256 752 064343')
         self.assertContains(
             response, 'href="mailto:info@mindset-group.org"'
