@@ -14,12 +14,13 @@
     <p class="join-thanks-fee">Fee: {{ payment_link.amount_text }}</p>
     <p>Your registration is confirmed once we receive your payment.</p>
     <p>Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.</p>
-    <p>Questions? Call or WhatsApp us on <a href="tel:+256752064343">+256 752 064343</a>, Monday to Saturday, 8:00 am to 6:00 pm, or email <a href="mailto:info@mindset-group.org">info@mindset-group.org</a>.</p>
+    <p>Questions? {% include 'includes/contact_links.html' with event_from='join-thanks' %}, Monday to Saturday, 8:00 am to 6:00 pm, or email <a href="mailto:info@mindset-group.org">info@mindset-group.org</a>.</p>
 </section>
 
 <section class="home-section reveal join-thanks-payment">
     <div class="join-pay">
         <a href="{{ payment_link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-green" data-umami-event="pay-click" data-umami-event-level="{{ payment_link.label }}" data-umami-event-from="join-thanks">Pay {{ payment_link.amount_text }} with Mobile Money</a>
+        <p class="join-cash-note">You can also pay in cash. Contact our team to arrange it.</p>
         <a href="/refund-policy/" class="story-share-note join-refund-link">Read our refund and cancellation policy</a>
         <div class="join-pay-secondary">
             <a href="/join/?programme=holiday" class="btn btn-outline">Register another child</a>
@@ -30,7 +31,7 @@
 <section class="about-hero reveal">
     <h1>Thank you</h1>
     <p>We have received your registration. Our team will get in touch with you about the next steps.</p>
-    <p>Questions? Call or WhatsApp us on <a href="tel:+256752064343">+256 752 064343</a>, Monday to Saturday, 8:00 am to 6:00 pm.</p>
+    <p>Questions? {% include 'includes/contact_links.html' with event_from='join-thanks' %}, Monday to Saturday, 8:00 am to 6:00 pm.</p>
     {% if steam_public %}
     <p class="section-cta-wrap"><a href="{% url 'steam_experience' %}" class="btn btn-green" data-umami-event="join-steam-link" data-umami-event-from="join">See the STEAM Experience</a></p>
     {% endif %}

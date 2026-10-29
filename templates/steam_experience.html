@@ -191,8 +191,9 @@ appears when there are more venues to list.{% endcomment %}
     <p class="section-subtitle">Register your child first. Our team will tell you how to pay.</p>
     {% endif %}
     <p class="section-subtitle">Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.</p>
+    <p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>
     <p><strong>Email:</strong> <a href="mailto:info@mindset-group.org">info@mindset-group.org</a></p>
-    <p><strong>Phone:</strong> <a href="tel:+256752064343">+256 752 064343</a></p>
+    <p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>
     <p><a href="{% url 'refund_policy' %}">Read the refund and cancellation policy</a></p>
 </section>
 
@@ -241,7 +242,7 @@ appears when there are more venues to list.{% endcomment %}
         {% if content.contact_hours or content.contact_phone %}
         <div class="steam-contact-details">
             {% if content.contact_hours %}<p>Opening hours: {{ content.contact_hours }}</p>{% endif %}
-            {% if content.contact_phone %}<p>Phone: <a href="tel:{{ content.contact_phone|cut:' ' }}">{{ content.contact_phone }}</a></p>{% endif %}
+            {% if content.contact_phone %}<p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>{% endif %}
         </div>
         {% endif %}
     </div>

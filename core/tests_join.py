@@ -333,7 +333,7 @@ class JoinThanksPageTests(SimpleTestCase):
             'Thank you',
             'We have received your registration. Our team will get in touch '
             'with you about the next steps.',
-            'Questions? Call or WhatsApp us on',
+            'Questions? Call',
             '+256 752 064343',
             'Monday to Saturday, 8:00 am to 6:00 pm.',
         ):
