@@ -16,7 +16,7 @@ from . import views
 JOIN_LINK = '/join/?programme=holiday'
 THANKS_URL = '/join/thanks/'
 
-# The hero, the contact section and the sticky bar at the bottom of the page.
+# The hero, the final call to action and the sticky bar at the bottom.
 REGISTER_BUTTONS = 3
 
 # The four KaCyberPay payment links, in order. Each entry carries the
@@ -55,7 +55,7 @@ def register_anchors(html, href):
     pattern = r'<a\b[^>]*href="%s"[^>]*>.*?</a>' % re.escape(href)
     return [
         anchor for anchor in re.findall(pattern, html, re.S)
-        if 'Register your child' in anchor
+        if 'register your child' in anchor.lower()
     ]
 
 
@@ -110,34 +110,19 @@ class RegisterLinkTests(SteamPageTestCase):
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
 class PaymentNoteTests(SteamPageTestCase):
-    """One short line under the Register button, only when it is filled in."""
+    """The optional payment note appears in programme details."""
 
     NOTE = 'A short note for the test'
-
-    @staticmethod
-    def hero(html):
-        match = re.search(
-            r'<section class="about-hero steam-hero.*?</section>', html, re.S
-        )
-        assert match is not None, 'the hero section did not render'
-        return match.group()
 
     def test_empty_note_renders_nothing_extra(self):
         response = self.get_page(payment_note=None)
         html = response.content.decode()
         self.assertNotIn('steam-payment-note', html)
-        # The button is still the last thing in the hero section.
-        self.assertRegex(self.hero(html), r'</a></p>\s*</section>$')
 
-    def test_filled_note_shows_one_line_under_the_button(self):
+    def test_filled_note_shows_one_line_with_registration_details(self):
         response = self.get_page(payment_note=self.NOTE)
         html = response.content.decode()
-        self.assertRegex(
-            self.hero(html),
-            r'</a></p>\s*<p class="steam-payment-note">%s</p>'
-            % re.escape(self.NOTE),
-        )
-        # One line, in one place, and nowhere else on the page.
+        self.assertContains(response, self.NOTE)
         self.assertEqual(html.count('steam-payment-note'), 1)
 
 

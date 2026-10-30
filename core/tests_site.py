@@ -24,7 +24,7 @@ class SteamExperienceSiteTests(SimpleTestCase):
         self.assertContains(response, 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.')
 
     @override_settings(STEAM_EXPERIENCE_PUBLIC=False, STEAM_PAYMENTS_ENABLED=False)
-    def test_payment_links_are_not_rendered_and_sibling_note_appears_once(self):
+    def test_payment_links_are_hidden_and_sibling_note_is_in_journey_and_faq(self):
         response = self.client.get('/steam-experience/')
 
         for payment_url in (
@@ -45,7 +45,7 @@ class SteamExperienceSiteTests(SimpleTestCase):
         self.assertContains(
             response,
             'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
-            count=1,
+            count=2,
         )
         self.assertContains(response, 'Register your child first. Our team will tell you how to pay.')
         self.assertContains(response, 'Read the refund and cancellation policy')

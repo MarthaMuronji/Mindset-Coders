@@ -2639,14 +2639,14 @@ a.build-card:focus-visible {
     padding-bottom: 0;
 }
 
-.steam-page .btn {
+.steam-page .btn:not(.btn-outline):not(.btn-outline-light) {
     min-height: 44px;
     border-color: #1E7A38;
     background: #1E7A38;
     color: #FFFFFF;
 }
 
-.steam-page .btn:hover {
+.steam-page .btn:not(.btn-outline):not(.btn-outline-light):hover {
     background: #18622D;
     color: #FFFFFF;
 }
@@ -2660,6 +2660,19 @@ a.build-card:focus-visible {
     text-align: center;
 }
 
+.steam-hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: center;
+    gap: 40px;
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+.steam-hero-copy {
+    min-width: 0;
+}
+
 .steam-hero h1 {
     color: #FFFFFF;
     font-family: 'Poppins', sans-serif;
@@ -2667,7 +2680,7 @@ a.build-card:focus-visible {
 }
 
 .steam-hero p {
-    max-width: 700px;
+    max-width: 720px;
     margin-right: auto;
     margin-left: auto;
     color: #FFFFFF;
@@ -2675,19 +2688,116 @@ a.build-card:focus-visible {
     font-size: 17px;
 }
 
+.steam-hero-facts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 20px;
+}
+
+.steam-hero-facts span {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+}
+
+.steam-hero-facts i {
+    flex: 0 0 auto;
+    margin-top: 5px;
+    color: #7CCB8F;
+}
+
+.steam-hero-image {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 3 / 2;
+    border-radius: 20px;
+}
+
+.steam-hero-image img {
+    border-radius: 20px;
+}
+
+.steam-hero-actions,
+.steam-final-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
 .steam-hero .section-cta-wrap {
     margin-top: 24px;
 }
 
-.steam-hero .btn-primary {
+.steam-hero .btn {
     min-height: 48px;
-    border: 1.5px solid #FFFFFF;
+}
+
+.steam-hero .btn-primary {
+    border: 1.5px solid #1E7A38;
     background: #1E7A38;
+    color: #FFFFFF;
+}
+
+.steam-hero .btn-outline-light {
+    border: 1.5px solid #FFFFFF;
+    background: transparent;
     color: #FFFFFF;
 }
 
 .steam-hero .btn-primary:hover {
     background: #18622D;
+}
+
+.steam-experience-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.steam-experience-card {
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
+    text-align: left;
+}
+
+.steam-experience-image {
+    aspect-ratio: 3 / 2;
+    border-radius: 14px 14px 0 0;
+}
+
+.steam-experience-image img {
+    border-radius: 14px 14px 0 0;
+}
+
+.steam-experience-card-copy {
+    padding: 20px;
+}
+
+.steam-experience-card h3 {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--navy);
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+}
+
+.steam-experience-card h3 i {
+    flex: 0 0 auto;
+    margin-top: 4px;
+    color: var(--green-text);
+}
+
+.steam-experience-card p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
 }
 
 .steam-page .home-section {
@@ -2765,6 +2875,12 @@ a.build-card:focus-visible {
     padding: 24px;
     border-top: 0;
     text-align: left;
+}
+
+.steam-stage-register {
+    width: 100%;
+    margin-top: auto;
+    text-align: center;
 }
 
 .steam-stage-head {
@@ -2868,30 +2984,27 @@ a.build-card:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    min-width: 0;
+    gap: 14px;
+    margin-top: 24px;
     color: #5A6B7A;
     text-align: center;
 }
 
 .steam-break::before,
 .steam-break::after {
-    flex: 1 1 24px;
-    min-width: 18px;
+    flex: 1 1 0;
     border-top: 2px dashed #2FA84F;
     content: '';
 }
 
 .steam-break-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: #5A6B7A;
     font-size: 13px;
     font-weight: 600;
     line-height: 1.4;
-}
-
-.steam-break-name,
-.steam-break-dates {
-    display: block;
 }
 
 .steam-weeks {
@@ -3019,6 +3132,14 @@ a.build-card:focus-visible {
     line-height: 1.5;
 }
 
+.steam-journey > .steam-discount-note {
+    margin-top: 20px;
+}
+
+.steam-full-register {
+    flex: 0 0 auto;
+}
+
 .steam-discount-note i {
     flex: 0 0 auto;
     margin-top: 3px;
@@ -3144,6 +3265,211 @@ a.build-card:focus-visible {
     line-height: 1.65;
 }
 
+.steam-projects > h3 {
+    margin: 24px 0 12px;
+    color: var(--navy);
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+.steam-project-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.steam-project-list li,
+.steam-inclusion-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #D7E8DB;
+    border-radius: 12px;
+    background: #FFFFFF;
+    color: var(--navy);
+    line-height: 1.5;
+}
+
+.steam-project-list i,
+.steam-inclusion-list i {
+    flex: 0 0 auto;
+    margin-top: 4px;
+    color: var(--green-text);
+}
+
+.steam-passport {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    border: 1px solid #D7E8DB;
+    border-radius: 16px;
+    background: var(--green-light);
+}
+
+.steam-passport-copy {
+    max-width: 860px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.steam-passport-copy p {
+    margin-bottom: 12px;
+    color: var(--navy);
+}
+
+.steam-passport-copy .btn {
+    margin-top: 12px;
+}
+
+.steam-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.steam-gallery-grid .img-slot--wide {
+    margin-top: 0;
+}
+
+.steam-details > h2,
+.steam-experiences > h2,
+.steam-journey > h2,
+.steam-inclusions > h2,
+.steam-faq > h2 {
+    margin-bottom: 24px;
+}
+
+.steam-age-groups {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #D7E8DB;
+    border-radius: 14px;
+    background: #FFFFFF;
+}
+
+.steam-age-groups h3 {
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.steam-age-groups ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.steam-age-groups li {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--green-light);
+}
+
+.steam-age-groups p {
+    margin-top: 12px;
+}
+
+.steam-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.steam-registration-steps {
+    color: var(--navy);
+}
+
+.steam-registration-steps h3 {
+    margin-bottom: 12px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.steam-registration-steps p + p {
+    margin-top: 12px;
+}
+
+.steam-registration-steps a {
+    color: var(--navy);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--green);
+    text-underline-offset: 3px;
+}
+
+.steam-details-contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 24px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.steam-details-contact p {
+    margin: 0;
+}
+
+.steam-inclusion-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.steam-faq-list {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.steam-faq-list details {
+    padding: 16px 18px;
+    border-bottom: 1px solid #D7E8DB;
+    background: #FFFFFF;
+}
+
+.steam-faq-list details:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+.steam-faq-list details:last-child {
+    border-radius: 0 0 12px 12px;
+}
+
+.steam-faq-list summary {
+    color: var(--navy);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.steam-faq-list details p {
+    margin-top: 10px;
+    color: var(--text-muted);
+}
+
+.steam-final-cta {
+    text-align: center;
+}
+
+.steam-final-cta > h2 {
+    margin-bottom: 14px;
+}
+
+.steam-spaces-note {
+    margin-bottom: 12px;
+    color: var(--text-muted);
+}
+
+.steam-final-facts {
+    margin-top: 16px;
+    color: var(--text-muted);
+}
+
+.steam-final-actions .btn {
+    min-width: 200px;
+    min-height: 48px;
+}
+
 .steam-sticky-bar {
     position: fixed;
     z-index: 1000;
@@ -3176,63 +3502,24 @@ a.build-card:focus-visible {
 }
 
 @media (min-width: 1000px) {
-    .steam-stage-grid:has(.steam-break) {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 110px minmax(0, 1fr);
-    }
-
-    .steam-stage-grid:has(.steam-break) .steam-break {
-        padding: 14px 6px;
-    }
-
-    .steam-stage-grid:has(.steam-break) .steam-break::before {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        z-index: 0;
-        border-top: 0;
-        border-left: 2px dashed #2FA84F;
-    }
-
-    .steam-stage-grid:has(.steam-break) .steam-break::after {
-        display: none;
-    }
-
-    .steam-stage-grid:has(.steam-break) .steam-break-label {
-        position: relative;
-        z-index: 1;
-        width: 120px;
-        max-width: 120px;
-        padding: 10px 6px;
-        border: 1px solid #CDEAD2;
-        border-radius: 12px;
-        background: #FFFFFF;
-        color: #16324F;
-        writing-mode: horizontal-tb;
-        transform: none;
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-
-    .steam-stage-grid:has(.steam-break) .steam-break-name,
-    .steam-stage-grid:has(.steam-break) .steam-break-dates {
-        display: block;
-    }
-
-    .steam-stage-grid:has(.steam-break) .steam-break-name {
-        white-space: nowrap;
-    }
-}
-
-@media (min-width: 900px) {
     .steam-glance-list {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 769px) {
     .steam-stage-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .steam-experience-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1100px) {
+    .steam-experience-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
@@ -3256,6 +3543,11 @@ a.build-card:focus-visible {
         border-radius: 0 0 14px 14px;
     }
 
+    .steam-hero-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
+    }
+
     .steam-hero h1 {
         font-size: 28px;
     }
@@ -3271,6 +3563,29 @@ a.build-card:focus-visible {
 
     .steam-page .steam-journey {
         padding-top: 28px;
+    }
+
+    .steam-experience-grid,
+    .steam-project-list,
+    .steam-gallery-grid,
+    .steam-details-grid,
+    .steam-inclusion-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .steam-experience-grid {
+        gap: 16px;
+    }
+
+    .steam-hero-actions,
+    .steam-final-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .steam-hero-actions .btn,
+    .steam-final-actions .btn {
+        width: 100%;
     }
 
     .steam-stage-grid {
@@ -3297,7 +3612,7 @@ a.build-card:focus-visible {
     }
 
     .steam-break-label {
-        max-width: 75%;
+        max-width: 85%;
         overflow-wrap: anywhere;
     }
 

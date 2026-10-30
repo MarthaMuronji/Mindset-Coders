@@ -125,16 +125,17 @@ def refund_policy(request):
 
 STEAM_EXPERIENCE = {
     'age_range': 'Ages 8 to 19',
+    'age_groups': [],
     'start_date': '16 November 2026',
     'end_date': '29 January 2027',
     'schedule': 'Monday to Friday, 8:00 am to 1:00 pm',
     'duration': 'Nine teaching weeks',
     'classes_resume': 'Classes resume on Monday, 4 January 2027.',
     'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
-    'venues': ['Mindset Coders Headquarters, Kyanja Ring Road'],
+    'venues': ['Amreena Mall, Level 3, room 304, Kyanja Ring Road, Kampala'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
     'payment_options': 'Pay online by Mobile Money. You can also pay in cash.',
-    'discount_note': '',
+    'discount_note': 'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
     'payment_links': [
         {
             'key': 'discover',
@@ -161,46 +162,96 @@ STEAM_EXPERIENCE = {
             'url': 'https://kacyberpay.com/pay/hc6sn7yqxq',
         },
     ],
-    'registration_url': '',
-    # One short line under the Register button, for anything the team needs to
-    # say about paying. Empty means nothing is rendered there.
+    'spaces_note': '',
+    'gallery': [],
+    'experience_cards': [
+        {
+            'title': 'Robotics and Engineering',
+            'text': 'Children assemble, experiment with and build robots while learning about mechanical systems, electronics, sensors and engineering principles.',
+            'icon': 'fa-robot',
+            'image': 'images/steam-robotics.jpg',
+            'alt': 'Robotics and engineering activity',
+        },
+        {
+            'title': 'AI and Coding',
+            'text': 'Children explore artificial intelligence, computational thinking and coding, discovering how technology works and how they can use it to create solutions.',
+            'icon': 'fa-brain',
+            'image': 'images/steam-ai.jpg',
+            'alt': 'Artificial intelligence and coding activity',
+        },
+        {
+            'title': 'Creative Arts and Design',
+            'text': 'Children explore creativity through design thinking, visual arts, experimentation and hands-on creative projects.',
+            'icon': 'fa-palette',
+            'image': 'images/steam-arts.jpg',
+            'alt': 'Creative arts and design activity',
+        },
+        {
+            'title': 'Entrepreneurship and Innovation',
+            'text': 'Children learn to identify problems, develop ideas, create prototypes and present their solutions with confidence.',
+            'icon': 'fa-lightbulb',
+            'image': 'images/steam-innovation.jpg',
+            'alt': 'Entrepreneurship and innovation activity',
+        },
+    ],
+    'project_examples': [
+        {'text': 'A working robot or robotic prototype', 'icon': 'fa-robot'},
+        {'text': 'A coding or AI-powered project', 'icon': 'fa-code'},
+        {'text': 'A creative design or artwork', 'icon': 'fa-palette'},
+        {'text': 'An innovation prototype', 'icon': 'fa-lightbulb'},
+        {'text': 'A presentation explaining their idea', 'icon': 'fa-person-chalkboard'},
+    ],
+    # Optional payment note shown with the registration details.
     'payment_note': None,
     'contact_hours': 'Monday to Saturday, 8:00 am to 6:00 pm',
     'contact_phone': '+256 752 064343',
     'safety_note': None,
-    'passport_note': 'M-Pass is the learner passport that accompanies this journey, helping children document projects, reflect on what they learn, and build evidence of their developing competencies.',
+    'passport_note': [
+        'Every learner gets an M-Pass, their personal STEAM Learning Passport.',
+        'Through M-Pass, children document their projects, reflect on their learning and build a portfolio of evidence showing how their skills develop.',
+        "Parents get a window into their child's learning journey, not just a certificate at the end.",
+    ],
     'inclusions': [
         'Kits for use during the Build stage',
         'A kit to take home in the Innovate stage',
         'Snacks provided',
         'A showcase at the end of each level',
         'A certificate for each level completed',
+        'Hands-on STEAM learning sessions',
+        'Robotics and technology activities',
+        'Practical creative projects',
+        'Access to the M-Pass learning passport',
+        'Facilitator guidance',
+        'Project documentation and portfolio development',
     ],
     # The three stages of the holiday journey, in order. The page draws one
     # card per stage and one week block per week, so weeks must stay a number.
     'stages': [
         {
             'name': 'Discover',
+            'key': 'discover',
             'weeks': 2,
             'dates': '16 to 27 November 2026',
             'fee': 'UGX 300,000',
-            'blurb': "We start with your child's interests and passions, not in the middle.",
+            'blurb': 'Children explore different STEAM disciplines, experiment with ideas and discover their interests.',
             'note': None,
         },
         {
             'name': 'Build',
+            'key': 'build',
             'weeks': 3,
             'dates': '30 November to 18 December 2026',
             'fee': 'UGX 400,000',
-            'blurb': 'Based on those passions and interests, learners build with technology.',
+            'blurb': 'Children move into practical projects, building robots, experimenting with AI and developing their creative and technical skills.',
             'note': 'Kits for use during the Build stage',
         },
         {
             'name': 'Innovate',
+            'key': 'innovate',
             'weeks': 4,
             'dates': '4 to 29 January 2027',
             'fee': 'UGX 500,000',
-            'blurb': 'Learners come together as a team. They use design thinking to come up with ideas, take on challenges and build a project to showcase, exhibit or compete with.',
+            'blurb': 'Children apply what they have learned to develop solutions, create projects and present their innovations.',
             'note': 'A kit to take home in the Innovate stage',
         },
     ],
@@ -217,6 +268,56 @@ STEAM_EXPERIENCE = {
         'note': 'when paid upfront',
         'saving': 'Save UGX 100,000',
     },
+    'faq': [
+        {
+            'question': 'What age groups can participate?',
+            'answer': 'Learners aged 8 to 19 can take part.',
+        },
+        {
+            'question': 'Does my child need prior coding or robotics experience?',
+            'answer': '',
+        },
+        {
+            'question': 'Can my child register for just one stage?',
+            'answer': 'Yes. You can register for Discover, Build or Innovate on its own.',
+        },
+        {
+            'question': 'Can my child participate in the complete programme?',
+            'answer': 'Yes. The complete journey is UGX 1,100,000 when paid upfront.',
+        },
+        {
+            'question': 'What happens during the Christmas break?',
+            'answer': 'There are no classes from 21 December 2026 to 2 January 2027. Classes resume on Monday, 4 January 2027.',
+        },
+        {
+            'question': 'Are learning materials and robotics kits included?',
+            'answer': 'Kits are used during the Build stage, and learners take a kit home in the Innovate stage.',
+        },
+        {
+            'question': 'What will my child take home?',
+            'answer': 'A kit to take home in the Innovate stage, a certificate for each level completed, and their M-Pass record of their projects.',
+        },
+        {
+            'question': 'Can I register more than one child?',
+            'answer': 'Yes. Register each child on the registration page.',
+        },
+        {
+            'question': 'Are there sibling discounts?',
+            'answer': 'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
+        },
+        {
+            'question': 'How do I pay?',
+            'answer': 'Pay online by Mobile Money. You can also pay in cash. Register your child first, then you will see your fee and the payment button.',
+        },
+        {
+            'question': 'What happens if my child misses a session?',
+            'answer': '',
+        },
+        {
+            'question': 'Where is Mindset located?',
+            'answer': 'Amreena Mall, Level 3, room 304, Kyanja Ring Road, Kampala.',
+        },
+    ],
 }
 
 def steam_experience(request):
@@ -226,11 +327,9 @@ def steam_experience(request):
         'content': STEAM_EXPERIENCE,
         'is_public': is_public,
         'steam_payments_enabled': getattr(settings, 'STEAM_PAYMENTS_ENABLED', False),
+        'event_description': 'Give your child a holiday filled with robotics, artificial intelligence, coding, creative arts and entrepreneurship. Join the Mindset STEAM Experience in Kampala.',
         # Analytics stay off while the page is not public yet
         'hide_umami': not is_public,
-        # Until the team sets a registration link, the buttons on the
-        # page point at the existing contact page
-        'registration_url': STEAM_EXPERIENCE['registration_url'] or reverse('contact'),
     })
     if not is_public:
         # Hidden until launch, so search engines leave it alone
