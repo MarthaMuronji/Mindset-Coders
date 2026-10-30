@@ -1,269 +1,281 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}The STEAM Experience | Mindset Coders Uganda{% endblock %}
-{% block meta_title_og %}The STEAM Experience | Mindset Coders Uganda{% endblock %}
-{% block meta_description %}The STEAM Experience is a holiday learning pathway where your child discovers what they love, builds with technology, and innovates.{% endblock %}
-{% block og_description %}The STEAM Experience is a holiday learning pathway where your child discovers what they love, builds with technology, and innovates.{% endblock %}
+{% block title %}Mindset STEAM Experience 2026/2027 | Robotics, AI, Coding &amp; Creativity{% endblock %}
+{% block meta_title_og %}Mindset STEAM Experience 2026/2027 | Robotics, AI, Coding &amp; Creativity{% endblock %}
+{% block meta_description %}Give your child a holiday filled with robotics, artificial intelligence, coding, creative arts and entrepreneurship. Join the Mindset STEAM Experience in Kampala.{% endblock %}
+{% block og_description %}Give your child a holiday filled with robotics, artificial intelligence, coding, creative arts and entrepreneurship. Join the Mindset STEAM Experience in Kampala.{% endblock %}
 
 {% block content %}
 
 {% if not is_public %}
-{% comment %}
-While the program is not public yet, tell crawlers to skip this page. The view also sends an X-Robots-Tag header with the same instruction.
-{% endcomment %}
 <meta name="robots" content="noindex, nofollow">
 {% endif %}
 
-<div class="steam-page">
-<section class="about-hero steam-hero reveal">
-    <span class="badge">Holiday program</span>
-    <h1>The STEAM Experience</h1>
-    <p>A holiday learning pathway where your child discovers what they love, builds with technology, and innovates.</p>
-    <p class="section-cta-wrap"><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a></p>
-    {% if content.payment_note %}<p class="steam-payment-note">{{ content.payment_note }}</p>{% endif %}
-</section>
-
-{% if content.age_range or content.start_date or content.end_date or content.schedule or content.venues %}
-<section class="home-section steam-glance reveal" aria-label="At a glance">
-    <h2 class="steam-glance-title">At a glance</h2>
-    <div class="steam-glance-list">
-        {% if content.age_range %}
-        <span class="steam-chip"><i class="fa-solid fa-user-group" aria-hidden="true"></i> {{ content.age_range }}</span>
-        {% endif %}
-        {% if content.start_date or content.end_date %}
-        <span class="steam-chip"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {% if content.start_date and content.end_date %}{{ content.start_date }} to {{ content.end_date }}{% else %}{{ content.start_date }}{{ content.end_date }}{% endif %}</span>
-        {% endif %}
-        {% if content.schedule %}
-        <span class="steam-chip"><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ content.schedule }}</span>
-        {% endif %}
-        {% if content.venues %}
-        <span class="steam-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ content.venues.0 }}</span>
-        {% endif %}
-    </div>
-</section>
+{% if is_public %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "Mindset STEAM Experience",
+  "description": "{{ event_description|escapejs }}",
+  "startDate": "2026-11-16",
+  "endDate": "2027-01-29",
+  "location": {
+    "@type": "Place",
+    "name": "Amreena Mall",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{{ content.venues.0|escapejs }}",
+      "addressLocality": "Kampala",
+      "addressCountry": "UG"
+    }
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "Mindset Coders Uganda"
+  },
+  "offers": [
+    {% for offer in content.payment_links %}
+    {
+      "@type": "Offer",
+      "name": "{{ offer.label|escapejs }}",
+      "price": "{{ offer.amount_text|cut:'UGX '|cut:','|escapejs }}",
+      "priceCurrency": "UGX",
+      "url": "https://mindset-group.org/join/?programme=holiday"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
 {% endif %}
 
-{% if content.stages %}
-<section class="home-section steam-journey reveal">
-    <h2>Your holiday journey</h2>
-    <div class="steam-stage-grid">
-        {% for stage in content.stages %}
-        <article class="build-card steam-stage-card steam-stage-card--{{ forloop.counter }} reveal reveal-delay-{{ forloop.counter }}">
-            <div class="steam-stage-head">
-                <span class="steam-stage-number" aria-hidden="true">{{ forloop.counter }}</span>
-                <h3>{{ stage.name }}</h3>
+<div class="steam-page">
+    <section class="steam-hero reveal">
+        <div class="steam-hero-layout">
+            <div class="steam-hero-copy">
+                <h1>This holiday, let your child discover what they're capable of creating.</h1>
+                <p>A hands-on STEAM experience where children explore robotics, artificial intelligence, coding, creative arts and entrepreneurship.</p>
+                <p>From their first discovery to building real projects and presenting their own innovations, every child gets the opportunity to think, experiment and create.</p>
+                <p class="steam-hero-facts">
+                    <span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ content.start_date }} to {{ content.end_date }}</span>
+                    <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ content.venues.0 }}</span>
+                </p>
+                <div class="steam-hero-actions">
+                    <a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register Your Child</a>
+                    <a href="#programme-details" class="btn btn-outline-light">Explore the Experience</a>
+                </div>
             </div>
-            <p class="steam-stage-meta">
-                {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.name }}: {{ stage.dates }}</span>{% endif %}
-                {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} weeks</span>{% endif %}
-            </p>
-            {% if stage.fee %}<p class="steam-stage-fee">{{ stage.fee }}</p>{% endif %}
-            {% if stage.blurb %}<p>{{ stage.blurb }}</p>{% endif %}
-            {% if stage.note %}<p class="steam-stage-note"><i class="fa-solid fa-box-open" aria-hidden="true"></i> {{ stage.note }}</p>{% endif %}
-        </article>
-        {% if content.break and content.break.after == stage.name %}
-        <div class="steam-break">
-            <span class="steam-break-label">
-                <span class="steam-break-name">{{ content.break.label }}: {{ content.break.dates }}</span>
-            </span>
+            <div class="img-slot img-slot--hero steam-hero-image">
+                <img src="{% static 'images/steam-hero.jpg' %}" alt="Children exploring robotics and creative technology during the STEAM Experience" width="900" height="600" onerror="this.remove()">
+            </div>
         </div>
-        {% endif %}
-        {% endfor %}
-    </div>
+    </section>
 
-    {% comment %}Photo slot: when a photo for this page is ready, remove the
-    comment marks around this block and point the src at the new image.
-    It must be a picture that is not used on any other page.
-    <div class="img-slot img-slot--wide">
-        <img src="{% static 'images/steam-experience.jpg' %}" alt="Learners building a project together during the STEAM Experience" width="1200" height="600" loading="lazy" onerror="this.remove()">
-    </div>
-    {% endcomment %}
-
-    <div class="steam-weeks">
-        <p class="steam-weeks-title">Nine teaching weeks</p>
-        <div class="steam-weeks-bar" aria-hidden="true">
-            {% for stage in content.stages %}
-            {% for w in ""|ljust:stage.weeks %}<span class="steam-week steam-week--{{ stage.name|lower }}"></span>{% endfor %}
-            {% if content.break and content.break.after == stage.name %}<span class="steam-week-gap"></span>{% endif %}
+    {% if content.experience_cards %}
+    <section class="home-section steam-experiences reveal">
+        <h2>What your child will experience</h2>
+        <div class="steam-experience-grid">
+            {% for card in content.experience_cards %}
+            <article class="build-card steam-experience-card reveal reveal-delay-{{ forloop.counter }}">
+                <div class="img-slot steam-experience-image">
+                    <img src="{% static card.image %}" alt="{{ card.alt }}" width="900" height="600" loading="lazy" onerror="this.remove()">
+                </div>
+                <div class="steam-experience-card-copy">
+                    <h3><i class="fa-solid {{ card.icon }}" aria-hidden="true"></i> {{ card.title }}</h3>
+                    <p>{{ card.text }}</p>
+                </div>
+            </article>
             {% endfor %}
         </div>
-        <p class="steam-sr-only">{% for stage in content.stages %}{{ stage.weeks }} weeks of {{ stage.name }}{% if content.break and content.break.after == stage.name %}, then the {{ content.break.label }}{% if content.break.dates %} from {{ content.break.dates }}{% endif %}{% endif %}{% if not forloop.last %}, then {% endif %}{% endfor %}.</p>
-        <p>{{ content.classes_resume }}</p>
-        <p>{{ content.pathway_note }}</p>
-    </div>
+    </section>
+    {% endif %}
 
-    {% if content.full_journey and content.full_journey.fee %}
-    <div class="steam-full-journey reveal">
-        <div class="steam-full-journey-main">
-            <h3>The complete holiday journey</h3>
-            <p class="steam-full-journey-price">{{ content.full_journey.fee }}{% if content.full_journey.note %} <span class="steam-full-journey-note">{{ content.full_journey.note }}</span>{% endif %}</p>
+    {% if content.stages %}
+    <section class="home-section steam-journey reveal">
+        <h2>The learning journey: Discover, Build, Innovate</h2>
+        <p class="section-subtitle">Every learner begins with Discover. You can register stage by stage, or choose the complete journey.</p>
+        <div class="steam-stage-grid">
+            {% for stage in content.stages %}
+            <article class="build-card steam-stage-card steam-stage-card--{{ forloop.counter }} reveal reveal-delay-{{ forloop.counter }}">
+                <div class="steam-stage-head">
+                    <span class="steam-stage-number" aria-hidden="true">{{ forloop.counter }}</span>
+                    <h3>{{ stage.name }}</h3>
+                </div>
+                <p class="steam-stage-meta">
+                    {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.name }}: {{ stage.dates }}</span>{% endif %}
+                    {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} weeks</span>{% endif %}
+                </p>
+                {% if stage.fee %}<p class="steam-stage-fee">{{ stage.fee }}</p>{% endif %}
+                {% if stage.blurb %}<p>{{ stage.blurb }}</p>{% endif %}
+                {% if stage.note %}<p class="steam-stage-note"><i class="fa-solid fa-box-open" aria-hidden="true"></i> {{ stage.note }}</p>{% endif %}
+                <a href="{% url 'join' %}?programme=holiday&amp;stage={{ stage.key }}" class="btn btn-primary steam-stage-register" data-umami-event="register-click" data-umami-event-from="steam-experience">Register for {{ stage.name }}</a>
+                {% if stage.key == 'build' or stage.key == 'innovate' %}<p class="steam-stage-prerequisite">Learners must complete the Discover stage first.</p>{% endif %}
+            </article>
+            {% endfor %}
         </div>
-        {% if content.full_journey.saving %}<span class="steam-saving-badge">{{ content.full_journey.saving }}</span>{% endif %}
+        {% if content.full_journey and content.full_journey.fee %}
+        <div class="steam-full-journey reveal">
+            <div class="steam-full-journey-main">
+                <h3>The complete holiday journey</h3>
+                <p class="steam-full-journey-price">{{ content.full_journey.fee }} <span class="steam-full-journey-note">when paid upfront</span></p>
+                <p class="steam-full-journey-includes">Covers Discover, Build and Innovate.</p>
+            </div>
+            {% if content.full_journey.saving %}<span class="steam-saving-badge">{{ content.full_journey.saving }}</span>{% endif %}
+            <a href="{% url 'join' %}?programme=holiday&amp;stage=full" class="btn btn-primary steam-full-register" data-umami-event="register-click" data-umami-event-from="steam-experience">Register for the complete journey</a>
+        </div>
+        {% endif %}
         {% if content.discount_note %}<p class="steam-discount-note"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i> {{ content.discount_note }}</p>{% endif %}
-    </div>
-    {% endif %}
-</section>
-{% else %}
-<section class="home-section reveal">
-    <h2>Learning that moves</h2>
-    <div class="build-cards-grid">
-        <div class="build-card reveal reveal-delay-1">
-            <h3>Discover</h3>
-            <p>We start with your child's interests and passions, not in the middle.</p>
+        {% if content.break %}
+        <div class="steam-break">
+            <span class="steam-break-label"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i> {{ content.break.label }}: {{ content.break.dates }}</span>
         </div>
-        <div class="build-card reveal reveal-delay-2">
-            <h3>Build</h3>
-            <p>Based on those passions and interests, learners build with technology.</p>
-        </div>
-        <div class="build-card reveal reveal-delay-3">
-            <h3>Innovate</h3>
-            <p>Learners come together as a team. They use design thinking to come up with ideas, take on challenges and build a project to showcase, exhibit or compete with.</p>
-        </div>
-    </div>
-    {% comment %}Photo slot: when a photo for this page is ready, remove the
-    comment marks around this block and point the src at the new image.
-    It must be a picture that is not used on any other page.
-    <div class="img-slot img-slot--wide">
-        <img src="{% static 'images/steam-experience.jpg' %}" alt="Learners building a project together during the STEAM Experience" width="1200" height="600" loading="lazy" onerror="this.remove()">
-    </div>
-    {% endcomment %}
-</section>
+        {% endif %}
 
-{% comment %}The strip above already shows the full date span and the
-schedule, so this section only carries the duration sentence, and only
-when there is one.{% endcomment %}
-{% if content.duration %}
-<section class="home-section reveal">
-    <h2>Dates and schedule</h2>
-    <p class="section-subtitle">{{ content.duration }}</p>
-</section>
-{% endif %}
-{% endif %}
-
-<section class="home-section section-tint steam-why reveal">
-    <h2>Why this pathway</h2>
-    <p class="section-subtitle">The pathway builds step by step. Each stage grows out of the one before it, so learners always have something real to build on.</p>
-    <p class="section-subtitle">They begin with what already interests them, build skills around it, and then bring those skills together on bigger challenges as a team.</p>
-</section>
-
-{% comment %}The at a glance strip above already carries the age range, the
-full date span, the schedule and the first venue, so this section only
-appears when there are more venues to list.{% endcomment %}
-{% if content.venues|length > 1 %}
-<section class="home-section reveal">
-    <h2>Where</h2>
-    {% for venue in content.venues %}
-    {% if not forloop.first %}<p class="section-subtitle">{{ venue }}</p>{% endif %}
-    {% endfor %}
-</section>
-{% endif %}
-
-{% if content.stages %}
-{% if content.payment_options or content.inclusions %}
-<section class="home-section steam-payment reveal">
-    <h2>What is included and how to pay</h2>
-    <div class="steam-payment-grid">
-        {% if content.inclusions %}
-        <div class="steam-payment-card steam-included">
-            <h3>What is included</h3>
-            <ul class="tick-list-compact">
-                {% for item in content.inclusions %}
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
+        {% if content.duration %}
+        <div class="steam-weeks">
+            <p class="steam-weeks-title">{{ content.duration }}</p>
+            <div class="steam-weeks-bar" aria-hidden="true">
+                {% for stage in content.stages %}
+                {% for w in ""|ljust:stage.weeks %}<span class="steam-week steam-week--{{ stage.name|lower }}"></span>{% endfor %}
+                {% if content.break and content.break.after == stage.name %}<span class="steam-week-gap"></span>{% endif %}
                 {% endfor %}
-            </ul>
+            </div>
+            <p class="steam-sr-only">{% for stage in content.stages %}{{ stage.weeks }} weeks of {{ stage.name }}{% if content.break and content.break.after == stage.name %}, then the {{ content.break.label }} from {{ content.break.dates }}{% endif %}{% if not forloop.last %}, then {% endif %}{% endfor %}.</p>
+            {% if content.classes_resume %}<p>{{ content.classes_resume }}</p>{% endif %}
+            {% if content.pathway_note %}<p>{{ content.pathway_note }}</p>{% endif %}
         </div>
         {% endif %}
-        {% if content.payment_options %}
-        <div class="steam-payment-card steam-payment-options">
-            <h3>How to pay</h3>
-            <p>{{ content.payment_options }}</p>
-        </div>
-        {% endif %}
-    </div>
-</section>
-{% endif %}
 
-<section class="home-section steam-pay reveal">
-    {% if steam_payments_enabled %}
-    <p class="section-subtitle">Register your child first. You will see your fee and the payment button on the next page.</p>
-    {% else %}
-    <p class="section-subtitle">Register your child first. Our team will tell you how to pay.</p>
+    </section>
     {% endif %}
-    <p class="section-subtitle">Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.</p>
-    <p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>
-    <p><strong>Email:</strong> <a href="mailto:info@mindset-group.org">info@mindset-group.org</a></p>
-    <p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>
-    <p><a href="{% url 'refund_policy' %}">Read the refund and cancellation policy</a></p>
-</section>
 
-{% else %}
-{% if content.price %}
-<section class="home-section reveal">
-    <h2>Price and payment</h2>
-    <p class="section-subtitle">{{ content.price }}</p>
-    {% if content.payment_options %}<p class="section-subtitle">{{ content.payment_options }}</p>{% endif %}
-    {% if content.discount_note %}<p class="section-subtitle">{{ content.discount_note }}</p>{% endif %}
-    {% if content.inclusions %}
-    <div class="steam-included">
-        <h3>What is included</h3>
-        <ul class="tick-list-compact">
-            {% for item in content.inclusions %}
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i> {{ item }}</li>
+    {% if content.project_examples %}
+    <section class="home-section section-tint steam-projects reveal">
+        <h2>Less screen time. More creating, experimenting and discovering.</h2>
+        <p class="section-subtitle">We believe children learn best when they have the opportunity to make things, test ideas, solve problems and learn from experimentation.</p>
+        <h3>Examples of projects and experiences available</h3>
+        <ul class="steam-project-list">
+            {% for project in content.project_examples %}
+            <li><i class="fa-solid {{ project.icon }}" aria-hidden="true"></i> {{ project.text }}</li>
             {% endfor %}
         </ul>
-    </div>
+    </section>
     {% endif %}
-</section>
-{% endif %}
-{% endif %}
 
-{% if content.passport_note %}
-<section class="home-section reveal">
-    <h2>Their journey is recorded</h2>
-    <p class="section-subtitle">{{ content.passport_note }}</p>
-</section>
-{% endif %}
-
-{% if content.safety_note %}
-<section class="home-section reveal">
-    <h2>Safety and your child's information</h2>
-    <p class="section-subtitle">{{ content.safety_note }}</p>
-</section>
-{% endif %}
-
-<section class="home-section steam-contact reveal">
-    <h2>How to register and get in touch</h2>
-    <div class="steam-contact-grid">
-        <div class="steam-contact-actions">
-            <p><a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a></p>
-            <p><a href="{% url 'contact' %}" class="btn btn-outline" data-umami-event="steam-contact-link" data-umami-event-from="steam-experience">Contact Mindset Coders</a></p>
+    {% if content.passport_note %}
+    <section class="home-section steam-passport reveal">
+        <div class="steam-passport-copy">
+            <h2>More than a holiday camp. A learning journey you can follow.</h2>
+            {% for paragraph in content.passport_note %}<p>{{ paragraph }}</p>{% endfor %}
         </div>
-        {% if content.contact_hours or content.contact_phone %}
-        <div class="steam-contact-details">
-            {% if content.contact_hours %}<p>Opening hours: {{ content.contact_hours }}</p>{% endif %}
-            {% if content.contact_phone %}<p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>{% endif %}
+        {% comment %}M-Pass screenshot slot. Render nothing until screenshots are available.{% endcomment %}
+    </section>
+    {% endif %}
+
+    {% if content.gallery %}
+    <section class="home-section steam-gallery reveal">
+        <h2>The experience at Mindset</h2>
+        <div class="steam-gallery-grid">
+            {% for image in content.gallery %}
+            <div class="img-slot img-slot--wide">
+                <img src="{% static image.file %}" alt="{{ image.alt }}" width="900" height="600" loading="lazy" onerror="this.remove()">
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="home-section steam-details reveal" id="programme-details">
+        <h2>Programme details</h2>
+        {% if content.age_range or content.start_date or content.end_date or content.schedule or content.venues %}
+        <div class="steam-glance-list">
+            {% if content.age_range %}<span class="steam-chip"><i class="fa-solid fa-user-group" aria-hidden="true"></i> {{ content.age_range }}</span>{% endif %}
+            {% if content.start_date or content.end_date %}<span class="steam-chip"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ content.start_date }} to {{ content.end_date }}</span>{% endif %}
+            {% if content.schedule %}<span class="steam-chip"><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ content.schedule }}</span>{% endif %}
+            {% if content.venues %}<span class="steam-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ content.venues.0 }}</span>{% endif %}
         </div>
         {% endif %}
+        {% if content.age_groups %}
+        <div class="steam-age-groups">
+            <h3>Age groups</h3>
+            <ul>{% for group in content.age_groups %}<li>{{ group }}</li>{% endfor %}</ul>
+            <p>Activities are differentiated by age and ability.</p>
+        </div>
+        {% endif %}
+        <div class="steam-details-grid">
+            {% if content.payment_options %}
+            <div class="steam-payment-card steam-payment-options">
+                <h3>How to pay</h3>
+                <p>{{ content.payment_options }}</p>
+            </div>
+            {% endif %}
+            <div class="steam-payment-card steam-registration-steps">
+                <h3>How to register</h3>
+                {% if steam_payments_enabled %}
+                <p>Register your child first. You will see your fee and the payment button on the next page.</p>
+                {% else %}
+                <p>Register your child first. Our team will tell you how to pay.</p>
+                {% endif %}
+                {% if content.payment_note %}<p class="steam-payment-note">{{ content.payment_note }}</p>{% endif %}
+                <p><a href="{% url 'refund_policy' %}">Read the refund and cancellation policy</a></p>
+            </div>
+        </div>
+        <div class="steam-details-contact">
+            <p>{% include 'includes/contact_links.html' with event_from='steam-experience' %}</p>
+            <p>Email: <a href="mailto:info@mindset-group.org">info@mindset-group.org</a></p>
+            {% if content.contact_hours %}<p>Opening hours: {{ content.contact_hours }}</p>{% endif %}
+        </div>
+    </section>
+
+    {% if content.inclusions %}
+    <section class="home-section steam-inclusions reveal">
+        <h2>What's included</h2>
+        <ul class="steam-inclusion-list">
+            {% for item in content.inclusions %}
+            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> {{ item }}</li>
+            {% endfor %}
+        </ul>
+        <p class="steam-included-note">No additional purchases are required. The programme fee covers the learning experience and required materials.</p>
+    </section>
+    {% endif %}
+
+    {% if content.faq %}
+    <section class="home-section section-tint steam-faq reveal">
+        <h2>Frequently asked questions</h2>
+        <div class="steam-faq-list">
+            {% for item in content.faq %}
+            {% if item.answer %}
+            <details>
+                <summary>{{ item.question }}</summary>
+                <p>{{ item.answer }}</p>
+            </details>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="home-section steam-final-cta reveal">
+        <h2>Give your child a holiday filled with discovery, creativity and innovation.</h2>
+        {% if content.spaces_note %}<p class="steam-spaces-note">{{ content.spaces_note }}</p>{% endif %}
+        <p>Register your child for the Mindset STEAM Experience.</p>
+        <p class="steam-final-facts">{{ content.start_date }} to {{ content.end_date }} | {{ content.venues.0 }}</p>
+        <div class="steam-final-actions">
+            <a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register Your Child</a>
+            <a href="https://wa.me/256752064343" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-umami-event="whatsapp-click" data-umami-event-from="steam-experience">Enquire on WhatsApp</a>
+        </div>
+        <p class="steam-final-journey-link"><a href="{% url 'join' %}?programme=holiday&amp;stage=full">Register for the complete journey</a></p>
+    </section>
+
+    <section class="cta-banner reveal">
+        <h2>Build it, code it, test it, and see your ideas come to life.</h2>
+        <p>Creating the next generation of Africa's greatest innovators.</p>
+    </section>
+
+    <div class="steam-sticky-bar">
+        <a href="{% url 'join' %}?programme=holiday" class="btn btn-green" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a>
     </div>
-</section>
-
-<section class="home-section section-tint reveal">
-    <p class="section-subtitle">Learners can keep documenting their projects and tracking their growth on M-Pass.</p>
-</section>
-
-<section class="cta-banner reveal">
-    <h2>Build it, code it, test it, and see your ideas come to life.</h2>
-    <p>Creating the next generation of Africa's greatest innovators.</p>
-</section>
-
-{% comment %}A single registration button that stays within thumb reach on a
-phone. The bar is hidden by CSS from 768px up, so it never shows on a
-desktop, and the page gets bottom padding so it never covers the footer
-or the closing banner.{% endcomment %}
-<div class="steam-sticky-bar">
-    <a href="{% url 'join' %}?programme=holiday" class="btn btn-green" data-umami-event="register-click" data-umami-event-from="steam-experience">Register your child</a>
-</div>
 </div>
 
 {% endblock %}

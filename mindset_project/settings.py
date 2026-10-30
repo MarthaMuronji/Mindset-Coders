@@ -15,6 +15,24 @@ from pathlib import Path
 import dj_database_url
 
 
+def _comma_separated_env(name):
+    return [
+        value.strip()
+        for value in os.environ.get(name, '').split(',')
+        if value.strip()
+    ]
+
+
+def _get_allowed_hosts():
+    return [
+        '.onrender.com',
+        '.vercel.app',
+        '.mindset-group.org',
+        'localhost',
+        '127.0.0.1',
+    ] + _comma_separated_env('EXTRA_ALLOWED_HOSTS')
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,12 +62,9 @@ STEAM_EXPERIENCE_PUBLIC = os.environ.get('STEAM_EXPERIENCE_PUBLIC', 'False') == 
 # every registration lands on the plain thank you page.
 STEAM_PAYMENTS_ENABLED = os.environ.get('STEAM_PAYMENTS_ENABLED', 'False') == 'True'
 
-ALLOWED_HOSTS = ['.onrender.com', '.vercel.app', '.mindset-group.org', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = _get_allowed_hosts()
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://mindset-group.org',
-    'https://*.vercel.app',
-]
+CSRF_TRUSTED_ORIGINS = _comma_separated_env('CSRF_TRUSTED_ORIGINS')
 
 # Application definition
 

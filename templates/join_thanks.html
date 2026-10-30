@@ -12,6 +12,7 @@
     <h1>Thank you</h1>
     <p>We have received your registration for the Holiday STEAM Experience, {{ stage_label }}.</p>
     <p class="join-thanks-fee">Fee: {{ payment_link.amount_text }}</p>
+    {% if stage_label == 'Build (3 weeks)' or stage_label == 'Innovate (4 weeks)' %}<p>Learners must complete the Discover stage first.</p>{% endif %}
     <p>Your registration is confirmed once we receive your payment.</p>
     <p>Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.</p>
     <p>Questions? {% include 'includes/contact_links.html' with event_from='join-thanks' %}, Monday to Saturday, 8:00 am to 6:00 pm, or email <a href="mailto:info@mindset-group.org">info@mindset-group.org</a>.</p>
