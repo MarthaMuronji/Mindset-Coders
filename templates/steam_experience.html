@@ -23,7 +23,13 @@
   "endDate": "2027-01-29",
   "location": {
     "@type": "Place",
-    "name": "{{ content.venues.0|escapejs }}"
+    "name": "Amreena Mall",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{{ content.venues.0|escapejs }}",
+      "addressLocality": "Kampala",
+      "addressCountry": "UG"
+    }
   },
   "organizer": {
     "@type": "Organization",
@@ -88,7 +94,7 @@
     {% if content.stages %}
     <section class="home-section steam-journey reveal">
         <h2>The learning journey: Discover, Build, Innovate</h2>
-        <p class="section-subtitle">Each stage builds on the one before it. You can register your child for one stage or for the complete journey.</p>
+        <p class="section-subtitle">Every learner begins with Discover. You can register stage by stage, or choose the complete journey.</p>
         <div class="steam-stage-grid">
             {% for stage in content.stages %}
             <article class="build-card steam-stage-card steam-stage-card--{{ forloop.counter }} reveal reveal-delay-{{ forloop.counter }}">
@@ -104,9 +110,22 @@
                 {% if stage.blurb %}<p>{{ stage.blurb }}</p>{% endif %}
                 {% if stage.note %}<p class="steam-stage-note"><i class="fa-solid fa-box-open" aria-hidden="true"></i> {{ stage.note }}</p>{% endif %}
                 <a href="{% url 'join' %}?programme=holiday&amp;stage={{ stage.key }}" class="btn btn-primary steam-stage-register" data-umami-event="register-click" data-umami-event-from="steam-experience">Register for {{ stage.name }}</a>
+                {% if stage.key == 'build' or stage.key == 'innovate' %}<p class="steam-stage-prerequisite">Learners must complete the Discover stage first.</p>{% endif %}
             </article>
             {% endfor %}
         </div>
+        {% if content.full_journey and content.full_journey.fee %}
+        <div class="steam-full-journey reveal">
+            <div class="steam-full-journey-main">
+                <h3>The complete holiday journey</h3>
+                <p class="steam-full-journey-price">{{ content.full_journey.fee }} <span class="steam-full-journey-note">when paid upfront</span></p>
+                <p class="steam-full-journey-includes">Covers Discover, Build and Innovate.</p>
+            </div>
+            {% if content.full_journey.saving %}<span class="steam-saving-badge">{{ content.full_journey.saving }}</span>{% endif %}
+            <a href="{% url 'join' %}?programme=holiday&amp;stage=full" class="btn btn-primary steam-full-register" data-umami-event="register-click" data-umami-event-from="steam-experience">Register for the complete journey</a>
+        </div>
+        {% endif %}
+        {% if content.discount_note %}<p class="steam-discount-note"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i> {{ content.discount_note }}</p>{% endif %}
         {% if content.break %}
         <div class="steam-break">
             <span class="steam-break-label"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i> {{ content.break.label }}: {{ content.break.dates }}</span>
@@ -128,17 +147,6 @@
         </div>
         {% endif %}
 
-        {% if content.discount_note %}<p class="steam-discount-note"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i> {{ content.discount_note }}</p>{% endif %}
-        {% if content.full_journey and content.full_journey.fee %}
-        <div class="steam-full-journey reveal">
-            <div class="steam-full-journey-main">
-                <h3>The complete holiday journey</h3>
-                <p class="steam-full-journey-price">{{ content.full_journey.fee }}{% if content.full_journey.note %} <span class="steam-full-journey-note">{{ content.full_journey.note }}</span>{% endif %}</p>
-            </div>
-            {% if content.full_journey.saving %}<span class="steam-saving-badge">{{ content.full_journey.saving }}</span>{% endif %}
-            <a href="{% url 'join' %}?programme=holiday&amp;stage=full" class="btn btn-primary steam-full-register" data-umami-event="register-click" data-umami-event-from="steam-experience">Register for the complete journey</a>
-        </div>
-        {% endif %}
     </section>
     {% endif %}
 
@@ -160,7 +168,6 @@
         <div class="steam-passport-copy">
             <h2>More than a holiday camp. A learning journey you can follow.</h2>
             {% for paragraph in content.passport_note %}<p>{{ paragraph }}</p>{% endfor %}
-            <a href="https://mpass.mindsetlearn.org/auth" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-umami-event="go-mpass" data-umami-event-from="steam-experience">Discover M-Pass</a>
         </div>
         {% comment %}M-Pass screenshot slot. Render nothing until screenshots are available.{% endcomment %}
     </section>
@@ -229,6 +236,7 @@
             <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> {{ item }}</li>
             {% endfor %}
         </ul>
+        <p class="steam-included-note">No additional purchases are required. The programme fee covers the learning experience and required materials.</p>
     </section>
     {% endif %}
 
@@ -257,6 +265,7 @@
             <a href="{% url 'join' %}?programme=holiday" class="btn btn-primary" data-umami-event="register-click" data-umami-event-from="steam-experience">Register Your Child</a>
             <a href="https://wa.me/256752064343" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-umami-event="whatsapp-click" data-umami-event-from="steam-experience">Enquire on WhatsApp</a>
         </div>
+        <p class="steam-final-journey-link"><a href="{% url 'join' %}?programme=holiday&amp;stage=full">Register for the complete journey</a></p>
     </section>
 
     <section class="cta-banner reveal">

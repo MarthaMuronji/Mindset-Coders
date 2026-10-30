@@ -72,29 +72,107 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         )
         self.assertContains(self.response, 'data-umami-event="whatsapp-click"')
 
-    def test_faq_renders_answers_and_omits_empty_answers(self):
-        self.assertContains(self.response, 'Learners aged 8 to 19 can take part.')
+    def test_faq_renders_confirmed_answers_and_omits_empty_answers(self):
         self.assertContains(
             self.response,
-            'Yes. You can register for Discover, Build or Innovate on its own.',
+            'Learners aged 8 to 19 can take part, in three groups: Juniors (8 to 11 years), Explorers (12 to 14 years) and Young Innovators (15 to 19 years). Activities are differentiated by age and ability.',
         )
-        self.assertNotContains(
+        self.assertContains(
+            self.response,
+            'Every learner begins with the Discover stage, then continues to Build and Innovate. You can register stage by stage, or choose the complete journey.',
+        )
+        self.assertContains(
+            self.response,
+            'No prior coding, robotics or AI experience is required. However, every learner must begin with the Discover stage before progressing to Build and Innovate. This ensures everyone develops the necessary foundation.',
+        )
+        self.assertContains(
             self.response,
             'Does my child need prior coding or robotics experience?',
+        )
+        self.assertContains(
+            self.response,
+            'Kits are used during the Build stage, and learners take a kit home in the Innovate stage. No additional purchases are required. The programme fee covers the learning experience and required materials.',
         )
         self.assertNotContains(
             self.response,
             'What happens if my child misses a session?',
         )
 
-    def test_empty_gallery_age_groups_and_spaces_note_do_not_render(self):
+    def test_empty_gallery_does_not_render(self):
         self.assertNotContains(self.response, 'steam-gallery')
-        self.assertNotContains(self.response, 'steam-age-groups')
-        self.assertNotContains(
+
+    def test_venue_is_consistent_across_steam_contact_and_home(self):
+        venue = 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road'
+        self.assertContains(self.response, venue)
+        self.assertContains(self.client.get('/contact/'), venue)
+        with override_settings(STEAM_EXPERIENCE_PUBLIC=True):
+            home = self.client.get('/')
+        self.assertContains(home, venue)
+
+    def test_confirmed_age_groups_spaces_and_purchase_note_render(self):
+        for group in (
+            'Juniors: 8 to 11 years',
+            'Explorers: 12 to 14 years',
+            'Young Innovators: 15 to 19 years',
+        ):
+            self.assertContains(self.response, group)
+        self.assertContains(
             self.response,
             'Activities are differentiated by age and ability.',
         )
-        self.assertNotContains(self.response, 'steam-spaces-note')
+        self.assertContains(self.response, 'Spaces are limited.')
+        self.assertContains(
+            self.response,
+            'No additional purchases are required. The programme fee covers the learning experience and required materials.',
+        )
+
+    def test_mpass_link_is_absent_from_page_body(self):
+        body = self.html.split('<main>', 1)[1].split('</main>', 1)[0]
+        self.assertNotIn('mpass.mindsetlearn.org', body)
+        self.assertContains(self.response, 'Every learner gets an M-Pass')
+
+    def test_stage_cards_and_join_flow_explain_discover_first(self):
+        for stage in ('Build', 'Innovate'):
+            card_start = self.html.index(f'<h3>{stage}</h3>')
+            card_end = self.html.index('</article>', card_start)
+            card = self.html[card_start:card_end]
+            button_position = card.index(f'Register for {stage}')
+            note_position = card.index(
+                'Learners must complete the Discover stage first.'
+            )
+            self.assertLess(button_position, note_position)
+
+        join_response = self.client.get('/join/')
+        self.assertContains(
+            join_response,
+            'Every learner begins with Discover. Choose Build or Innovate only if your child has already completed Discover.',
+        )
+
+    def test_build_and_innovate_confirmation_pages_explain_discover_first(self):
+        with override_settings(STEAM_PAYMENTS_ENABLED=True):
+            for stage in ('build', 'innovate'):
+                with self.subTest(stage=stage):
+                    response = self.client.get(
+                        f'/join/thanks/?programme=holiday&stage={stage}'
+                    )
+                    html = response.content.decode()
+                    fee_position = html.index('class="join-thanks-fee"')
+                    note_position = html.index(
+                        'Learners must complete the Discover stage first.'
+                    )
+                    self.assertLess(fee_position, note_position)
+
+    def test_complete_journey_is_prominent_and_repeated_in_final_cta(self):
+        self.assertContains(self.response, 'UGX 1,100,000')
+        self.assertContains(self.response, 'when paid upfront')
+        self.assertContains(self.response, 'Save UGX 100,000')
+        self.assertContains(self.response, 'Covers Discover, Build and Innovate.')
+        self.assertContains(
+            self.response,
+            'href="/join/?programme=holiday&amp;stage=full"',
+            count=2,
+        )
+        self.assertContains(self.response, 'Register for the complete journey')
 
     def test_payment_addresses_do_not_appear_on_the_page_or_jsonld(self):
         self.assertNotContains(self.response, 'kacyberpay')
@@ -124,7 +202,13 @@ class PublicSteamEventJsonLdTests(SimpleTestCase):
             event['location'],
             {
                 '@type': 'Place',
-                'name': 'Amreena Mall, Level 3, room 304, Kyanja Ring Road, Kampala',
+                'name': 'Amreena Mall',
+                'address': {
+                    '@type': 'PostalAddress',
+                    'streetAddress': 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road',
+                    'addressLocality': 'Kampala',
+                    'addressCountry': 'UG',
+                },
             },
         )
         self.assertEqual(

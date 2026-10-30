@@ -125,14 +125,18 @@ def refund_policy(request):
 
 STEAM_EXPERIENCE = {
     'age_range': 'Ages 8 to 19',
-    'age_groups': [],
+    'age_groups': [
+        'Juniors: 8 to 11 years',
+        'Explorers: 12 to 14 years',
+        'Young Innovators: 15 to 19 years',
+    ],
     'start_date': '16 November 2026',
     'end_date': '29 January 2027',
     'schedule': 'Monday to Friday, 8:00 am to 1:00 pm',
     'duration': 'Nine teaching weeks',
     'classes_resume': 'Classes resume on Monday, 4 January 2027.',
     'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
-    'venues': ['Amreena Mall, Level 3, room 304, Kyanja Ring Road, Kampala'],
+    'venues': ['Amreena Mall, Level 3, Room 304, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
     'payment_options': 'Pay online by Mobile Money. You can also pay in cash.',
     'discount_note': 'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
@@ -162,7 +166,7 @@ STEAM_EXPERIENCE = {
             'url': 'https://kacyberpay.com/pay/hc6sn7yqxq',
         },
     ],
-    'spaces_note': '',
+    'spaces_note': 'Spaces are limited.',
     'gallery': [],
     'experience_cards': [
         {
@@ -271,15 +275,15 @@ STEAM_EXPERIENCE = {
     'faq': [
         {
             'question': 'What age groups can participate?',
-            'answer': 'Learners aged 8 to 19 can take part.',
+            'answer': 'Learners aged 8 to 19 can take part, in three groups: Juniors (8 to 11 years), Explorers (12 to 14 years) and Young Innovators (15 to 19 years). Activities are differentiated by age and ability.',
         },
         {
             'question': 'Does my child need prior coding or robotics experience?',
-            'answer': '',
+            'answer': 'No prior coding, robotics or AI experience is required. However, every learner must begin with the Discover stage before progressing to Build and Innovate. This ensures everyone develops the necessary foundation.',
         },
         {
             'question': 'Can my child register for just one stage?',
-            'answer': 'Yes. You can register for Discover, Build or Innovate on its own.',
+            'answer': 'Every learner begins with the Discover stage, then continues to Build and Innovate. You can register stage by stage, or choose the complete journey.',
         },
         {
             'question': 'Can my child participate in the complete programme?',
@@ -291,7 +295,7 @@ STEAM_EXPERIENCE = {
         },
         {
             'question': 'Are learning materials and robotics kits included?',
-            'answer': 'Kits are used during the Build stage, and learners take a kit home in the Innovate stage.',
+            'answer': 'Kits are used during the Build stage, and learners take a kit home in the Innovate stage. No additional purchases are required. The programme fee covers the learning experience and required materials.',
         },
         {
             'question': 'What will my child take home?',
@@ -315,7 +319,7 @@ STEAM_EXPERIENCE = {
         },
         {
             'question': 'Where is Mindset located?',
-            'answer': 'Amreena Mall, Level 3, room 304, Kyanja Ring Road, Kampala.',
+            'answer': 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road.',
         },
     ],
 }

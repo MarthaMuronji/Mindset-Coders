@@ -304,7 +304,7 @@ class JoinPageTests(SimpleTestCase):
         response = self.client.get('/join/')
         self.assertContains(
             response,
-            'Choose a stage if you picked the Holiday STEAM Experience.',
+            'Every learner begins with Discover. Choose Build or Innovate only if your child has already completed Discover.',
         )
 
     @override_settings(STEAM_EXPERIENCE_PUBLIC=False)

@@ -2979,6 +2979,14 @@ a.build-card:focus-visible {
     color: #2FA84F;
 }
 
+.steam-stage-prerequisite {
+    margin: 10px 0 0;
+    color: #5A6B7A;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+}
+
 .steam-break {
     position: relative;
     display: flex;
@@ -3062,17 +3070,18 @@ a.build-card:focus-visible {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px solid #CDEAD2;
-    border-left: 5px solid #2FA84F;
-    border-radius: 14px;
+    gap: 18px;
+    margin-top: 24px;
+    padding: 28px;
+    border: 2px solid #CDEAD2;
+    border-left: 7px solid #2FA84F;
+    border-radius: 18px;
     background: #E8F7EA;
+    box-shadow: 0 8px 24px rgba(22, 50, 79, 0.12);
 }
 
 .steam-full-journey-main {
-    flex: 1 1 240px;
+    flex: 1 1 300px;
     min-width: 0;
 }
 
@@ -3095,9 +3104,15 @@ a.build-card:focus-visible {
     margin: 0;
     color: #16324F;
     font-family: 'Poppins', sans-serif;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     overflow-wrap: anywhere;
+}
+
+.steam-full-journey-includes {
+    margin: 8px 0 0;
+    color: #16324F;
+    font-weight: 600;
 }
 
 .steam-full-journey-note {
@@ -3138,6 +3153,11 @@ a.build-card:focus-visible {
 
 .steam-full-register {
     flex: 0 0 auto;
+    min-height: 52px;
+    padding-right: 24px;
+    padding-left: 24px;
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .steam-discount-note i {
@@ -3417,6 +3437,18 @@ a.build-card:focus-visible {
     gap: 12px;
 }
 
+.steam-included-note {
+    margin: 20px 0 0;
+    padding: 16px 18px;
+    border: 1px solid #CDEAD2;
+    border-left: 5px solid #2FA84F;
+    border-radius: 12px;
+    background: #E8F7EA;
+    color: #16324F;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
 .steam-faq-list {
     max-width: 900px;
     margin: 0 auto;
@@ -3468,6 +3500,18 @@ a.build-card:focus-visible {
 .steam-final-actions .btn {
     min-width: 200px;
     min-height: 48px;
+}
+
+.steam-final-journey-link {
+    margin: 12px 0 0;
+    font-size: 14px;
+}
+
+.steam-final-journey-link a {
+    color: var(--navy);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 .steam-sticky-bar {
@@ -3594,6 +3638,27 @@ a.build-card:focus-visible {
 
     .steam-stage-card {
         padding: 20px;
+    }
+
+    .steam-full-journey {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .steam-full-journey-main {
+        flex-basis: auto;
+    }
+
+    .steam-full-journey-price {
+        font-size: 23px;
+    }
+
+    .steam-full-register {
+        width: 100%;
+        min-width: 0;
+        white-space: normal;
+        text-align: center;
     }
 
     .steam-stage-head {

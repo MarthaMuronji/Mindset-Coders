@@ -88,7 +88,7 @@ class RegistrationForm(forms.ModelForm):
         choices=Registration.STAGE_CHOICES,
         required=False,
         label='Stage',
-        help_text='Choose a stage if you picked the Holiday STEAM Experience.',
+        help_text='Every learner begins with Discover. Choose Build or Innovate only if your child has already completed Discover.',
     )
 
     class Meta:

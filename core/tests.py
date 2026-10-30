@@ -208,7 +208,7 @@ class SteamPopupTests(SimpleTestCase):
             self.assertContains(response, f'<span>{stage}</span>')
         self.assertContains(response, '16 November 2026 to 29 January 2027')
         self.assertContains(response, 'Ages 8 to 19')
-        self.assertContains(response, 'Mindset Coders Headquarters, Kyanja Ring Road')
+        self.assertContains(response, 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road')
         self.assertContains(response, 'Stages from UGX 300,000')
         self.assertContains(response, 'class="steam-popup-extra"', count=2)
         self.assertContains(response, 'class="steam-popup-price steam-popup-extra"')
