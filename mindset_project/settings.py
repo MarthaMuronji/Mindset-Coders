@@ -46,6 +46,10 @@ STEAM_PAYMENTS_ENABLED = os.environ.get('STEAM_PAYMENTS_ENABLED', 'False') == 'T
 
 ALLOWED_HOSTS = ['.onrender.com', '.vercel.app', '.mindset-group.org', 'localhost', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://mindset-group.org',
+    'https://*.vercel.app',
+]
 
 # Application definition
 
