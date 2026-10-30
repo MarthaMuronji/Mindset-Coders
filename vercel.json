@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "mindset_project/wsgi.py": {
+      "maxDuration": 30
+    }
+  }
+}
