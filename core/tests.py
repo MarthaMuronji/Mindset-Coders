@@ -212,20 +212,22 @@ class SteamPopupTests(SimpleTestCase):
         self.assertContains(response, 'Stages from UGX 300,000')
         self.assertContains(response, 'class="steam-popup-extra"', count=2)
         self.assertContains(response, 'class="steam-popup-price steam-popup-extra"')
-        self.assertContains(response, 'Register your child')
+        self.assertContains(response, 'Explore the experience')
+        self.assertNotContains(response, 'Register your child')
 
     def test_shared_script_uses_per_visit_state(self):
         response = self.client.get('/')
         self.assertContains(response, "'steam-promo-visit'")
         self.assertNotContains(response, 'popupSeen')
 
-    def test_register_button_links_to_holiday_join_form(self):
+    def test_explore_button_links_to_steam_experience(self):
         response = self.client.get('/')
         html = response.content.decode()
         self.assertRegex(
             html,
-            r'<a href="/join/\?programme=holiday" class="btn steam-popup-primary"'
-            r'[^>]*data-umami-event="steam-popup-register"',
+            r'<a href="/steam-experience/" class="btn steam-popup-primary"'
+            r'[^>]*data-umami-event="steam-popup-register"[^>]*>'
+            r'Explore the experience <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>',
         )
 
     def test_shared_script_ignores_persistent_promo_storage(self):
