@@ -3370,6 +3370,28 @@ a.build-card:focus-visible {
     margin-top: 0;
 }
 
+.steam-gallery-more {
+    margin-top: 20px;
+}
+
+.steam-gallery-more summary {
+    display: table;
+    margin: 0 auto;
+    padding: 12px 22px;
+    border: 1px solid var(--green-border-light);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--navy);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.steam-gallery-more summary:hover,
+.steam-gallery-more summary:focus-visible {
+    background: var(--navy);
+    color: var(--white);
+}
+
 .steam-details > h2,
 .steam-experiences > h2,
 .steam-journey > h2,

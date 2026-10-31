@@ -169,12 +169,10 @@ STEAM_EXPERIENCE = {
     'spaces_note': 'Spaces are limited.',
     'gallery': [
         {'file': 'images/gallery-1.jpg', 'alt': 'Boys assembling a LEGO robot in the computer lab'},
-        {'file': 'images/gallery-2.jpg', 'alt': 'A girl smiling as she holds a small green and white robot'},
         {'file': 'images/gallery-3.jpg', 'alt': 'A boy coding at a computer with an electronics rig beside him'},
         {'file': 'images/gallery-4.jpg', 'alt': 'A facilitator guiding learners as they code on laptops'},
         {'file': 'images/gallery-5.jpg', 'alt': 'A team of children presenting their project on stage'},
         {'file': 'images/gallery-6.jpg', 'alt': 'A young boy typing on a laptop'},
-        {'file': 'images/gallery-7.jpg', 'alt': 'Children standing beside the prototype they built'},
         {'file': 'images/gallery-8.jpg', 'alt': 'A young child working on a laptop'},
         {'file': 'images/gallery-9.jpg', 'alt': 'A learner connects wires to a circuit board during a hands-on experiment'},
         {'file': 'images/gallery-10.jpg', 'alt': 'Learners coding at desktop computers while facilitators assist'},
