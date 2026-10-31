@@ -98,8 +98,86 @@ class SteamExperienceRedesignTests(SimpleTestCase):
             'What happens if my child misses a session?',
         )
 
-    def test_empty_gallery_does_not_render(self):
-        self.assertNotContains(self.response, 'steam-gallery')
+    def test_gallery_renders_eight_images_with_alt_text(self):
+        self.assertContains(self.response, 'steam-gallery')
+        gallery_images = re.findall(
+            r'<img src="/static/images/gallery-\d+\.jpg" alt="([^"]*)"',
+            self.html,
+        )
+        self.assertEqual(len(gallery_images), 8)
+        for alt in gallery_images:
+            self.assertTrue(alt.strip(), 'gallery image alt text must not be empty')
+
+    def test_gallery_files_exist_and_are_within_size_limit(self):
+        from pathlib import Path
+
+        from django.conf import settings
+
+        images_dir = Path(settings.BASE_DIR) / 'static' / 'images'
+        for number in range(1, 9):
+            with self.subTest(number=number):
+                path = images_dir / f'gallery-{number}.jpg'
+                self.assertTrue(path.exists(), f'{path.name} is missing')
+                self.assertLess(path.stat().st_size, 150_000, f'{path.name} exceeds 150 KB')
+
+    def test_slot_images_exist_and_are_within_size_limits(self):
+        from pathlib import Path
+
+        from django.conf import settings
+
+        images_dir = Path(settings.BASE_DIR) / 'static' / 'images'
+        # (filename, max bytes). The hero may be larger than the other slots.
+        limits = {
+            'steam-hero.jpg': 200_000,
+            'steam-robotics.jpg': 150_000,
+            'steam-ai.jpg': 150_000,
+            'steam-innovation.jpg': 150_000,
+        }
+        for name, limit in limits.items():
+            with self.subTest(name=name):
+                path = images_dir / name
+                self.assertTrue(path.exists(), f'{name} is missing')
+                self.assertLess(path.stat().st_size, limit, f'{name} exceeds its size limit')
+
+    def test_slot_images_render_and_have_alt_text(self):
+        for name, alt in (
+            ('steam-hero.jpg', 'Children learning to code at computers'),
+            ('steam-robotics.jpg', 'Robotics and engineering activity'),
+            ('steam-ai.jpg', 'Artificial intelligence and coding activity'),
+            ('steam-innovation.jpg', 'Entrepreneurship and innovation activity'),
+        ):
+            with self.subTest(name=name):
+                self.assertContains(self.response, f'images/{name}')
+        for alt in (
+            'Robotics and engineering activity',
+            'Artificial intelligence and coding activity',
+            'Entrepreneurship and innovation activity',
+        ):
+            self.assertTrue(alt.strip())
+
+    def test_arts_slot_is_left_empty_but_card_still_renders(self):
+        from pathlib import Path
+
+        from django.conf import settings
+
+        # No acceptable arts photo exists in the archive, so the file is absent...
+        arts_path = Path(settings.BASE_DIR) / 'static' / 'images' / 'steam-arts.jpg'
+        self.assertFalse(arts_path.exists(), 'steam-arts.jpg should be left empty')
+        # ...but the Creative Arts card and its section still render; the template
+        # drops the broken image via onerror="this.remove()".
+        self.assertContains(self.response, 'Creative Arts and Design')
+        self.assertContains(self.response, 'images/steam-arts.jpg')
+        self.assertContains(self.response, 'onerror="this.remove()"')
+
+    def test_page_renders_when_a_slot_image_file_is_missing(self):
+        # The template tolerates a missing image (onerror removes it), so the
+        # page must still return 200 even though steam-arts.jpg does not exist.
+        self.assertEqual(self.response.status_code, 200)
+        self.assertContains(
+            self.response,
+            "This holiday, let your child discover what they're capable of creating.",
+            msg_prefix='hero copy should render regardless of image files',
+        )
 
     def test_venue_is_consistent_across_steam_contact_and_home(self):
         venue = 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road'
