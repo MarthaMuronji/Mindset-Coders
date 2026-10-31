@@ -178,12 +178,24 @@
         <h2>The experience at Mindset</h2>
         <p class="section-subtitle">Photos from past Mindset programmes and events.</p>
         <div class="steam-gallery-grid">
-            {% for image in content.gallery %}
+            {% for image in content.gallery|slice:":8" %}
             <div class="img-slot img-slot--wide">
                 <img src="{% static image.file %}" alt="{{ image.alt }}" width="900" height="600" loading="lazy" onerror="this.remove()">
             </div>
             {% endfor %}
         </div>
+        {% if content.gallery|length > 8 %}
+        <details class="steam-gallery-more">
+            <summary>Show more photos</summary>
+            <div class="steam-gallery-grid">
+                {% for image in content.gallery|slice:"8:" %}
+                <div class="img-slot img-slot--wide">
+                    <img src="{% static image.file %}" alt="{{ image.alt }}" width="900" height="600" loading="lazy" onerror="this.remove()">
+                </div>
+                {% endfor %}
+            </div>
+        </details>
+        {% endif %}
     </section>
     {% endif %}
 

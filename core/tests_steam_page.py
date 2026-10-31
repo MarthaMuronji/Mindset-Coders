@@ -104,15 +104,28 @@ class SteamExperienceRedesignTests(SimpleTestCase):
             'What happens if my child misses a session?',
         )
 
-    def test_gallery_renders_thirteen_images_with_alt_text(self):
+    def test_gallery_renders_eleven_images_with_first_eight_outside_show_more(self):
         self.assertContains(self.response, 'steam-gallery')
         gallery_images = re.findall(
             r'<img src="/static/images/gallery-\d+\.jpg" alt="([^"]*)"',
             self.html,
         )
-        self.assertEqual(len(gallery_images), 13)
+        self.assertEqual(len(gallery_images), 11)
         for alt in gallery_images:
             self.assertTrue(alt.strip(), 'gallery image alt text must not be empty')
+        gallery = re.search(
+            r'<section class="home-section steam-gallery reveal">(.*?)</section>',
+            self.html,
+            re.DOTALL,
+        ).group(1)
+        self.assertEqual(
+            gallery.count('width="900" height="600" loading="lazy"'),
+            11,
+        )
+        visible, show_more = gallery.split('<details class="steam-gallery-more">', 1)
+        self.assertEqual(visible.count('<img '), 8)
+        self.assertIn('<summary>Show more photos</summary>', show_more)
+        self.assertEqual(show_more.count('<img '), 3)
         self.assertContains(
             self.response,
             'Photos from past Mindset programmes and events.',
@@ -124,11 +137,29 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         from django.conf import settings
 
         images_dir = Path(settings.BASE_DIR) / 'static' / 'images'
-        for number in range(1, 14):
+        for number in (1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13):
             with self.subTest(number=number):
                 path = images_dir / f'gallery-{number}.jpg'
                 self.assertTrue(path.exists(), f'{path.name} is missing')
                 self.assertLess(path.stat().st_size, 150_000, f'{path.name} exceeds 150 KB')
+        for number in (2, 7):
+            with self.subTest(removed_number=number):
+                path = images_dir / f'gallery-{number}.jpg'
+                self.assertFalse(path.exists(), f'{path.name} should have been removed')
+                self.assertNotContains(self.response, f'images/{path.name}')
+
+    def test_gallery_with_eight_or_fewer_photos_has_no_show_more_block(self):
+        gallery = views.STEAM_EXPERIENCE['gallery'][:8]
+        with mock.patch.dict(views.STEAM_EXPERIENCE, {'gallery': gallery}):
+            response = self.client.get(STEAM_URL)
+
+        html = response.content.decode()
+        self.assertEqual(
+            len(re.findall(r'<img src="/static/images/gallery-\d+\.jpg"', html)),
+            8,
+        )
+        self.assertNotContains(response, 'steam-gallery-more')
+        self.assertNotContains(response, 'Show more photos')
 
     def test_slot_images_exist_and_are_within_size_limits(self):
         from pathlib import Path
