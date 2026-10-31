@@ -353,10 +353,12 @@ class BrandAssetsTests(SimpleTestCase):
         self.assertIn('mindset-logo.png', logo_html)
         self.assertIn('alt="Mindset Coders"', logo_html)
 
-    def test_footer_contains_text_wordmark(self):
+    def test_footer_contains_white_mindset_logo_image(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
+        self.assertContains(response, 'static/images/mindset-logo-white.png')
+        self.assertContains(response, 'alt="Mindset Coders"')
+        self.assertNotContains(
             response,
             '<div class="footer-brand">mindset<span class="logo-accent">&lt;/&gt;</span></div>',
         )
