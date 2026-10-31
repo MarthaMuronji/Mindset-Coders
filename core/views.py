@@ -176,6 +176,11 @@ STEAM_EXPERIENCE = {
         {'file': 'images/gallery-6.jpg', 'alt': 'A young boy typing on a laptop'},
         {'file': 'images/gallery-7.jpg', 'alt': 'Children standing beside the prototype they built'},
         {'file': 'images/gallery-8.jpg', 'alt': 'A young child working on a laptop'},
+        {'file': 'images/gallery-9.jpg', 'alt': 'A learner connects wires to a circuit board during a hands-on experiment'},
+        {'file': 'images/gallery-10.jpg', 'alt': 'Learners coding at desktop computers while facilitators assist'},
+        {'file': 'images/gallery-11.jpg', 'alt': 'Learners and a facilitator work together on an electronics project'},
+        {'file': 'images/gallery-12.jpg', 'alt': 'Two learners work together on an electronic circuit'},
+        {'file': 'images/gallery-13.jpg', 'alt': 'A learner speaks into a microphone as a facilitator holds it at an event'},
     ],
     'experience_cards': [
         {
@@ -197,7 +202,7 @@ STEAM_EXPERIENCE = {
             'text': 'Children explore creativity through design thinking, visual arts, experimentation and hands-on creative projects.',
             'icon': 'fa-palette',
             'image': 'images/steam-arts.jpg',
-            'alt': 'Creative arts and design activity',
+            'alt': 'Two learners presenting a tabletop project at an event',
         },
         {
             'title': 'Entrepreneurship and Innovation',

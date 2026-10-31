@@ -1,7 +1,13 @@
 import json
 import re
+from unittest import mock
 
-from django.test import SimpleTestCase, override_settings
+from django.test import (
+    SimpleTestCase,
+    override_settings,
+)
+
+from . import views
 
 
 STEAM_URL = '/steam-experience/'
@@ -98,15 +104,19 @@ class SteamExperienceRedesignTests(SimpleTestCase):
             'What happens if my child misses a session?',
         )
 
-    def test_gallery_renders_eight_images_with_alt_text(self):
+    def test_gallery_renders_thirteen_images_with_alt_text(self):
         self.assertContains(self.response, 'steam-gallery')
         gallery_images = re.findall(
             r'<img src="/static/images/gallery-\d+\.jpg" alt="([^"]*)"',
             self.html,
         )
-        self.assertEqual(len(gallery_images), 8)
+        self.assertEqual(len(gallery_images), 13)
         for alt in gallery_images:
             self.assertTrue(alt.strip(), 'gallery image alt text must not be empty')
+        self.assertContains(
+            self.response,
+            'Photos from past Mindset programmes and events.',
+        )
 
     def test_gallery_files_exist_and_are_within_size_limit(self):
         from pathlib import Path
@@ -114,7 +124,7 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         from django.conf import settings
 
         images_dir = Path(settings.BASE_DIR) / 'static' / 'images'
-        for number in range(1, 9):
+        for number in range(1, 14):
             with self.subTest(number=number):
                 path = images_dir / f'gallery-{number}.jpg'
                 self.assertTrue(path.exists(), f'{path.name} is missing')
@@ -131,6 +141,7 @@ class SteamExperienceRedesignTests(SimpleTestCase):
             'steam-hero.jpg': 200_000,
             'steam-robotics.jpg': 150_000,
             'steam-ai.jpg': 150_000,
+            'steam-arts.jpg': 150_000,
             'steam-innovation.jpg': 150_000,
         }
         for name, limit in limits.items():
@@ -141,43 +152,49 @@ class SteamExperienceRedesignTests(SimpleTestCase):
 
     def test_slot_images_render_and_have_alt_text(self):
         for name, alt in (
-            ('steam-hero.jpg', 'Children learning to code at computers'),
+            (
+                'steam-hero.jpg',
+                'Children learning to code at computers during the STEAM Experience',
+            ),
             ('steam-robotics.jpg', 'Robotics and engineering activity'),
             ('steam-ai.jpg', 'Artificial intelligence and coding activity'),
+            ('steam-arts.jpg', 'Two learners presenting a tabletop project at an event'),
             ('steam-innovation.jpg', 'Entrepreneurship and innovation activity'),
         ):
             with self.subTest(name=name):
-                self.assertContains(self.response, f'images/{name}')
-        for alt in (
-            'Robotics and engineering activity',
-            'Artificial intelligence and coding activity',
-            'Entrepreneurship and innovation activity',
-        ):
-            self.assertTrue(alt.strip())
+                self.assertContains(
+                    self.response,
+                    f'<img src="/static/images/{name}" alt="{alt}"',
+                )
 
-    def test_arts_slot_is_left_empty_but_card_still_renders(self):
+    def test_arts_slot_uses_a_photo_and_card_still_renders(self):
         from pathlib import Path
 
         from django.conf import settings
 
-        # No acceptable arts photo exists in the archive, so the file is absent...
         arts_path = Path(settings.BASE_DIR) / 'static' / 'images' / 'steam-arts.jpg'
-        self.assertFalse(arts_path.exists(), 'steam-arts.jpg should be left empty')
-        # ...but the Creative Arts card and its section still render; the template
-        # drops the broken image via onerror="this.remove()".
+        self.assertTrue(arts_path.exists(), 'steam-arts.jpg is missing')
+        self.assertLess(arts_path.stat().st_size, 150_000)
         self.assertContains(self.response, 'Creative Arts and Design')
         self.assertContains(self.response, 'images/steam-arts.jpg')
-        self.assertContains(self.response, 'onerror="this.remove()"')
-
-    def test_page_renders_when_a_slot_image_file_is_missing(self):
-        # The template tolerates a missing image (onerror removes it), so the
-        # page must still return 200 even though steam-arts.jpg does not exist.
-        self.assertEqual(self.response.status_code, 200)
         self.assertContains(
             self.response,
+            'alt="Two learners presenting a tabletop project at an event"',
+        )
+
+    def test_page_renders_when_a_slot_image_file_is_missing(self):
+        gallery = [image.copy() for image in views.STEAM_EXPERIENCE['gallery']]
+        gallery[0]['file'] = 'images/missing-slot-test.jpg'
+        with mock.patch.dict(views.STEAM_EXPERIENCE, {'gallery': gallery}):
+            response = self.client.get(STEAM_URL)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
             "This holiday, let your child discover what they're capable of creating.",
             msg_prefix='hero copy should render regardless of image files',
         )
+        self.assertContains(response, 'images/missing-slot-test.jpg')
 
     def test_venue_is_consistent_across_steam_contact_and_home(self):
         venue = 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road'
