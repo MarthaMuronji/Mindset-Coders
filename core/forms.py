@@ -1,10 +1,29 @@
+import re
+
 from django import forms
 
 from .models import Story
 
+# One friendly sentence for every phone problem: an empty box, letters
+# in the number, or a number that is too short or too long
+PHONE_ERROR = 'Please enter a phone number we can call, for example +256 7XX XXX XXX.'
+
+# Digits, spaces, plus signs, hyphens and brackets, and nothing else
+PHONE_ALLOWED_CHARACTERS = re.compile(r'^[0-9 +()\-]+$')
+
+
 class ContactForm(forms.Form):
     name = forms.CharField(max_length=100)
     email = forms.EmailField()
+    phone = forms.CharField(
+        max_length=30,
+        label='Phone number',
+        help_text='So our team can call you back.',
+        error_messages={
+            'required': PHONE_ERROR,
+            'max_length': PHONE_ERROR,
+        },
+    )
     role = forms.ChoiceField(choices=[
         ('school', 'School'),
         ('educator', 'Educator'),
@@ -13,6 +32,19 @@ class ContactForm(forms.Form):
         ('other', 'Other'),
     ])
     message = forms.CharField(widget=forms.Textarea)
+
+    def clean_phone(self):
+        """A number the team can actually dial.
+
+        Digits, spaces, plus signs, hyphens and brackets are welcome, and
+        between 9 and 15 digits must be there once the decorations are
+        removed. Every problem gets the same friendly sentence.
+        """
+        phone = self.cleaned_data.get('phone', '').strip()
+        digits = re.sub(r'\D', '', phone)
+        if not PHONE_ALLOWED_CHARACTERS.fullmatch(phone) or not 9 <= len(digits) <= 15:
+            raise forms.ValidationError(PHONE_ERROR)
+        return phone
 
 
 class StoryForm(forms.ModelForm):

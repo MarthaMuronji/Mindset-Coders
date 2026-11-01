@@ -30,7 +30,6 @@ TOPIC_STARTERS = {
     'learner': 'I am interested in joining a Mindset Coders programme.',
     'school': 'I would like to bring STEAM to our school.',
     'global': 'I would like to know more about global opportunities.',
-    'university': 'I would like to know more about University Preparation.',
     'products': 'I would like to know more about your products and resources.',
     'partner': 'I would like to partner with Mindset Coders.',
     'story': 'I would like to share a story with Mindset Coders.',
@@ -64,6 +63,7 @@ def contact(request):
                 contact_message = ContactMessage.objects.create(
                     name=form.cleaned_data['name'],
                     email=form.cleaned_data['email'],
+                    phone=form.cleaned_data['phone'],
                     role=form.cleaned_data['role'],
                     message=form.cleaned_data['message'],
                 )

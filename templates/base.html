@@ -57,7 +57,7 @@
                 <ul class="nav-links">
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'about' %}">About</a></li>
-    <li><a href="https://mpass.mindsetlearn.org/auth" target="_blank" rel="noopener noreferrer" data-umami-event="go-mpass" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">M-Pass</a></li>
+    <li><a href="https://mpass.mindsetlearn.org/" target="_blank" rel="noopener noreferrer" data-umami-event="go-mpass" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">M-Pass</a></li>
     <li><a href="{% url 'shop' %}">Shop</a></li>
     <li><a href="{% url 'for_schools' %}">For Schools</a></li>
     <li><a href="{% url 'global_opportunities' %}">Global Opportunities</a></li>
@@ -79,7 +79,7 @@
         <ul class="footer-links">
     {% comment %}restore the Blog link when posts exist{% endcomment %}
     <li><a href="{% url 'innovators_circle' %}">Innovators' Circle</a></li>
-    <li><a href="{% url 'university_preparation' %}">University Preparation</a></li>
+    {% comment %}<li><a href="{% url 'university_preparation' %}">University Preparation</a></li>{% endcomment %}
     <li><a href="{% url 'shop' %}">Shop</a></li>
     <li><a href="{% url 'impact' %}">Impact and Stories</a></li>
     <li><a href="{% url 'privacy' %}">Privacy</a></li>

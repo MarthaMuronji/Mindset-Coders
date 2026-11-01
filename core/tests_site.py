@@ -110,7 +110,7 @@ class HeaderAndSocialSiteTests(SimpleTestCase):
         self.assertNotContains(response, '>Login</a>')
         self.assertContains(
             response,
-            '<a href="https://mpass.mindsetlearn.org/auth" target="_blank" rel="noopener noreferrer" data-umami-event="go-mpass" data-umami-event-from="home">M-Pass</a>',
+            '<a href="https://mpass.mindsetlearn.org/" target="_blank" rel="noopener noreferrer" data-umami-event="go-mpass" data-umami-event-from="home">M-Pass</a>',
         )
 
     def test_social_links_render_in_footer_and_contact(self):

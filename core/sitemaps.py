@@ -14,7 +14,6 @@ class StaticViewSitemap(Sitemap):
             'for_schools',
             'global_opportunities',
             'innovators_circle',
-            'university_preparation',
             'partners',
             'privacy',
             'shop',

@@ -25,6 +25,11 @@ def _build_text(contact_message, admin_url, review_url=None):
         'Name: {}'.format(contact_message.name),
         'Email: {}'.format(contact_message.email),
     ]
+    # The phone line belongs to contact messages only: a story carries no
+    # phone number, so its email keeps exactly the lines it had before
+    phone = getattr(contact_message, 'phone', '')
+    if phone:
+        lines.append('Phone: {}'.format(phone))
     # Only mention the role when the model actually has that field
     if hasattr(contact_message, 'role'):
         lines.append('Role: {}'.format(contact_message.role))

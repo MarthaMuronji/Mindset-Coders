@@ -142,6 +142,9 @@ class ContactMessage(models.Model):
     """A message sent through the contact form, shown in the Django admin."""
     name = models.CharField(max_length=100)
     email = models.EmailField()
+    # Optional on the model, so older rows and older code keep working,
+    # while the contact form itself always asks for it
+    phone = models.CharField(max_length=30, null=True, blank=True)
     role = models.CharField(max_length=20)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
