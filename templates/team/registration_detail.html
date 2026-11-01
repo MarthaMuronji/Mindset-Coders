@@ -1,0 +1,75 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_registrations' %}">Registrations</a>
+    <h1>{{ registration.learner_name }}</h1>
+    <span class="team-status team-status-{{ registration.payment_status }}">{{ status_label }}</span>
+  </div>
+  <section class="team-panel">
+    <h2>Parent or carer</h2>
+    <dl class="team-details">
+      <dt>Name</dt><dd>{{ registration.parent_name }}</dd>
+      <dt>Phone</dt><dd>{{ registration.parent_phone }}</dd>
+      <dt>Email</dt><dd><a href="mailto:{{ registration.parent_email }}">{{ registration.parent_email }}</a></dd>
+    </dl>
+    <div class="team-phone-actions">
+      <a class="btn btn-primary" href="tel:{{ phone_tel }}">Call</a>
+      <a class="btn btn-outline" href="https://wa.me/{{ phone_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    </div>
+  </section>
+  <section class="team-panel">
+    <h2>Learner and programme</h2>
+    <dl class="team-details">
+      <dt>Learner name</dt><dd>{{ registration.learner_name }}</dd>
+      <dt>Age</dt><dd>{{ registration.learner_age }}</dd>
+      <dt>School</dt><dd>{{ registration.school_name|default:"Not provided" }}</dd>
+      <dt>Programme</dt><dd>{{ registration.get_programme_display }}</dd>
+      <dt>Stage</dt><dd>{{ registration.get_stage_display|default:"Not set" }}</dd>
+      <dt>Received</dt><dd>{{ registration.created_at|date:"j M Y, g:i a" }}</dd>
+      <dt>Consent recorded</dt><dd>{% if registration.consent %}Yes{% else %}No{% endif %}</dd>
+      <dt>Handled</dt><dd>{% if registration.handled %}Yes{% else %}No{% endif %}</dd>
+    </dl>
+  </section>
+  <section class="team-panel">
+    <h2>Payment</h2>
+    <dl class="team-details">
+      <dt>Payment method</dt><dd>{{ registration.get_payment_method_display|default:"Not selected" }}</dd>
+      <dt>Payment status</dt><dd>{{ status_label }}</dd>
+      <dt>Amount due</dt><dd>{% if registration.amount_due is not None %}UGX {{ registration.amount_due }}{% else %}Not set{% endif %}</dd>
+      <dt>Amount paid</dt><dd>UGX {{ registration.amount_paid }}</dd>
+      <dt>Balance</dt><dd>UGX {{ balance }}</dd>
+      <dt>Receipt number</dt><dd>{{ registration.receipt_number|default:"Not recorded" }}</dd>
+      <dt>Paid at</dt><dd>{{ registration.paid_at|date:"j M Y, g:i a"|default:"Not recorded" }}</dd>
+      <dt>Recorded by</dt><dd>{{ registration.payment_recorded_by|default:"Not recorded" }}</dd>
+    </dl>
+    <h3>Internal note</h3>
+    {% if can_change %}
+      <form method="post" class="team-form">
+        {% csrf_token %}
+        <label for="payment-note">Internal note</label>
+        <textarea id="payment-note" name="payment_note" rows="4">{{ registration.payment_note }}</textarea>
+        <button class="btn btn-outline" type="submit">Save note</button>
+      </form>
+    {% else %}
+      <p class="team-note">{{ registration.payment_note|default:"No note" }}</p>
+    {% endif %}
+  </section>
+  {% if can_change %}
+    <section class="team-panel">
+      <h2>Payment actions</h2>
+      <p>Review the details on the next page before confirming an action.</p>
+      <div class="team-action-links">
+        <form method="post" action="{% url 'team_registration_action' registration.pk 'paid' %}">
+          {% csrf_token %}<button class="btn btn-primary" type="submit">Mark as paid in full</button>
+        </form>
+        <form method="post" action="{% url 'team_registration_action' registration.pk 'part_paid' %}">
+          {% csrf_token %}<button class="btn btn-outline" type="submit">Record part payment</button>
+        </form>
+        <form method="post" action="{% url 'team_registration_action' registration.pk 'cancel' %}">
+          {% csrf_token %}<button class="btn btn-danger" type="submit">Cancel registration</button>
+        </form>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

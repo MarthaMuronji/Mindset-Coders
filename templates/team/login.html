@@ -1,0 +1,23 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <section class="team-panel team-login-panel">
+    <h1>Team sign in</h1>
+    <p>Sign in to view registrations and contact messages.</p>
+    <form method="post" class="team-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="team-errors" role="alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+      {% for field in form %}
+        <div class="team-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="team-errors" role="alert">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <button class="btn btn-primary team-submit" type="submit">Sign in</button>
+    </form>
+  </section>
+{% endblock %}

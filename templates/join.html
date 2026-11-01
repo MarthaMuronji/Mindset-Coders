@@ -65,6 +65,16 @@
                 <p class="field-hint">{{ form.stage.help_text }}</p>
                 {% endif %}
             </div>
+            {% if form.show_payment_method %}
+            <div class="form-group" id="payment-method-group"{% if not form.payment_method_required %} hidden{% endif %}>
+                <p>{{ form.payment_method.label }}</p>
+                {{ form.payment_method.errors }}
+                {{ form.payment_method }}
+                {% if form.payment_method.help_text %}
+                <p class="field-hint">{{ form.payment_method.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
             <div class="form-group">
                 <label for="{{ form.consent.id_for_label }}" class="consent-label">{{ form.consent }} {{ form.consent.label }}</label>
                 {{ form.consent.errors }}
@@ -75,6 +85,27 @@
             </div>
             <button type="submit" class="btn btn-green">Send my registration</button>
         </form>
+        {% if form.show_payment_method and not form.payment_method_required %}
+        <script>
+            (function () {
+                var programme = document.getElementById('id_programme');
+                var paymentGroup = document.getElementById('payment-method-group');
+                var paymentOptions = paymentGroup.querySelectorAll('input[name="payment_method"]');
+                function updatePaymentMethod() {
+                    var isHoliday = programme.value === 'holiday';
+                    paymentGroup.hidden = !isHoliday;
+                    for (var index = 0; index < paymentOptions.length; index += 1) {
+                        paymentOptions[index].required = isHoliday;
+                        if (!isHoliday) {
+                            paymentOptions[index].checked = false;
+                        }
+                    }
+                }
+                programme.addEventListener('change', updatePaymentMethod);
+                updatePaymentMethod();
+            })();
+        </script>
+        {% endif %}
         <p class="story-share-note">Read how we handle your information on our <a href="{% url 'privacy' %}">privacy page</a>.</p>
     </div>
 </section>

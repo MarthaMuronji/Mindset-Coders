@@ -54,7 +54,7 @@ class SteamExperienceSiteTests(SimpleTestCase):
     def test_enabled_payment_copy_is_shown(self):
         response = self.client.get('/steam-experience/')
 
-        self.assertContains(response, 'Register your child first. You will see your fee and the payment button on the next page.')
+        self.assertContains(response, 'Register your child first. You will see your fee and payment options on the next page.')
 
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=False)

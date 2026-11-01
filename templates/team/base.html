@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{ page_title|default:"Team" }} | Mindset Coders</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/team.css' %}">
+</head>
+<body class="team-body">
+  <header class="team-header">
+    <a class="team-brand" href="{% url 'team_home' %}" aria-label="Mindset Coders team home">
+      <img src="{% static 'images/mindset-logo.png' %}" alt="Mindset Coders">
+    </a>
+    {% if request.user.is_authenticated %}
+      <form method="post" action="{% url 'team_logout' %}" class="team-logout">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline">Sign out</button>
+      </form>
+    {% endif %}
+  </header>
+  <main class="team-main">
+    {% if messages %}
+      <div class="team-flashes" role="status">
+        {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

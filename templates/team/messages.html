@@ -1,0 +1,59 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_home' %}">Team home</a>
+    <h1>Contact messages</h1>
+    <p>Follow up with people who have contacted Mindset Coders.</p>
+  </div>
+  <nav class="team-filter-tabs" aria-label="Filter messages">
+    <a class="{% if follow_up == 'no' %}is-active{% endif %}" href="?follow_up=no">Not followed up</a>
+    <a class="{% if follow_up == 'yes' %}is-active{% endif %}" href="?follow_up=yes">Followed up</a>
+    <a class="{% if follow_up == 'all' %}is-active{% endif %}" href="?follow_up=all">All</a>
+  </nav>
+  {% if contact_messages %}
+    <div class="team-message-list">
+      {% for contact in contact_messages %}
+        <article class="team-panel team-message-card">
+          <div class="team-card-heading">
+            <h2>{{ contact.name }}</h2>
+            <span class="team-status {% if contact.handled %}team-status-paid{% else %}team-status-pending{% endif %}">
+              {% if contact.handled %}Followed up{% else %}Not followed up{% endif %}
+            </span>
+          </div>
+          <dl class="team-details">
+            <dt>Role</dt><dd>{{ contact.role }}</dd>
+            <dt>Phone</dt><dd>{% if contact.phone %}{{ contact.phone }}{% else %}No phone given{% endif %}</dd>
+            <dt>Email</dt><dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd>
+            <dt>Date</dt><dd>{{ contact.created_at|date:"j M Y, g:i a" }}</dd>
+          </dl>
+          {% if contact.phone %}
+            <div class="team-phone-actions">
+              <a class="btn btn-primary" href="tel:{{ contact.phone_tel }}">Call</a>
+              <a class="btn btn-outline" href="https://wa.me/{{ contact.phone_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            </div>
+          {% endif %}
+          <div class="team-message-body">
+            <h3>Message</h3>
+            <p>{{ contact.message|linebreaksbr }}</p>
+          </div>
+          {% if can_change %}
+            <form method="post" action="{% url 'team_message_follow_up' contact.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="handled" value="{% if contact.handled %}false{% else %}true{% endif %}">
+              <input type="hidden" name="follow_up" value="{{ follow_up }}">
+              <button class="btn {% if contact.handled %}btn-outline{% else %}btn-primary{% endif %}" type="submit">
+                {% if contact.handled %}Mark as not followed up{% else %}Mark as followed up{% endif %}
+              </button>
+            </form>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="team-panel team-empty">
+      <h2>No messages here</h2>
+      <p>There are no messages in this view.</p>
+    </section>
+  {% endif %}
+{% endblock %}

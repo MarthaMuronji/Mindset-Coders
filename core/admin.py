@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import F
 from django.utils import timezone
 from .models import Post, ContactMessage, Registration, Story
 
@@ -22,14 +23,55 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ('learner_name', 'parent_name', 'parent_email', 'programme', 'stage', 'created_at', 'handled')
-    list_filter = ('handled', 'programme', 'stage')
-    search_fields = ('parent_name', 'learner_name', 'parent_email')
-    # Registrations arrive from the form, so nothing but the handled flag is editable
+    list_display = (
+        'learner_name', 'parent_name', 'parent_email', 'programme', 'stage',
+        'payment_method', 'payment_status', 'amount_due', 'amount_paid',
+        'balance', 'created_at', 'handled',
+    )
+    list_filter = (
+        'handled', 'programme', 'stage', 'payment_method', 'payment_status',
+    )
+    search_fields = (
+        'parent_name', 'learner_name', 'parent_email', 'receipt_number',
+    )
     readonly_fields = (
         'parent_name', 'parent_email', 'parent_phone', 'learner_name',
         'learner_age', 'school_name', 'programme', 'stage', 'consent', 'created_at',
+        'payment_method', 'amount_due', 'paid_at', 'balance',
+        'payment_recorded_by',
     )
+    actions = ('mark_as_paid', 'mark_as_cancelled')
+
+    @admin.display(description='Balance')
+    def balance(self, registration):
+        return max((registration.amount_due or 0) - registration.amount_paid, 0)
+
+    @admin.action(description='Mark as paid')
+    def mark_as_paid(self, request, queryset):
+        now = timezone.now()
+        eligible = queryset.exclude(amount_due__isnull=True)
+        count = eligible.update(
+            payment_status='paid',
+            amount_paid=F('amount_due'),
+            paid_at=now,
+        )
+        skipped = queryset.count() - count
+        message = 'Marked {} {} as paid.'.format(
+            count, 'registration' if count == 1 else 'registrations'
+        )
+        if skipped:
+            message += ' {} without an amount due were skipped.'.format(skipped)
+        self.message_user(request, message)
+
+    @admin.action(description='Mark as cancelled')
+    def mark_as_cancelled(self, request, queryset):
+        count = queryset.update(payment_status='cancelled')
+        self.message_user(
+            request,
+            'Marked {} {} as cancelled.'.format(
+                count, 'registration' if count == 1 else 'registrations'
+            ),
+        )
 
 
 @admin.register(Story)

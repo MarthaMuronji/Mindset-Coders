@@ -1,0 +1,25 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <section class="team-heading">
+    <p class="team-eyebrow">Mindset Coders</p>
+    <h1>Team home</h1>
+    <p>Choose what you need to work on.</p>
+  </section>
+  <div class="team-area-grid">
+    {% if can_view_registrations %}
+      <a class="team-area-card" href="{% url 'team_registrations' %}">
+        <h2>Registrations</h2>
+        <p>See registrations and track payments.</p>
+        <span>Open registrations</span>
+      </a>
+    {% endif %}
+    {% if can_view_messages %}
+      <a class="team-area-card" href="{% url 'team_messages' %}">
+        <h2>Contact messages</h2>
+        <p>Read messages and mark follow-up.</p>
+        <span>Open messages</span>
+      </a>
+    {% endif %}
+  </div>
+{% endblock %}

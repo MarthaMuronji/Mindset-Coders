@@ -1,0 +1,9 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <section class="team-panel">
+    <h1>You do not have access</h1>
+    <p>Please contact the person who manages your team access if you think you should be able to see this page.</p>
+    <a class="btn btn-outline" href="{% url 'team_home' %}">Back to team home</a>
+  </section>
+{% endblock %}

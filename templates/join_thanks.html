@@ -8,6 +8,26 @@
 {% block content %}
 
 {% if payment_link %}
+{% if cash_confirmation %}
+<section class="about-hero reveal join-thanks-hero">
+    <h1>Thank you</h1>
+    <p>We have received your registration for the Holiday STEAM Experience, {{ stage_label }}.</p>
+    <p class="join-thanks-fee">Amount to pay: {{ payment_link.amount_text }}</p>
+    <p>Your registration is confirmed once we receive your payment.</p>
+    <p>{{ cash_instructions }}</p>
+    {% if cash_hold_note %}<p>{{ cash_hold_note }}</p>{% endif %}
+    <p>{{ discount_note }}</p>
+</section>
+
+<section class="home-section reveal join-thanks-payment">
+    <div class="join-pay">
+        <a href="/refund-policy/" class="story-share-note join-refund-link">Read our refund and cancellation policy</a>
+        <div class="join-pay-secondary">
+            <a href="/join/?programme=holiday" class="btn btn-outline">Register another child</a>
+        </div>
+    </div>
+</section>
+{% else %}
 <section class="about-hero reveal join-thanks-hero">
     <h1>Thank you</h1>
     <p>We have received your registration for the Holiday STEAM Experience, {{ stage_label }}.</p>
@@ -21,13 +41,13 @@
 <section class="home-section reveal join-thanks-payment">
     <div class="join-pay">
         <a href="{{ payment_link.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-green" data-umami-event="pay-click" data-umami-event-level="{{ payment_link.label }}" data-umami-event-from="join-thanks">Pay {{ payment_link.amount_text }} with Mobile Money</a>
-        <p class="join-cash-note">You can also pay in cash. Contact our team to arrange it.</p>
         <a href="/refund-policy/" class="story-share-note join-refund-link">Read our refund and cancellation policy</a>
         <div class="join-pay-secondary">
             <a href="/join/?programme=holiday" class="btn btn-outline">Register another child</a>
         </div>
     </div>
 </section>
+{% endif %}
 {% else %}
 <section class="about-hero reveal">
     <h1>Thank you</h1>

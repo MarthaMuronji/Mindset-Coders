@@ -72,9 +72,9 @@ def contact(request):
                 messages.error(request, "Sorry, we could not send your message. Please try again in a moment.")
             else:
                 # Notify the team, but never let the email change the outcome above
-                admin_url = request.build_absolute_uri('/admin/core/contactmessage/')
+                team_url = request.build_absolute_uri('/team/messages/')
                 try:
-                    send_contact_notification(contact_message, admin_url)
+                    send_contact_notification(contact_message, team_url)
                 except Exception:
                     logger.exception("Failed to send contact notification")
                 messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
@@ -138,7 +138,9 @@ STEAM_EXPERIENCE = {
     'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
     'venues': ['Amreena Mall, Level 3, Room 304, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
-    'payment_options': 'Pay online by Mobile Money. You can also pay in cash.',
+    'payment_options': 'Choose how to pay when you register: online by Mobile Money, or in cash.',
+    'cash_instructions': 'Pay the fee in cash at Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Monday to Saturday, 8:00 am to 6:00 pm.',
+    'cash_hold_note': '',
     'discount_note': 'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
     'payment_links': [
         {
@@ -645,6 +647,7 @@ def robots_txt(request):
         'User-agent: *',
         'Disallow: /admin/',
         'Disallow: /review/',
+        'Disallow: /team/',
         'Sitemap: {}'.format(request.build_absolute_uri('/sitemap.xml')),
     ]
     return HttpResponse('\n'.join(lines) + '\n', content_type='text/plain')
