@@ -35,12 +35,12 @@
             <p>Find competitions and international opportunities.</p>
             <a href="{% url 'contact' %}?topic=global#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-global" data-umami-event-from="contact">Ask about global opportunities</a>
         </div>
-        <div class="build-card reveal reveal-delay-4">
+        {% comment %}<div class="build-card reveal reveal-delay-4">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
             <h3>University Preparation</h3>
             <p>Prepare for the SAT and related tests with Prep Genius.</p>
             <a href="{% url 'contact' %}?topic=university#contact-form" class="btn btn-green btn-sm" data-umami-event="contact-university" data-umami-event-from="contact">Ask about University Preparation</a>
-        </div>
+        </div>{% endcomment %}
         <div class="build-card reveal reveal-delay-5">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
             <h3>Products and resources</h3>
@@ -84,6 +84,14 @@
             <div class="form-group">
                 <label for="{{ form.email.id_for_label }}">Email</label>
                 {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                {{ form.phone.errors }}
+                {{ form.phone }}
+                {% if form.phone.help_text %}
+                <p class="field-hint">{{ form.phone.help_text }}</p>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="{{ form.role.id_for_label }}">I am a...</label>

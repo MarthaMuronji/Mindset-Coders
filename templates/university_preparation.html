@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}University Preparation | SAT preparation with Prep Genius{% endblock %}
-{% block meta_title_og %}University Preparation | SAT preparation with Prep Genius{% endblock %}
-{% block meta_description %}SAT preparation and support for studying in the United States, delivered with Prep Genius, India, for Mindset Coders learners.{% endblock %}
-{% block og_description %}SAT preparation and support for studying in the United States, delivered with Prep Genius, India, for Mindset Coders learners.{% endblock %}
+{% block title %}University Preparation{% endblock %}
+{% block meta_title_og %}University Preparation{% endblock %}
+{% block meta_description %}This page is temporarily hidden while Mindset Coders reviews the service offering.{% endblock %}
+{% block og_description %}This page is temporarily hidden while Mindset Coders reviews the service offering.{% endblock %}
 
 {% block content %}
-
+{% comment %}
 <section class="about-hero reveal">
     <span class="badge">University Preparation</span>
     <h1>Prepare for the next step beyond school</h1>
@@ -43,7 +43,7 @@
             <p>Preparation for other relevant university entrance tests as the partnership grows.</p>
         </div>
         <div class="build-card reveal reveal-delay-3">
-            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-plane"></i></div>
+            <div class=\"why-icon\" aria-hidden=\"true\"><i class=\"fa-solid fa-plane\"></i></div>
             <h3>Studying in the United States</h3>
             <p>Resources and support for students who are interested in studying at universities in the United States.</p>
         </div>
@@ -66,5 +66,6 @@
         <a href="{% url 'global_opportunities' %}" class="btn btn-outline btn-outline-light">Explore Global Opportunities</a>
     </div>
 </section>
+{% endcomment %}
 
 {% endblock %}

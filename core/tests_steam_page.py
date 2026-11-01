@@ -2,10 +2,7 @@ import json
 import re
 from unittest import mock
 
-from django.test import (
-    SimpleTestCase,
-    override_settings,
-)
+from django.test import SimpleTestCase, override_settings
 
 from . import views
 
@@ -252,9 +249,27 @@ class SteamExperienceRedesignTests(SimpleTestCase):
             'No additional purchases are required. The programme fee covers the learning experience and required materials.',
         )
 
-    def test_mpass_link_is_absent_from_page_body(self):
+    def test_mpass_discover_link_points_to_product_page(self):
         body = self.html.split('<main>', 1)[1].split('</main>', 1)[0]
-        self.assertNotIn('mpass.mindsetlearn.org', body)
+        anchors = re.findall(r'<a\b[^>]*>.*?</a>', body, re.DOTALL)
+        discover_links = [
+            anchor for anchor in anchors
+            if re.search(r'>\s*Discover M-Pass\s*</a>', anchor)
+        ]
+        self.assertTrue(discover_links, 'Discover M-Pass anchor is missing')
+
+        discover_link = discover_links[0]
+        self.assertIn('href="https://mpass.mindsetlearn.org/"', discover_link)
+        self.assertIn('target="_blank"', discover_link)
+        rel = re.search(r'\brel="([^"]*)"', discover_link)
+        self.assertIsNotNone(rel)
+        rel_values = rel.group(1).split()
+        self.assertIn('noopener', rel_values)
+        self.assertIn('noreferrer', rel_values)
+        self.assertFalse(any(
+            'href="https://mpass.mindsetlearn.org/auth"' in anchor
+            for anchor in anchors
+        ))
         self.assertContains(self.response, 'Every learner gets an M-Pass')
 
     def test_stage_cards_and_join_flow_explain_discover_first(self):

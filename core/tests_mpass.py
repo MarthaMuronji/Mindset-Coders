@@ -14,13 +14,13 @@ class MPassMenuTests(SimpleTestCase):
 
     def test_menu_contains_mpass_link(self):
         nav_html = self.get_navbar_html()
-        self.assertIn('https://mpass.mindsetlearn.org/auth', nav_html)
+        self.assertIn('https://mpass.mindsetlearn.org/', nav_html)
         self.assertIn('>M-Pass</a>', nav_html)
 
     def test_mpass_link_opens_in_new_tab(self):
         nav_html = self.get_navbar_html()
         # Find the M-Pass link tag specifically
-        mpass_idx = nav_html.index('https://mpass.mindsetlearn.org/auth')
+        mpass_idx = nav_html.index('https://mpass.mindsetlearn.org/')
         tag_start = nav_html.rfind('<a ', 0, mpass_idx)
         tag_end = nav_html.index('>', mpass_idx)
         tag = nav_html[tag_start:tag_end]
@@ -44,7 +44,7 @@ class MPassMenuTests(SimpleTestCase):
         html = response.content.decode('utf-8')
         self.assertNotIn('https://www.mindsetlearn.org/', html)
         self.assertNotRegex(html, r'<[^>]+\bclass="[^"]*\bbtn-login\b')
-        self.assertIn('href="https://mpass.mindsetlearn.org/auth"', html)
+        self.assertIn('href="https://mpass.mindsetlearn.org/"', html)
 
     def test_mindset_learn_redirects_to_join(self):
         response = self.client.get('/mindset-learn/')

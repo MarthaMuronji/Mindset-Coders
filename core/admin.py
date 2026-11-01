@@ -13,11 +13,11 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'created_at', 'handled')
+    list_display = ('name', 'email', 'phone', 'created_at', 'handled')
     list_filter = ('handled',)
-    search_fields = ('name', 'email', 'message')
+    search_fields = ('name', 'email', 'phone', 'message')
     # Messages arrive from the form, so nothing but the handled flag is editable
-    readonly_fields = ('name', 'email', 'role', 'message', 'created_at')
+    readonly_fields = ('name', 'email', 'phone', 'role', 'message', 'created_at')
 
 
 @admin.register(Registration)
