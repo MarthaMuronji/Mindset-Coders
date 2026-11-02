@@ -3,6 +3,7 @@ from django.urls import path, reverse
 
 from . import registration
 from . import team
+from . import team_people
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -75,6 +76,15 @@ urlpatterns = [
         team.message_follow_up,
         name='team_message_follow_up',
     ),
+    path('team/roster/', team.roster_list, name='team_roster'),
+    path('team/roster/<int:pk>/', team.roster_detail, name='team_roster_detail'),
+    path('team/people/', team_people.people_list, name='team_people'),
+    path(
+        'team/welcome/<uidb64>/<token>/',
+        team_people.team_welcome,
+        name='team_welcome',
+    ),
+    path('team/audit/', team_people.audit_log, name='team_audit'),
 ]
 
 if settings.DEBUG:

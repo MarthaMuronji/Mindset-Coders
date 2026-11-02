@@ -11,6 +11,8 @@
       <p>Are you sure you want to cancel this registration?</p>
     {% elif action == "paid" %}
       <p>Enter the remaining balance and confirm that payment has been received in full.</p>
+    {% elif action == "anonymise" %}
+      <p>This cannot be undone. Personal details will be removed while class and payment records are kept.</p>
     {% else %}
       <p>Record the amount received. The registration will remain marked as part paid.</p>
     {% endif %}

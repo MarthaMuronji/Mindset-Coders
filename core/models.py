@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -161,6 +163,14 @@ class Registration(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        permissions = [
+            ('view_full_registration', 'Can view full registration details'),
+            ('view_finance_fields', 'Can view registration finance fields'),
+            ('view_roster', 'Can view the learner roster'),
+            ('reveal_contact', 'Can reveal parent contact details'),
+            ('record_payment', 'Can record registration payments'),
+            ('anonymise_registration', 'Can anonymise registrations'),
+        ]
 
     def __str__(self):
         return f'{self.learner_name} ({self.parent_name})'
@@ -183,3 +193,54 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.email})'
+
+
+class AuditEvent(models.Model):
+    ACTION_CHOICES = [
+        ('sign_in', 'Signed in'),
+        ('failed_sign_in', 'Failed sign in'),
+        ('registration_opened', 'Opened registration'),
+        ('contact_revealed', 'Revealed parent contact'),
+        ('payment_recorded', 'Recorded payment'),
+        ('status_changed', 'Changed registration status'),
+        ('anonymised', 'Anonymised registration'),
+        ('invite_sent', 'Created invitation link'),
+        ('role_changed', 'Changed team role'),
+        ('person_switched_off', 'Switched off team member'),
+        ('person_switched_on', 'Switched on team member'),
+        ('message_followed_up', 'Marked message followed up'),
+    ]
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='team_audit_events',
+    )
+    username = models.CharField(max_length=150, blank=True)
+    action = models.CharField(max_length=32, choices=ACTION_CHOICES)
+    object_type = models.CharField(max_length=100, blank=True)
+    object_id = models.CharField(max_length=100, blank=True)
+    detail = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        ordering = ['-created_at', '-pk']
+        permissions = [
+            ('manage_team', 'Can manage team members'),
+            ('view_audit_log', 'Can view the team audit log'),
+        ]
+        indexes = [models.Index(fields=['-created_at', '-id'])]
+
+    def __str__(self):
+        return '{}: {}'.format(self.get_action_display(), self.username or 'Unknown person')
+
+
+@receiver(post_migrate, dispatch_uid='core.create_team_role_groups')
+def create_team_role_groups(sender, app_config, using, apps, **kwargs):
+    if app_config.label != 'core':
+        return
+    from .team_people import sync_team_roles
+
+    sync_team_roles(using=using, app_config=app_config, apps=apps)

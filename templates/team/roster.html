@@ -1,0 +1,36 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_home' %}">Team home</a>
+    <h1>Class roster</h1>
+    <p>Choose a stage to see its learners.</p>
+  </div>
+  <form method="get" class="team-panel team-filters">
+    <div class="team-field">
+      <label for="roster-stage">Stage</label>
+      <select id="roster-stage" name="stage">
+        {% for value, label in stage_choices %}
+          <option value="{{ value }}" {% if stage == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-primary" type="submit">Show learners</button>
+  </form>
+  {% if learners %}
+    <div class="team-roster-grid">
+      {% for learner in learners %}
+        <a class="team-panel team-roster-card" href="{% url 'team_roster_detail' learner.pk %}">
+          <h2>{{ learner.learner_name }}</h2>
+          <p>Age: {{ learner.learner_age }}</p>
+          <p>Stage: {{ learner.get_stage_display }}</p>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="team-panel team-empty">
+      <h2>No learners in this stage</h2>
+      <p>Choose another stage to see its learners.</p>
+    </section>
+  {% endif %}
+{% endblock %}

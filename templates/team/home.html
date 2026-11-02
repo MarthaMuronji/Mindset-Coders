@@ -21,5 +21,26 @@
         <span>Open messages</span>
       </a>
     {% endif %}
+    {% if can_view_roster %}
+      <a class="team-area-card" href="{% url 'team_roster' %}">
+        <h2>Class roster</h2>
+        <p>See learners by class stage.</p>
+        <span>Open roster</span>
+      </a>
+    {% endif %}
+    {% if can_manage_team %}
+      <a class="team-area-card" href="{% url 'team_people' %}">
+        <h2>People</h2>
+        <p>Invite and manage team members.</p>
+        <span>Manage people</span>
+      </a>
+    {% endif %}
+    {% if can_view_audit %}
+      <a class="team-area-card" href="{% url 'team_audit' %}">
+        <h2>Activity log</h2>
+        <p>Review team account activity.</p>
+        <span>Open activity log</span>
+      </a>
+    {% endif %}
   </div>
 {% endblock %}

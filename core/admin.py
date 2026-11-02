@@ -1,7 +1,11 @@
+from collections.abc import Sequence
+from typing import ClassVar
+
 from django.contrib import admin
 from django.db.models import F
 from django.utils import timezone
-from .models import Post, ContactMessage, Registration, Story
+
+from .models import AuditEvent, ContactMessage, Post, Registration, Story
 
 
 @admin.register(Post)
@@ -9,7 +13,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'published', 'created_at')
     list_filter = ('published',)
     search_fields = ('title', 'excerpt', 'content')
-    prepopulated_fields = {'slug': ('title',)}
+    prepopulated_fields: ClassVar[dict[str, Sequence[str]]] = {'slug': ('title',)}
 
 
 @admin.register(ContactMessage)
@@ -60,7 +64,7 @@ class RegistrationAdmin(admin.ModelAdmin):
             count, 'registration' if count == 1 else 'registrations'
         )
         if skipped:
-            message += ' {} without an amount due were skipped.'.format(skipped)
+            message += f' {skipped} without an amount due were skipped.'
         self.message_user(request, message)
 
     @admin.action(description='Mark as cancelled')
@@ -104,3 +108,23 @@ class StoryAdmin(admin.ModelAdmin):
             reviewed_by=None,
         )
         self.message_user(request, 'Unapproved {} selected {}.'.format(count, 'story' if count == 1 else 'stories'))
+
+
+@admin.register(AuditEvent)
+class AuditEventAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'username', 'action', 'object_type', 'object_id')
+    list_filter = ('action', 'created_at')
+    search_fields = ('username', 'object_type', 'object_id', 'detail')
+    readonly_fields = (
+        'created_at', 'user', 'username', 'action', 'object_type',
+        'object_id', 'detail',
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

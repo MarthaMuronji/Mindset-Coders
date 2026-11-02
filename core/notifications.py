@@ -107,3 +107,44 @@ def send_contact_notification(contact_message, team_url, review_url=None):
         logger.warning('Contact notification email failed with HTTP status %s', exc.code)
     except Exception as exc:
         logger.warning('Contact notification email failed (%s)', type(exc).__name__)
+
+
+def send_team_invite(email, invite_url):
+    """Send only a short instruction and the one-time team invitation link."""
+    api_key = os.environ.get('BREVO_API_KEY')
+    from_email = os.environ.get('CONTACT_FROM_EMAIL')
+    if not api_key or not from_email or not email:
+        return False
+    try:
+        payload = {
+            'sender': {
+                'name': os.environ.get('CONTACT_FROM_NAME', 'Mindset Coders Website'),
+                'email': from_email,
+            },
+            'to': [{'email': email}],
+            'subject': 'Mindset Coders team invitation',
+            'textContent': 'Set your password using this one-time team invitation link:\n\n{}'.format(
+                invite_url
+            ),
+        }
+        request = urllib.request.Request(
+            BREVO_SEND_URL,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                'api-key': api_key,
+                'content-type': 'application/json',
+                'accept': 'application/json',
+            },
+            method='POST',
+        )
+        response = urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS)
+        try:
+            response.read()
+        finally:
+            response.close()
+        return True
+    except urllib.error.HTTPError as exc:
+        logger.warning('Team invitation email failed with HTTP status %s', exc.code)
+    except Exception as exc:
+        logger.warning('Team invitation email failed (%s)', type(exc).__name__)
+    return False
