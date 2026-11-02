@@ -26,6 +26,7 @@ VALID_POST = {
     'school_name': '',
     'programme': 'holiday',
     'stage': 'discover',
+    'payment_method': 'online',
     'consent': 'on',
     'website': '',
 }
@@ -37,6 +38,7 @@ PROGRAMMES = ('holiday', 'weekend', 'school', 'unsure')
 STAGES = ('discover', 'build', 'innovate', 'full')
 
 
+@override_settings(STEAM_PAYMENTS_ENABLED=True)
 class JoinPageTests(SimpleTestCase):
     """The Join form: rendering, saving, validation and the spam trap."""
 
@@ -123,7 +125,8 @@ class JoinPageTests(SimpleTestCase):
         response, saved, notified = self.post_form(VALID_POST)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
-            response['Location'], '/join/thanks/?programme=holiday&stage=discover'
+            response['Location'],
+            '/join/thanks/?programme=holiday&stage=discover&method=online',
         )
 
         self.assertEqual(len(saved), 1)
@@ -136,16 +139,18 @@ class JoinPageTests(SimpleTestCase):
         self.assertEqual(registration.school_name, '')
         self.assertEqual(registration.programme, 'holiday')
         self.assertEqual(registration.stage, 'discover')
+        self.assertEqual(registration.payment_method, 'online')
+        self.assertEqual(registration.amount_due, 300000)
         self.assertTrue(registration.consent)
         self.assertFalse(registration.handled)
 
-        # The team is emailed about it, with a link to this record in the
-        # admin, and never with any personal details
+        # The team email links to the private registration page and never
+        # carries any personal details
         self.assertEqual(len(notified), 1)
         self.assertIs(notified[0][0], registration)
         self.assertEqual(
             notified[0][1],
-            'http://testserver/admin/core/registration/42/change/',
+            'http://testserver/team/registrations/42/',
         )
 
     def test_missing_consent_fails(self):
@@ -214,7 +219,8 @@ class JoinPageTests(SimpleTestCase):
         save_mock.assert_called()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
-            response['Location'], '/join/thanks/?programme=holiday&stage=discover'
+            response['Location'],
+            '/join/thanks/?programme=holiday&stage=discover&method=online',
         )
         # No message is waiting for them, so nothing can be shown as an error
         self.assertEqual(list(get_messages(response.wsgi_request)), [])
@@ -272,7 +278,8 @@ class JoinPageTests(SimpleTestCase):
         response, saved, notified = self.post_form(data)
         location = response['Location']
         self.assertEqual(
-            location, '/join/thanks/?programme=holiday&stage=discover'
+            location,
+            '/join/thanks/?programme=holiday&stage=discover&method=online',
         )
         # No name, age or contact detail ever lands in the address
         for value in (
@@ -378,7 +385,7 @@ class RegistrationNotificationTests(SimpleTestCase):
             consent=True,
         )
 
-    def send(self, registration, admin_url='http://testserver/admin/core/registration/1/change/'):
+    def send(self, registration, team_url='http://testserver/team/registrations/1/'):
         """Send with the three environment variables set and the API stubbed."""
         environment = {
             'BREVO_API_KEY': 'test-key',
@@ -387,7 +394,7 @@ class RegistrationNotificationTests(SimpleTestCase):
         }
         with mock.patch.dict(os.environ, environment):
             with mock.patch('core.registration.urllib.request.urlopen') as send:
-                send_registration_notification(registration, admin_url)
+                send_registration_notification(registration, team_url)
         self.assertEqual(send.call_count, 1)
         request = send.call_args.args[0]
         return json.loads(request.data.decode('utf-8'))
@@ -399,13 +406,18 @@ class RegistrationNotificationTests(SimpleTestCase):
         # reach the parent
         self.assertNotIn('replyTo', payload)
 
-    def test_body_is_one_line_with_the_programme_and_the_admin_link(self):
-        payload = self.send(self.build_registration())
+    def test_body_includes_payment_method_and_amount_due(self):
+        registration = self.build_registration()
+        registration.payment_method = 'cash'
+        registration.amount_due = 400000
+        payload = self.send(registration)
         body = payload['textContent']
-        self.assertNotIn('\n', body)
         self.assertIn('A new registration was received', body)
         self.assertIn('Holiday STEAM Experience', body)
-        self.assertIn('http://testserver/admin/core/registration/1/change/', body)
+        self.assertIn('http://testserver/team/registrations/1/', body)
+        self.assertNotIn('/admin/', body)
+        self.assertIn('Payment method: Cash', body)
+        self.assertIn('Amount due: UGX 400000', body)
 
     def test_body_carries_no_personal_details(self):
         payload = self.send(self.build_registration())

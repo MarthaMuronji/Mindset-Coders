@@ -119,6 +119,18 @@ class Registration(models.Model):
         ('full', 'Full journey (paid upfront)'),
     ]
 
+    PAYMENT_METHOD_CHOICES = [
+        ('online', 'Online'),
+        ('cash', 'Cash'),
+    ]
+
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('part_paid', 'Part paid'),
+        ('paid', 'Paid'),
+        ('cancelled', 'Cancelled'),
+    ]
+
     parent_name = models.CharField(max_length=100)
     parent_email = models.EmailField()
     parent_phone = models.CharField(max_length=30)
@@ -127,6 +139,22 @@ class Registration(models.Model):
     school_name = models.CharField(max_length=200, blank=True)
     programme = models.CharField(max_length=20, choices=PROGRAMME_CHOICES)
     stage = models.CharField(max_length=20, choices=STAGE_CHOICES, blank=True)
+    payment_method = models.CharField(
+        max_length=10,
+        choices=PAYMENT_METHOD_CHOICES,
+        blank=True,
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='pending',
+    )
+    amount_due = models.PositiveIntegerField(null=True, blank=True)
+    amount_paid = models.PositiveIntegerField(default=0)
+    receipt_number = models.CharField(max_length=100, blank=True)
+    payment_note = models.TextField(blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    payment_recorded_by = models.CharField(max_length=150, blank=True)
     consent = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     handled = models.BooleanField(default=False)

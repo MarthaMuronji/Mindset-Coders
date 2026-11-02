@@ -2,6 +2,7 @@ from django.http import HttpResponsePermanentRedirect
 from django.urls import path, reverse
 
 from . import registration
+from . import team
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -54,6 +55,26 @@ urlpatterns = [
     path('resources/', _redirect_to('shop'), name='resources'),
     path('blog/', views.blog, name='blog'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
+    path('team/login/', team.TeamLoginView.as_view(), name='team_login'),
+    path('team/logout/', team.team_logout, name='team_logout'),
+    path('team/', team.team_home, name='team_home'),
+    path('team/registrations/', team.registration_list, name='team_registrations'),
+    path(
+        'team/registrations/<int:pk>/',
+        team.registration_detail,
+        name='team_registration_detail',
+    ),
+    path(
+        'team/registrations/<int:pk>/actions/<slug:action>/',
+        team.registration_action,
+        name='team_registration_action',
+    ),
+    path('team/messages/', team.message_list, name='team_messages'),
+    path(
+        'team/messages/<int:pk>/follow-up/',
+        team.message_follow_up,
+        name='team_message_follow_up',
+    ),
 ]
 
 if settings.DEBUG:

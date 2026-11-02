@@ -34,6 +34,13 @@ PRESELECTABLE_STAGES = tuple(
     value for value, _label in Registration.STAGE_CHOICES
 )
 
+STAGE_FEES = {
+    'discover': 300000,
+    'build': 400000,
+    'innovate': 500000,
+    'full': 1100000,
+}
+
 # Shown on the Join page when saving fails, so the visitor can retry
 SAVE_FAILED_MESSAGE = 'Sorry, we could not send your registration. Please try again in a moment.'
 
@@ -91,6 +98,15 @@ class RegistrationForm(forms.ModelForm):
         help_text='Every learner begins with Discover. Choose Build or Innovate only if your child has already completed Discover.',
     )
 
+    payment_method = forms.ChoiceField(
+        choices=(),
+        required=False,
+        label='How will you pay?',
+        help_text='You can pay online straight after registering, or in cash during office hours.',
+        widget=forms.RadioSelect,
+        error_messages={'required': 'Please choose how you will pay.'},
+    )
+
     class Meta:
         model = Registration
         # consent and learner_age are declared above but stay in the field
@@ -98,7 +114,8 @@ class RegistrationForm(forms.ModelForm):
         # out on purpose, and created_at and handled belong to the admin.
         fields = (
             'parent_name', 'parent_email', 'parent_phone', 'learner_name',
-            'learner_age', 'school_name', 'programme', 'stage', 'consent',
+            'learner_age', 'school_name', 'programme', 'stage',
+            'payment_method', 'consent',
         )
         labels = {
             'parent_name': 'Your name',
@@ -108,6 +125,38 @@ class RegistrationForm(forms.ModelForm):
             'school_name': 'School (optional)',
             'programme': 'Programme',
         }
+
+    def __init__(
+        self,
+        *args,
+        payments_enabled=None,
+        cash_instructions='',
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        if payments_enabled is None:
+            payments_enabled = getattr(settings, 'STEAM_PAYMENTS_ENABLED', False)
+        programme = (
+            self.data.get('programme')
+            if self.is_bound
+            else self.initial.get('programme')
+        )
+        self.show_payment_method = (
+            payments_enabled and programme in ('', None, 'holiday')
+        )
+        self.payment_method_required = (
+            payments_enabled and programme == 'holiday'
+        )
+        if self.show_payment_method:
+            choices = [('online', 'Pay online by Mobile Money')]
+            if cash_instructions:
+                choices.append(('cash', 'Pay in cash'))
+            self.fields['payment_method'].choices = choices
+            self.fields['payment_method'].required = (
+                self.payment_method_required
+            )
+        else:
+            self.fields.pop('payment_method')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -126,14 +175,29 @@ class RegistrationForm(forms.ModelForm):
 
 
 def _build_registration_text(registration, admin_url):
-    """One line of plain text for one saved registration.
+    """Plain text for one saved registration, without personal details.
 
     The team can open the entry in the admin, so the email itself never
     needs a name, an age, a phone number or an address.
     """
-    return 'A new registration was received for the {}. Open it here: {}'.format(
+    payment_method = dict(Registration.PAYMENT_METHOD_CHOICES).get(
+        registration.payment_method,
+        'Not selected',
+    )
+    amount_due = (
+        'UGX {}'.format(registration.amount_due)
+        if registration.amount_due is not None
+        else 'Not set'
+    )
+    return (
+        'A new registration was received for the {}. Open it here: {}\n'
+        'Payment method: {}\n'
+        'Amount due: {}'
+    ).format(
         registration.get_programme_display(),
         admin_url,
+        payment_method,
+        amount_due,
     )
 
 
@@ -194,29 +258,45 @@ def join(request):
         # and store nothing at all
         if request.POST.get('website', '').strip():
             return redirect('join_thanks')
-        form = RegistrationForm(request.POST)
+        form = RegistrationForm(
+            request.POST,
+            payments_enabled=settings.STEAM_PAYMENTS_ENABLED,
+            cash_instructions=views.STEAM_EXPERIENCE.get(
+                'cash_instructions', ''
+            ),
+        )
         if form.is_valid():
-            # Keep the registration so the team can read it and mark it handled
+            # Keep the registration so the team can track its payment.
             try:
-                registration = form.save()
+                registration = form.save(commit=False)
+                if registration.programme == 'holiday':
+                    registration.amount_due = STAGE_FEES[registration.stage]
+                else:
+                    registration.amount_due = None
+                if not form.show_payment_method:
+                    registration.payment_method = ''
+                registration.save()
             except Exception:
                 # Saving failed, so keep the typed input and ask to retry
                 messages.error(request, SAVE_FAILED_MESSAGE)
             else:
                 # Notify the team, but never let the email change the outcome above
-                change_url = reverse(
-                    'admin:core_registration_change', args=[registration.pk]
-                )
-                admin_url = request.build_absolute_uri(change_url)
                 try:
-                    send_registration_notification(registration, admin_url)
+                    team_url = request.build_absolute_uri(
+                        reverse(
+                            'team_registration_detail',
+                            kwargs={'pk': registration.pk},
+                        )
+                    )
+                    send_registration_notification(registration, team_url)
                 except Exception:
                     logger.exception('Failed to send registration notification')
-                # Only the programme and the stage travel in the address,
-                # so no name, age or contact detail ever lands in a link
+                # Only payment routing fields travel in the address, never
+                # a name, age or contact detail.
                 query = urlencode({
                     'programme': registration.programme,
                     'stage': registration.stage,
+                    'method': registration.payment_method,
                 })
                 return redirect('{}?{}'.format(reverse('join_thanks'), query))
     else:
@@ -229,7 +309,13 @@ def join(request):
         if stage in PRESELECTABLE_STAGES:
             # Only ever preselect a stage the form actually offers
             initial['stage'] = stage
-        form = RegistrationForm(initial=initial)
+        form = RegistrationForm(
+            initial=initial,
+            payments_enabled=settings.STEAM_PAYMENTS_ENABLED,
+            cash_instructions=views.STEAM_EXPERIENCE.get(
+                'cash_instructions', ''
+            ),
+        )
     return render(request, 'join.html', {'form': form})
 
 
@@ -244,9 +330,11 @@ def join_thanks(request):
     """
     programme = request.GET.get('programme', '')
     stage = request.GET.get('stage', '')
+    payment_method = request.GET.get('method', 'online')
     stage_labels = dict(Registration.STAGE_CHOICES)
     stage_label = stage_labels.get(stage, '')
     payment_link = None
+    cash_confirmation = False
     if (
         programme == 'holiday'
         and stage_label
@@ -256,6 +344,14 @@ def join_thanks(request):
             if link.get('key') == stage:
                 payment_link = link
                 break
+        if (
+            payment_method == 'cash'
+            and payment_link
+            and views.STEAM_EXPERIENCE.get('cash_instructions')
+        ):
+            cash_confirmation = True
+        elif payment_method != 'online':
+            payment_link = None
     return render(request, 'join_thanks.html', {
         # The button to the STEAM Experience page only appears once that
         # page is public, the same rule the rest of the site follows
@@ -263,4 +359,10 @@ def join_thanks(request):
         'programme': programme,
         'stage_label': stage_label,
         'payment_link': payment_link,
+        'cash_confirmation': cash_confirmation,
+        'cash_instructions': views.STEAM_EXPERIENCE.get(
+            'cash_instructions', ''
+        ),
+        'cash_hold_note': views.STEAM_EXPERIENCE.get('cash_hold_note', ''),
+        'discount_note': views.STEAM_EXPERIENCE.get('discount_note', ''),
     })

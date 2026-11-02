@@ -1,8 +1,8 @@
 import json
 import re
-from unittest import mock
 
 from django.test import SimpleTestCase, override_settings
+from unittest import mock
 
 from . import views
 

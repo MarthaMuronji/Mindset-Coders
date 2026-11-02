@@ -62,27 +62,33 @@ class ContactLinksTests(SimpleTestCase):
                 self.assertContains(response, WHATSAPP_LINK)
                 self.assertContains(response, PHONE_LINK)
 
-    def test_cash_copy_only_appears_with_confirmation_payment(self):
+    def test_cash_instructions_only_appear_on_cash_confirmation(self):
         with override_settings(STEAM_PAYMENTS_ENABLED=True):
-            paid = self.client.get(
-                '/join/thanks/?programme=holiday&stage=build'
+            online = self.client.get(
+                '/join/thanks/?programme=holiday&stage=build&method=online'
+            )
+            cash = self.client.get(
+                '/join/thanks/?programme=holiday&stage=build&method=cash'
             )
         with override_settings(STEAM_PAYMENTS_ENABLED=False):
             plain = self.client.get(
-                '/join/thanks/?programme=holiday&stage=build'
+                '/join/thanks/?programme=holiday&stage=build&method=cash'
             )
 
         self.assertContains(
-            paid, 'You can also pay in cash. Contact our team to arrange it.'
+            cash,
+            'Pay the fee in cash at Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Monday to Saturday, 8:00 am to 6:00 pm.',
         )
+        self.assertNotContains(online, 'Pay the fee in cash at')
+        self.assertNotContains(plain, 'Pay the fee in cash at')
         self.assertNotContains(
-            plain, 'You can also pay in cash. Contact our team to arrange it.'
+            online, 'You can also pay in cash. Contact our team to arrange it.'
         )
 
     def test_payment_options_include_mobile_money_and_cash(self):
         self.assertEqual(
             STEAM_EXPERIENCE['payment_options'],
-            'Pay online by Mobile Money. You can also pay in cash.',
+            'Choose how to pay when you register: online by Mobile Money, or in cash.',
         )
 
 
@@ -277,7 +283,11 @@ class ContactNotificationTests(SimpleTestCase):
             with mock.patch('core.notifications.urllib.request.urlopen') as send:
                 send_contact_notification(
                     contact_message,
-                    'http://testserver/admin/core/contactmessage/1/change/',
+                    (
+                        'http://testserver/admin/core/storysubmission/1/change/'
+                        if hasattr(contact_message, 'story')
+                        else 'http://testserver/team/messages/'
+                    ),
                     review_url,
                 )
         self.assertEqual(send.call_count, 1)
@@ -342,7 +352,8 @@ class ContactPhoneLeavesJoinTests(SimpleTestCase):
             list(RegistrationForm._meta.fields),
             [
                 'parent_name', 'parent_email', 'parent_phone', 'learner_name',
-                'learner_age', 'school_name', 'programme', 'stage', 'consent',
+                'learner_age', 'school_name', 'programme', 'stage',
+                'payment_method', 'consent',
             ],
         )
         phone = RegistrationForm.base_fields['parent_phone']
@@ -377,7 +388,7 @@ class ContactPhoneLeavesJoinTests(SimpleTestCase):
             ) as send:
                 send_registration_notification(
                     registration,
-                    'http://testserver/admin/core/registration/1/change/',
+                    'http://testserver/team/registrations/1/',
                 )
         request = send.call_args.args[0]
         body = json.loads(request.data.decode('utf-8'))['textContent']
@@ -394,4 +405,3 @@ class ContactPhoneLeavesJoinTests(SimpleTestCase):
         self.assertContains(
             response, 'Tell us a little about what you need and we will read your message.'
         )
-

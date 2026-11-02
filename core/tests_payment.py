@@ -104,7 +104,8 @@ class RegisterLinkTests(SteamPageTestCase):
         self.assertNotContains(response, 'Merchant Pay')
         self.assertIsNone(re.search(r'merchant\s+pay', html, re.I))
         self.assertContains(
-            response, 'Pay online by Mobile Money. You can also pay in cash.'
+            response,
+            'Choose how to pay when you register: online by Mobile Money, or in cash.',
         )
 
 

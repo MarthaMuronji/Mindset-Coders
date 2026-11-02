@@ -17,7 +17,7 @@ SUBJECT = 'New message from the Mindset Coders website'
 TIMEOUT_SECONDS = 8
 
 
-def _build_text(contact_message, admin_url, review_url=None):
+def _build_text(contact_message, team_url, review_url=None):
     """Plain text body for one saved contact message."""
     lines = [
         'You have a new message from the website contact form.',
@@ -40,12 +40,17 @@ def _build_text(contact_message, admin_url, review_url=None):
         body = contact_message.story
     else:
         body = getattr(contact_message, 'message', '')
+    team_link_label = (
+        'All messages are in the admin: {}'.format(team_url)
+        if hasattr(contact_message, 'story')
+        else 'All messages are in the team area: {}'.format(team_url)
+    )
     lines.extend([
         '',
         'Message:',
         str(body),
         '',
-        'All messages are in the admin: {}'.format(admin_url),
+        team_link_label,
     ])
     # Stories also get the review page link, so the team can read and
     # publish them on the site. Contact messages never get this line.
@@ -57,7 +62,7 @@ def _build_text(contact_message, admin_url, review_url=None):
     return '\n'.join(lines)
 
 
-def send_contact_notification(contact_message, admin_url, review_url=None):
+def send_contact_notification(contact_message, team_url, review_url=None):
     """Email the team about one saved contact message. Never raises."""
     api_key = os.environ.get('BREVO_API_KEY')
     notify_raw = os.environ.get('CONTACT_NOTIFY_EMAIL')
@@ -80,7 +85,7 @@ def send_contact_notification(contact_message, admin_url, review_url=None):
                 'name': contact_message.name,
             },
             'subject': SUBJECT,
-            'textContent': _build_text(contact_message, admin_url, review_url),
+            'textContent': _build_text(contact_message, team_url, review_url),
         }
         request = urllib.request.Request(
             BREVO_SEND_URL,
