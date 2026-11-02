@@ -1,0 +1,37 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_roster' %}?stage={{ learner.stage|urlencode }}">Class roster</a>
+    <h1>{{ learner.learner_name }}</h1>
+  </div>
+  <section class="team-panel">
+    <dl class="team-details">
+      <dt>Age</dt><dd>{{ learner.learner_age }}</dd>
+      <dt>Stage</dt><dd>{{ learner.get_stage_display }}</dd>
+    </dl>
+  </section>
+  {% if show_contact %}
+    <section class="team-panel" aria-live="polite">
+      <h2>Parent contact</h2>
+      <dl class="team-details">
+        <dt>Name</dt><dd>{{ learner.parent_name }}</dd>
+        <dt>Phone</dt><dd>{{ learner.parent_phone }}</dd>
+      </dl>
+      <div class="team-phone-actions">
+        <a class="btn btn-primary" href="tel:{{ phone_tel }}">Call</a>
+        <a class="btn btn-outline" href="https://wa.me/{{ phone_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+      </div>
+    </section>
+  {% elif can_reveal %}
+    <section class="team-panel">
+      <h2>Parent contact</h2>
+      <p>Contact details stay hidden until you ask to reveal them.</p>
+      <form method="post" class="team-form">
+        {% csrf_token %}
+        <input type="hidden" name="reveal_contact" value="true">
+        <button class="btn btn-primary" type="submit">Show parent's phone</button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

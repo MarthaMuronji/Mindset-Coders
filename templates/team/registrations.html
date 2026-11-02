@@ -58,24 +58,26 @@
           </div>
           <p>Stage: {{ registration.get_stage_display|default:"Not set" }}</p>
           <p>Payment: {{ registration.get_payment_method_display|default:"Not selected" }}</p>
-          <p>Amount due: {% if registration.amount_due is not None %}UGX {{ registration.amount_due }}{% else %}Not set{% endif %}</p>
-          <p>Received: {{ registration.created_at|date:"j M Y, g:i a" }}</p>
-          <p>Parent: {{ registration.parent_name }}</p>
+          {% if can_view_full %}
+            <p>Amount due: {% if registration.amount_due is not None %}UGX {{ registration.amount_due }}{% else %}Not set{% endif %}</p>
+            <p>Received: {{ registration.created_at|date:"j M Y, g:i a" }}</p>
+            <p>Parent: {{ registration.parent_name }}</p>
+          {% endif %}
         </article>
       {% endfor %}
     </div>
     <div class="team-table-wrap">
       <table class="team-table">
-        <thead><tr><th>Learner</th><th>Stage</th><th>Payment</th><th>Amount due</th><th>Status</th><th>Date received</th></tr></thead>
+        <thead><tr><th>Learner</th><th>Stage</th><th>Payment</th>{% if can_view_full %}<th>Amount due</th>{% endif %}<th>Status</th>{% if can_view_full %}<th>Date received</th>{% endif %}</tr></thead>
         <tbody>
           {% for registration in registrations %}
             <tr>
-              <td><a href="{% url 'team_registration_detail' registration.pk %}">{{ registration.learner_name }}</a><small>{{ registration.parent_name }}</small></td>
+              <td><a href="{% url 'team_registration_detail' registration.pk %}">{{ registration.learner_name }}</a>{% if can_view_full %}<small>{{ registration.parent_name }}</small>{% endif %}</td>
               <td>{{ registration.get_stage_display|default:"Not set" }}</td>
               <td>{{ registration.get_payment_method_display|default:"Not selected" }}</td>
-              <td>{% if registration.amount_due is not None %}UGX {{ registration.amount_due }}{% else %}Not set{% endif %}</td>
+              {% if can_view_full %}<td>{% if registration.amount_due is not None %}UGX {{ registration.amount_due }}{% else %}Not set{% endif %}</td>{% endif %}
               <td><span class="team-status team-status-{{ registration.payment_status }}">{{ registration.status_label }}</span></td>
-              <td>{{ registration.created_at|date:"j M Y, g:i a" }}</td>
+              {% if can_view_full %}<td>{{ registration.created_at|date:"j M Y, g:i a" }}</td>{% endif %}
             </tr>
           {% endfor %}
         </tbody>

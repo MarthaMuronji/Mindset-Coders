@@ -1,0 +1,41 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_home' %}">Team home</a>
+    <h1>Activity log</h1>
+    <p>Team account actions are shown here without learner contact details.</p>
+  </div>
+  <form method="get" class="team-panel team-filters">
+    {% for field in filter_form %}
+      <div class="team-field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<div class="team-errors" role="alert">{{ field.errors }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Filter activity</button>
+  </form>
+  {% if events %}
+    <div class="team-audit-list">
+      {% for event in events %}
+        <article class="team-panel">
+          <h2>{{ event.get_action_display }}</h2>
+          <dl class="team-details">
+            <dt>Date</dt><dd>{{ event.created_at|date:"j M Y, g:i a" }}</dd>
+            <dt>Person</dt><dd>{{ event.username|default:"Unknown person" }}</dd>
+            <dt>Record</dt><dd>{{ event.object_type }}{% if event.object_id %} #{{ event.object_id }}{% endif %}</dd>
+            <dt>Details</dt><dd>{{ event.detail }}</dd>
+          </dl>
+        </article>
+      {% endfor %}
+    </div>
+    <nav class="team-pagination" aria-label="Activity pages">
+      {% if events.has_previous %}<a class="btn btn-outline" href="?{{ previous_query }}">Previous</a>{% endif %}
+      <span>Page {{ events.number }} of {{ events.paginator.num_pages }}</span>
+      {% if events.has_next %}<a class="btn btn-outline" href="?{{ next_query }}">Next</a>{% endif %}
+    </nav>
+  {% else %}
+    <section class="team-panel team-empty"><h2>No activity found</h2></section>
+  {% endif %}
+{% endblock %}

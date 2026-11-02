@@ -1,0 +1,103 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_home' %}">Team home</a>
+    <h1>People</h1>
+    <p>Invite and manage the people who use the team pages.</p>
+  </div>
+  {% if invite_url %}
+    <section class="team-panel team-invite-link" aria-live="polite">
+      <h2>Copy this one-time invitation link</h2>
+      <p>Send this link to the new team member. It expires after three days.</p>
+      <input type="text" readonly value="{{ invite_url }}" aria-label="Invitation link">
+    </section>
+  {% endif %}
+  <section class="team-panel">
+    <h2>Invite someone</h2>
+    <form method="post" class="team-form">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="invite">
+      {% for field in invite_form %}
+        <div class="team-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="team-errors" role="alert">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Create invitation link</button>
+    </form>
+  </section>
+  <section class="team-heading">
+    <h2>Team members</h2>
+  </section>
+  {% if people %}
+    <div class="team-people-list">
+      {% for person in people %}
+        <article class="team-panel team-person-card">
+          <h3>{{ person.get_full_name|default:person.username }}</h3>
+          <dl class="team-details">
+            <dt>Username</dt><dd>{{ person.get_username }}</dd>
+            <dt>Email</dt><dd>{{ person.email }}</dd>
+            <dt>Role</dt><dd>{{ person.team_role|default:"No role" }}</dd>
+            <dt>Active</dt><dd>{% if person.is_active %}Yes{% else %}No{% endif %}</dd>
+            <dt>Last sign in</dt><dd>{{ person.last_login|date:"j M Y, g:i a"|default:"Never" }}</dd>
+          </dl>
+          <form method="post" class="team-form team-person-actions">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="action">
+            <input type="hidden" name="user_id" value="{{ person.pk }}">
+            <input type="hidden" name="action" value="role">
+            <div class="team-field">
+              <label for="role-{{ person.pk }}">Change role</label>
+              <select id="role-{{ person.pk }}" name="role">
+                {% for role_value, role_label in roles %}
+                  <option value="{{ role_value }}" {% if person.team_role == role_value %}selected{% endif %}>{{ role_label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button class="btn btn-outline" type="submit">Save role</button>
+          </form>
+          <div class="team-person-actions">
+            {% if person.is_active %}
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="action">
+                <input type="hidden" name="user_id" value="{{ person.pk }}">
+                <input type="hidden" name="action" value="off">
+                <button class="btn btn-outline" type="submit">Switch off</button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="action">
+                <input type="hidden" name="user_id" value="{{ person.pk }}">
+                <input type="hidden" name="action" value="invite">
+                <button class="btn btn-outline" type="submit">Make a new invite link</button>
+              </form>
+            {% else %}
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="action">
+                <input type="hidden" name="user_id" value="{{ person.pk }}">
+                <input type="hidden" name="action" value="on">
+                <button class="btn btn-primary" type="submit">Switch back on</button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="action">
+                <input type="hidden" name="user_id" value="{{ person.pk }}">
+                <input type="hidden" name="action" value="invite">
+                <button class="btn btn-outline" type="submit">Make a new invite link</button>
+              </form>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="team-panel team-empty"><h2>No team members yet</h2></section>
+  {% endif %}
+  {% if action_form.errors %}
+    <section class="team-panel team-errors" role="alert">{{ action_form.errors }}</section>
+  {% endif %}
+{% endblock %}

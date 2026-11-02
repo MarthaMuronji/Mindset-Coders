@@ -11,26 +11,34 @@
     <dl class="team-details">
       <dt>Name</dt><dd>{{ registration.parent_name }}</dd>
       <dt>Phone</dt><dd>{{ registration.parent_phone }}</dd>
-      <dt>Email</dt><dd><a href="mailto:{{ registration.parent_email }}">{{ registration.parent_email }}</a></dd>
+      {% if can_view_full %}<dt>Email</dt><dd>{% if registration.parent_email == "Removed" %}Removed{% else %}<a href="mailto:{{ registration.parent_email }}">{{ registration.parent_email }}</a>{% endif %}</dd>{% endif %}
     </dl>
-    <div class="team-phone-actions">
-      <a class="btn btn-primary" href="tel:{{ phone_tel }}">Call</a>
-      <a class="btn btn-outline" href="https://wa.me/{{ phone_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-    </div>
+    {% if phone_tel %}
+      <div class="team-phone-actions">
+        <a class="btn btn-primary" href="tel:{{ phone_tel }}">Call</a>
+        <a class="btn btn-outline" href="https://wa.me/{{ phone_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+      </div>
+    {% endif %}
   </section>
-  <section class="team-panel">
-    <h2>Learner and programme</h2>
-    <dl class="team-details">
-      <dt>Learner name</dt><dd>{{ registration.learner_name }}</dd>
-      <dt>Age</dt><dd>{{ registration.learner_age }}</dd>
-      <dt>School</dt><dd>{{ registration.school_name|default:"Not provided" }}</dd>
-      <dt>Programme</dt><dd>{{ registration.get_programme_display }}</dd>
-      <dt>Stage</dt><dd>{{ registration.get_stage_display|default:"Not set" }}</dd>
-      <dt>Received</dt><dd>{{ registration.created_at|date:"j M Y, g:i a" }}</dd>
-      <dt>Consent recorded</dt><dd>{% if registration.consent %}Yes{% else %}No{% endif %}</dd>
-      <dt>Handled</dt><dd>{% if registration.handled %}Yes{% else %}No{% endif %}</dd>
-    </dl>
-  </section>
+  {% if can_view_full %}
+    <section class="team-panel">
+      <h2>Learner and programme</h2>
+      <dl class="team-details">
+        <dt>Age</dt><dd>{{ registration.learner_age }}</dd>
+        <dt>School</dt><dd>{{ registration.school_name|default:"Not provided" }}</dd>
+        <dt>Programme</dt><dd>{{ registration.get_programme_display }}</dd>
+        <dt>Stage</dt><dd>{{ registration.get_stage_display|default:"Not set" }}</dd>
+        <dt>Received</dt><dd>{{ registration.created_at|date:"j M Y, g:i a" }}</dd>
+        <dt>Consent recorded</dt><dd>{% if registration.consent %}Yes{% else %}No{% endif %}</dd>
+        <dt>Handled</dt><dd>{% if registration.handled %}Yes{% else %}No{% endif %}</dd>
+      </dl>
+    </section>
+  {% else %}
+    <section class="team-panel">
+      <h2>Stage</h2>
+      <p>{{ registration.get_stage_display|default:"Not set" }}</p>
+    </section>
+  {% endif %}
   <section class="team-panel">
     <h2>Payment</h2>
     <dl class="team-details">
@@ -55,7 +63,7 @@
       <p class="team-note">{{ registration.payment_note|default:"No note" }}</p>
     {% endif %}
   </section>
-  {% if can_change %}
+  {% if can_record_payment %}
     <section class="team-panel">
       <h2>Payment actions</h2>
       <p>Review the details on the next page before confirming an action.</p>
@@ -70,6 +78,16 @@
           {% csrf_token %}<button class="btn btn-danger" type="submit">Cancel registration</button>
         </form>
       </div>
+    </section>
+  {% endif %}
+  {% if can_anonymise %}
+    <section class="team-panel">
+      <h2>Remove personal details</h2>
+      <p>This cannot be undone. Payment and class records will remain.</p>
+      <form method="post" action="{% url 'team_registration_action' registration.pk 'anonymise' %}">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Review removal</button>
+      </form>
     </section>
   {% endif %}
 {% endblock %}

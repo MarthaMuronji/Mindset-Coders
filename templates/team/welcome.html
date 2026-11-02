@@ -1,0 +1,20 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <section class="team-panel team-login-panel">
+    <h1>Set your password</h1>
+    <p>Choose a password to finish setting up your team account.</p>
+    <form method="post" class="team-form">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="team-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="team-help">{{ field.help_text|safe }}</div>{% endif %}
+          {% if field.errors %}<div class="team-errors" role="alert">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button class="btn btn-primary team-submit" type="submit">Set password and sign in</button>
+    </form>
+  </section>
+{% endblock %}

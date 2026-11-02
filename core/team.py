@@ -5,6 +5,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db import transaction
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,6 +15,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_http_methods
 
+from .audit import record_audit_event
 from .models import ContactMessage, Registration
 
 
@@ -26,11 +28,12 @@ REGISTRATION_STATUSES = {
 REGISTRATION_FILTERS = ('pending', 'part_paid', 'paid', 'cancelled')
 METHOD_FILTERS = ('online', 'cash')
 FOLLOW_UP_FILTERS = ('no', 'yes', 'all')
-REGISTRATION_ACTIONS = ('paid', 'part_paid', 'cancel')
+REGISTRATION_ACTIONS = ('paid', 'part_paid', 'cancel', 'anonymise')
 ACTION_TITLES = {
     'paid': 'Mark as paid in full',
     'part_paid': 'Record part payment',
     'cancel': 'Cancel registration',
+    'anonymise': 'Remove personal details',
 }
 
 
@@ -95,6 +98,25 @@ class TeamLoginView(LoginView):
         context['page_title'] = 'Team sign in'
         return context
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        record_audit_event(
+            'sign_in',
+            user=self.request.user,
+            object_type='User',
+            object_id=self.request.user.pk,
+            detail='Signed in',
+        )
+        return response
+
+    def form_invalid(self, form):
+        record_audit_event(
+            'failed_sign_in',
+            username=self.request.POST.get('username', '').strip(),
+            detail='Sign in failed',
+        )
+        return super().form_invalid(form)
+
 
 team_logout = private_team_page(
     LogoutView.as_view(next_page=reverse_lazy('team_login'))
@@ -105,14 +127,28 @@ team_logout = private_team_page(
 def team_home(request):
     if not request.user.is_authenticated:
         return redirect(_login_url(request.get_full_path()))
-    can_view_registrations = _allowed(request, 'core.view_registration')
+    can_view_full = (
+        _allowed(request, 'core.view_registration')
+        or _allowed(request, 'core.view_full_registration')
+    )
+    can_view_finance = _allowed(request, 'core.view_finance_fields')
+    can_view_registrations = can_view_full or can_view_finance
     can_view_messages = _allowed(request, 'core.view_contactmessage')
-    if not can_view_registrations and not can_view_messages:
+    can_view_roster = (
+        _allowed(request, 'core.view_roster')
+        or _allowed(request, 'core.view_full_registration')
+    )
+    can_manage_team = _allowed(request, 'core.manage_team')
+    can_view_audit = _allowed(request, 'core.view_audit_log')
+    if not any((can_view_registrations, can_view_messages, can_view_roster, can_manage_team, can_view_audit)):
         return _deny_or_login(request)
     return render(request, 'team/home.html', {
         'page_title': 'Team home',
         'can_view_registrations': can_view_registrations,
+        'can_view_roster': can_view_roster,
         'can_view_messages': can_view_messages,
+        'can_manage_team': can_manage_team,
+        'can_view_audit': can_view_audit,
     })
 
 
@@ -148,9 +184,12 @@ def _phone_whatsapp(phone):
 
 @private_team_page
 def registration_list(request):
-    denied = _require_permission(request, 'core.view_registration')
-    if denied:
-        return denied
+    can_view_full = (
+        _allowed(request, 'core.view_registration')
+        or _allowed(request, 'core.view_full_registration')
+    )
+    if not can_view_full and not _allowed(request, 'core.view_finance_fields'):
+        return _deny_or_login(request)
 
     registrations = Registration.objects.all()
     status = request.GET.get('status', '')
@@ -209,15 +248,20 @@ def registration_list(request):
             ).count(),
         },
         'can_change': _allowed(request, 'core.change_registration'),
+        'can_view_full': can_view_full,
     })
 
 
 @private_team_page
 @require_http_methods(['GET', 'POST'])
 def registration_detail(request, pk):
-    denied = _require_permission(request, 'core.view_registration')
-    if denied:
-        return denied
+    can_view_full = (
+        _allowed(request, 'core.view_registration')
+        or _allowed(request, 'core.view_full_registration')
+    )
+    can_view_finance = _allowed(request, 'core.view_finance_fields')
+    if not can_view_full and not can_view_finance:
+        return _deny_or_login(request)
     registration = get_object_or_404(Registration, pk=pk)
     if request.method == 'POST':
         denied = _require_permission(request, 'core.change_registration')
@@ -227,10 +271,24 @@ def registration_detail(request, pk):
         registration.save(update_fields=['payment_note'])
         messages.success(request, 'Internal note saved.')
         return redirect('team_registration_detail', pk=registration.pk)
+    record_audit_event(
+        'registration_opened',
+        user=request.user,
+        object_type='Registration',
+        object_id=registration.pk,
+        detail='Registration details opened',
+    )
     context = _registration_context(registration)
     context.update({
         'page_title': 'Registration details',
+        'can_view_full': can_view_full,
+        'can_view_finance': can_view_finance,
         'can_change': _allowed(request, 'core.change_registration'),
+        'can_record_payment': (
+            _allowed(request, 'core.record_payment')
+            or _allowed(request, 'core.change_registration')
+        ),
+        'can_anonymise': _allowed(request, 'core.anonymise_registration'),
         'status_choices': REGISTRATION_STATUSES,
     })
     return render(request, 'team/registration_detail.html', context)
@@ -290,16 +348,29 @@ class RegistrationActionForm(forms.Form):
 
 
 @private_team_page
+@transaction.atomic
 @require_POST
 def registration_action(request, pk, action):
-    denied = _require_permission(request, 'core.view_registration')
-    if denied:
-        return denied
-    denied = _require_permission(request, 'core.change_registration')
-    if denied:
-        return denied
     if action not in REGISTRATION_ACTIONS:
         raise Http404
+    has_registration_access = any((
+        _allowed(request, 'core.view_registration'),
+        _allowed(request, 'core.view_full_registration'),
+        _allowed(request, 'core.view_finance_fields'),
+    ))
+    if not has_registration_access:
+        return _deny_or_login(request)
+    if action == 'anonymise':
+        denied = _require_permission(request, 'core.anonymise_registration')
+    elif (
+        _allowed(request, 'core.record_payment')
+        or _allowed(request, 'core.change_registration')
+    ):
+        denied = None
+    else:
+        denied = _deny_or_login(request)
+    if denied:
+        return denied
     registration = get_object_or_404(Registration, pk=pk)
     confirmed = request.POST.get('confirmed') == 'true'
     form = RegistrationActionForm(
@@ -307,6 +378,8 @@ def registration_action(request, pk, action):
         action=action,
         registration=registration,
     )
+    if action == 'anonymise':
+        form.fields.clear()
     if confirmed:
         if not form.is_valid():
             return render(request, 'team/action_confirm.html', {
@@ -317,6 +390,7 @@ def registration_action(request, pk, action):
                 'form': form,
             }, status=400)
         now = timezone.now()
+        old_status = registration.payment_status
         if action == 'paid':
             registration.payment_status = 'paid'
             registration.amount_paid = registration.amount_due or 0
@@ -333,6 +407,13 @@ def registration_action(request, pk, action):
                 'payment_recorded_by', 'receipt_number', 'payment_note',
             ])
             messages.success(request, 'Payment recorded. The registration is paid in full.')
+            record_audit_event(
+                'payment_recorded',
+                user=request.user,
+                object_type='Registration',
+                object_id=registration.pk,
+                detail='Payment recorded',
+            )
         elif action == 'part_paid':
             registration.payment_status = 'part_paid'
             registration.amount_paid += form.cleaned_data['amount']
@@ -346,7 +427,14 @@ def registration_action(request, pk, action):
                 'payment_recorded_by', 'receipt_number',
             ])
             messages.success(request, 'Part payment recorded.')
-        else:
+            record_audit_event(
+                'payment_recorded',
+                user=request.user,
+                object_type='Registration',
+                object_id=registration.pk,
+                detail='Part payment recorded',
+            )
+        elif action == 'cancel':
             registration.payment_status = 'cancelled'
             registration.paid_at = now
             registration.payment_recorded_by = request.user.get_username()
@@ -354,6 +442,32 @@ def registration_action(request, pk, action):
                 'payment_status', 'paid_at', 'payment_recorded_by',
             ])
             messages.success(request, 'Registration cancelled.')
+        else:
+            registration.learner_name = 'Removed'
+            registration.parent_name = 'Removed'
+            registration.parent_email = 'Removed'
+            registration.parent_phone = 'Removed'
+            registration.school_name = ''
+            registration.save(update_fields=[
+                'learner_name', 'parent_name', 'parent_email',
+                'parent_phone', 'school_name',
+            ])
+            messages.success(request, 'Personal details removed from this registration.')
+            record_audit_event(
+                'anonymised',
+                user=request.user,
+                object_type='Registration',
+                object_id=registration.pk,
+                detail='Registration anonymised',
+            )
+        if action != 'anonymise' and old_status != registration.payment_status:
+            record_audit_event(
+                'status_changed',
+                user=request.user,
+                object_type='Registration',
+                object_id=registration.pk,
+                detail='Registration status changed',
+            )
         return redirect('team_registration_detail', pk=registration.pk)
 
     return render(request, 'team/action_confirm.html', {
@@ -391,6 +505,7 @@ def message_list(request):
 
 
 @private_team_page
+@transaction.atomic
 @require_POST
 def message_follow_up(request, pk):
     denied = _require_permission(request, 'core.view_contactmessage')
@@ -400,9 +515,18 @@ def message_follow_up(request, pk):
     if denied:
         return denied
     contact_message = get_object_or_404(ContactMessage, pk=pk)
+    was_handled = contact_message.handled
     handled = request.POST.get('handled') == 'true'
     contact_message.handled = handled
     contact_message.save(update_fields=['handled'])
+    if handled and not was_handled:
+        record_audit_event(
+            'message_followed_up',
+            user=request.user,
+            object_type='ContactMessage',
+            object_id=contact_message.pk,
+            detail='Message marked followed up',
+        )
     messages.success(
         request,
         'Message marked as followed up.' if handled else 'Message marked as not followed up.',
@@ -411,3 +535,61 @@ def message_follow_up(request, pk):
         reverse('team_messages'),
         urlencode({'follow_up': request.POST.get('follow_up', 'no')}),
     ))
+
+
+def _can_view_roster(request):
+    return (
+        _allowed(request, 'core.view_roster')
+        or _allowed(request, 'core.view_full_registration')
+    )
+
+
+@private_team_page
+def roster_list(request):
+    if not _can_view_roster(request):
+        return _deny_or_login(request)
+    valid_stages = {value for value, _label in Registration.STAGE_CHOICES}
+    stage = request.GET.get('stage', 'discover')
+    if stage not in valid_stages:
+        stage = 'discover'
+    learners = Registration.objects.filter(stage=stage).order_by(
+        'learner_name', 'pk'
+    )
+    return render(request, 'team/roster.html', {
+        'page_title': 'Class roster',
+        'learners': learners,
+        'stage': stage,
+        'stage_choices': Registration.STAGE_CHOICES,
+    })
+
+
+@private_team_page
+@transaction.atomic
+@require_http_methods(['GET', 'POST'])
+def roster_detail(request, pk):
+    if not _can_view_roster(request):
+        return _deny_or_login(request)
+    learner = get_object_or_404(Registration, pk=pk)
+    show_contact = False
+    if request.method == 'POST':
+        denied = _require_permission(request, 'core.reveal_contact')
+        if denied:
+            return denied
+        show_contact = request.POST.get('reveal_contact') == 'true'
+        if not show_contact:
+            return _deny_or_login(request)
+        record_audit_event(
+            'contact_revealed',
+            user=request.user,
+            object_type='Registration',
+            object_id=learner.pk,
+            detail='Parent contact details revealed',
+        )
+    return render(request, 'team/roster_detail.html', {
+        'page_title': 'Learner details',
+        'learner': learner,
+        'show_contact': show_contact,
+        'can_reveal': _allowed(request, 'core.reveal_contact'),
+        'phone_tel': _phone_tel(learner.parent_phone) if show_contact else '',
+        'phone_whatsapp': _phone_whatsapp(learner.parent_phone) if show_contact else '',
+    })
