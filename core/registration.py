@@ -20,6 +20,8 @@ from django.urls import reverse
 from . import views
 from .models import Registration
 from .notifications import BREVO_SEND_URL, TIMEOUT_SECONDS
+from .phone_numbers import PHONE_ERROR, normalize_phone_number
+from .spam import create_form_timestamp, is_form_timestamp_valid
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +66,18 @@ class RegistrationForm(forms.ModelForm):
         },
     )
 
+    parent_phone = forms.CharField(
+        max_length=30,
+        label='Your phone number',
+        help_text=(
+            'For example 0772 123 456 or +256 772 123 456.'
+        ),
+        error_messages={
+            'required': PHONE_ERROR,
+            'max_length': PHONE_ERROR,
+        },
+    )
+
     # A whole number between 3 and 25, with a friendly message instead of
     # Django's "Ensure this value is ...". The label lives here too, because
     # a declared field does not take its label from Meta.
@@ -84,6 +98,7 @@ class RegistrationForm(forms.ModelForm):
         widget=forms.TextInput(attrs={
             'tabindex': '-1',
             'autocomplete': 'off',
+            'aria-hidden': 'true',
         }),
     )
 
@@ -157,6 +172,19 @@ class RegistrationForm(forms.ModelForm):
             )
         else:
             self.fields.pop('payment_method')
+
+    def clean_parent_email(self):
+        email = self.cleaned_data['parent_email']
+        domain = email.rsplit('@', 1)[-1].lower().rstrip('.')
+        if domain == 'mindset-group.org' or domain.endswith('.mindset-group.org'):
+            raise forms.ValidationError('Please check your email address.')
+        return email
+
+    def clean_parent_phone(self):
+        try:
+            return normalize_phone_number(self.cleaned_data['parent_phone'])
+        except ValueError as error:
+            raise forms.ValidationError(PHONE_ERROR) from error
 
     def clean(self):
         cleaned_data = super().clean()
@@ -258,6 +286,7 @@ def join(request):
         # and store nothing at all
         if request.POST.get('website', '').strip():
             return redirect('join_thanks')
+        form_timestamp = request.POST.get('form_timestamp', '')
         form = RegistrationForm(
             request.POST,
             payments_enabled=settings.STEAM_PAYMENTS_ENABLED,
@@ -265,7 +294,13 @@ def join(request):
                 'cash_instructions', ''
             ),
         )
-        if form.is_valid():
+        if not is_form_timestamp_valid(form_timestamp):
+            form.add_error(
+                None,
+                'Please check your details and send it again.',
+            )
+            form_timestamp = create_form_timestamp()
+        elif form.is_valid():
             # Keep the registration so the team can track its payment.
             try:
                 registration = form.save(commit=False)
@@ -300,6 +335,7 @@ def join(request):
                 })
                 return redirect('{}?{}'.format(reverse('join_thanks'), query))
     else:
+        form_timestamp = create_form_timestamp()
         programme = request.GET.get('programme', '')
         stage = request.GET.get('stage', '')
         initial = {}
@@ -316,7 +352,11 @@ def join(request):
                 'cash_instructions', ''
             ),
         )
-    return render(request, 'join.html', {'form': form})
+    return render(
+        request,
+        'join.html',
+        {'form': form, 'form_timestamp': form_timestamp},
+    )
 
 
 def join_thanks(request):

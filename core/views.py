@@ -21,6 +21,11 @@ from django.views.decorators.http import require_POST
 from .forms import ContactForm, ReviewStoryForm, StoryForm
 from .models import ContactMessage, Post, Story
 from .notifications import send_contact_notification
+from .spam import (
+    contact_rate_limit_exceeded,
+    create_form_timestamp,
+    is_form_timestamp_valid,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +61,23 @@ def about(request):
 
 def contact(request):
     if request.method == 'POST':
+        if request.POST.get('website', '').strip():
+            messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
+            return redirect('contact')
+        form_timestamp = request.POST.get('form_timestamp', '')
         form = ContactForm(request.POST)
-        if form.is_valid():
+        if not is_form_timestamp_valid(form_timestamp):
+            form.add_error(
+                None,
+                'Please check your details and send it again.',
+            )
+            form_timestamp = create_form_timestamp()
+        elif form.is_valid() and contact_rate_limit_exceeded(request):
+            form.add_error(
+                None,
+                'Please wait a while before sending another message.',
+            )
+        elif form.is_valid():
             # Keep the message so the team can read it and mark it handled in the admin
             try:
                 contact_message = ContactMessage.objects.create(
@@ -80,13 +100,18 @@ def contact(request):
                 messages.success(request, "Thanks for reaching out! We'll be in touch soon.")
                 return redirect('contact')
     else:
+        form_timestamp = create_form_timestamp()
         starter = TOPIC_STARTERS.get(request.GET.get('topic', ''))
         initial = {}
         if starter and 'message' in ContactForm.base_fields:
             # Only ever pre-fill an empty message box
             initial = {'message': starter}
         form = ContactForm(initial=initial)
-    return render(request, 'contact.html', {'form': form})
+    return render(
+        request,
+        'contact.html',
+        {'form': form, 'form_timestamp': form_timestamp},
+    )
 
 def global_opportunities(request):
     return render(request, 'global_opportunities.html')

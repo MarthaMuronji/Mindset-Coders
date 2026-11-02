@@ -77,12 +77,15 @@
 
         <form method="post" novalidate>
             {% csrf_token %}
+            <input type="hidden" name="form_timestamp" value="{{ form_timestamp }}">
+            {{ form.non_field_errors }}
             <div class="form-group">
                 <label for="{{ form.name.id_for_label }}">Name</label>
                 {{ form.name }}
             </div>
             <div class="form-group">
                 <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email.errors }}
                 {{ form.email }}
             </div>
             <div class="form-group">
@@ -100,6 +103,9 @@
             <div class="form-group">
                 <label for="{{ form.message.id_for_label }}">Message</label>
                 {{ form.message }}
+            </div>
+            <div class="honeypot-field" aria-hidden="true">
+                {{ form.website }}
             </div>
             <button type="submit" class="btn btn-green">Send Message</button>
         </form>
