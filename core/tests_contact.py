@@ -4,17 +4,23 @@ The project has no database in its test setup, so every test uses
 SimpleTestCase. The tests that save patch ContactMessage.objects.create,
 which is the only thing that would otherwise reach a database.
 """
+import hashlib
+import hmac
 import html
 import json
 import os
+import time
 from unittest import mock
 
-from django.test import SimpleTestCase, override_settings
+from django.core.cache import cache
+from django.core.signing import TimestampSigner
+from django.test import RequestFactory, SimpleTestCase, override_settings
 
 from .forms import ContactForm
 from .models import ContactMessage, Registration, Story
 from .notifications import send_contact_notification
 from .registration import RegistrationForm, send_registration_notification
+from .spam import FORM_TIMESTAMP_SALT, contact_rate_limit_exceeded
 from .views import STEAM_EXPERIENCE
 
 
@@ -28,13 +34,19 @@ PHONE_LINK = 'href="tel:+256752064343"'
 VALID_POST = {
     'name': 'Test Person',
     'email': 'person@example.com',
-    'phone': '+256 700 000000',
+    'phone': '+256 772 123 456',
     'role': 'parent',
     'message': 'Hello there, I have a question.',
+    'form_timestamp': TimestampSigner(
+        salt=FORM_TIMESTAMP_SALT
+    ).sign(str(int(time.time()) - 4)),
 }
 
 # The one sentence every phone problem shows
-FRIENDLY_ERROR = 'Please enter a phone number we can call, for example +256 7XX XXX XXX.'
+FRIENDLY_ERROR = (
+    'Please enter a valid phone number, for example 0772 123 456 '
+    'or +256 772 123 456.'
+)
 
 # The three environment variables that switch the notification email on
 BREVO_ENVIRONMENT = {
@@ -115,7 +127,8 @@ class ContactPhonePageTests(SimpleTestCase):
         phone = ContactForm.base_fields['phone']
         self.assertTrue(phone.required)
         self.assertEqual(phone.label, 'Phone number')
-        self.assertEqual(phone.help_text, 'So our team can call you back.')
+        self.assertIn('0772 123 456', phone.help_text)
+        self.assertIn('+256 772 123 456', phone.help_text)
 
     def test_the_topic_still_prefills_the_message_box(self):
         response = self.client.get('/contact/?topic=school')
@@ -135,7 +148,10 @@ class ContactPhonePageTests(SimpleTestCase):
 class ContactPhoneFormTests(SimpleTestCase):
     """Validating, saving and emailing one message with a phone number."""
 
-    def post_form(self, data, follow=False):
+    def setUp(self):
+        cache.clear()
+
+    def post_form(self, data, follow=False, forwarded_for=None):
         """POST with saving and emailing fully worked out.
 
         ContactMessage.objects.create is patched, so the view still
@@ -158,7 +174,12 @@ class ContactPhoneFormTests(SimpleTestCase):
                 with mock.patch(
                     'core.notifications.urllib.request.urlopen'
                 ) as send:
-                    response = self.client.post('/contact/', data, follow=follow)
+                    request_meta = {}
+                    if forwarded_for is not None:
+                        request_meta['HTTP_X_FORWARDED_FOR'] = forwarded_for
+                    response = self.client.post(
+                        '/contact/', data, follow=follow, **request_meta
+                    )
         payload = None
         if send.call_count:
             request = send.call_args.args[0]
@@ -173,9 +194,125 @@ class ContactPhoneFormTests(SimpleTestCase):
         message = saved[0]
         self.assertEqual(message.name, 'Test Person')
         self.assertEqual(message.email, 'person@example.com')
-        self.assertEqual(message.phone, '+256 700 000000')
+        self.assertEqual(message.phone, '+256772123456')
         self.assertEqual(message.role, 'parent')
         self.assertEqual(message.message, 'Hello there, I have a question.')
+
+    def test_the_contact_form_has_a_css_hidden_honeypot(self):
+        response = self.client.get('/contact/')
+        self.assertContains(response, 'name="website"')
+        self.assertContains(response, 'autocomplete="off"')
+        self.assertContains(response, 'tabindex="-1"')
+        self.assertContains(response, 'aria-hidden="true"')
+        self.assertContains(response, 'class="honeypot-field"')
+
+    def test_a_filled_honeypot_looks_successful_but_saves_and_emails_nothing(self):
+        response, saved, payload, create_mock = self.post_form(
+            dict(VALID_POST, website='https://spam.example.com'), follow=True
+        )
+        create_mock.assert_not_called()
+        self.assertEqual(saved, [])
+        self.assertIsNone(payload)
+        page = html.unescape(response.content.decode('utf-8'))
+        self.assertIn("Thanks for reaching out! We'll be in touch soon.", page)
+
+    def test_a_submission_under_three_seconds_is_rejected(self):
+        now = int(time.time())
+        recent_token = TimestampSigner(
+            salt=FORM_TIMESTAMP_SALT
+        ).sign(str(now))
+        with mock.patch('core.spam.time.time', return_value=now + 1):
+            response, saved, payload, create_mock = self.post_form(
+                dict(VALID_POST, form_timestamp=recent_token)
+            )
+        create_mock.assert_not_called()
+        self.assertEqual(saved, [])
+        self.assertIsNone(payload)
+        self.assertContains(response, 'Please check your details and send it again.')
+
+    def test_a_submission_over_24_hours_after_loading_is_rejected(self):
+        expired_token = TimestampSigner(
+            salt=FORM_TIMESTAMP_SALT
+        ).sign(str(int(time.time()) - (24 * 60 * 60 + 1)))
+        response, saved, payload, create_mock = self.post_form(
+            dict(VALID_POST, form_timestamp=expired_token)
+        )
+        create_mock.assert_not_called()
+        self.assertEqual(saved, [])
+        self.assertIsNone(payload)
+        self.assertContains(response, 'Please check your details and send it again.')
+        self.assertEqual(response.context['form'].data['name'], VALID_POST['name'])
+        self.assertEqual(response.context['form'].data['email'], VALID_POST['email'])
+        self.assertEqual(response.context['form'].data['phone'], VALID_POST['phone'])
+        self.assertEqual(
+            response.context['form'].data['message'], VALID_POST['message']
+        )
+        self.assertNotEqual(response.context['form_timestamp'], expired_token)
+
+    def test_our_domain_and_its_subdomains_are_rejected_as_contact_emails(self):
+        for email in (
+            'person@mindset-group.org',
+            'PERSON@MINDSET-GROUP.ORG',
+            'person@team.mindset-group.org',
+            'PERSON@TEAM.MINDSET-GROUP.ORG',
+        ):
+            with self.subTest(email=email):
+                response, saved, payload, create_mock = self.post_form(
+                    dict(VALID_POST, email=email)
+                )
+                create_mock.assert_not_called()
+                self.assertEqual(saved, [])
+                self.assertIsNone(payload)
+                self.assertContains(response, 'Please check your email address.')
+
+    def test_same_forwarded_ip_is_blocked_after_five_contact_messages(self):
+        for _ in range(5):
+            response, saved, _payload, create_mock = self.post_form(
+                VALID_POST, forwarded_for='198.51.100.11, 10.0.0.1'
+            )
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(len(saved), 1)
+            create_mock.assert_called_once()
+
+        response, saved, payload, create_mock = self.post_form(
+            VALID_POST, forwarded_for='198.51.100.11, 10.0.0.1'
+        )
+        create_mock.assert_not_called()
+        self.assertEqual(saved, [])
+        self.assertIsNone(payload)
+        self.assertContains(response, 'Please wait a while before sending another message.')
+
+    def test_two_forwarded_ips_do_not_block_each_other(self):
+        for _ in range(5):
+            self.post_form(VALID_POST, forwarded_for='198.51.100.21')
+
+        response, saved, _payload, create_mock = self.post_form(
+            VALID_POST, forwarded_for='198.51.100.22'
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(saved), 1)
+        create_mock.assert_called_once()
+
+    @override_settings(SECRET_KEY='spam-test-secret')
+    def test_invalid_forwarded_ip_falls_back_to_remote_addr_and_keys_are_hashed(self):
+        request = RequestFactory().post(
+            '/contact/',
+            HTTP_X_FORWARDED_FOR='not-an-ip, 198.51.100.30',
+            REMOTE_ADDR='192.0.2.17',
+        )
+        with mock.patch('core.spam.cache.add') as add:
+            with mock.patch('core.spam.cache.incr', return_value=1):
+                self.assertFalse(contact_rate_limit_exceeded(request))
+
+        cache_key = add.call_args.args[0]
+        expected_digest = hmac.new(
+            b'spam-test-secret',
+            b'192.0.2.17',
+            hashlib.sha256,
+        ).hexdigest()
+        self.assertEqual(cache_key, 'contact-form-rate:{}'.format(expected_digest))
+        self.assertNotIn('192.0.2.17', cache_key)
+        self.assertNotIn('not-an-ip', cache_key)
 
     def test_the_saved_message_shows_the_same_success_message(self):
         response, _saved, _payload, _create = self.post_form(
@@ -192,7 +329,7 @@ class ContactPhoneFormTests(SimpleTestCase):
         # Directly after the email line, and nothing else moved
         self.assertIn('Email: person@example.com', lines)
         email_at = lines.index('Email: person@example.com')
-        self.assertEqual(lines[email_at + 1], 'Phone: +256 700 000000')
+        self.assertEqual(lines[email_at + 1], 'Phone: +256772123456')
         self.assertEqual(lines[email_at - 1], 'Name: Test Person')
         self.assertEqual(
             payload['replyTo']['email'], 'person@example.com'
@@ -215,9 +352,15 @@ class ContactPhoneFormTests(SimpleTestCase):
         create_mock.assert_not_called()
         self.assertContains(response, FRIENDLY_ERROR)
 
-    def test_a_short_number_fails(self):
-        # Too short, far too long, and letters instead of digits
-        for phone in ('12345', '1234567890123456', 'call me maybe'):
+    def test_invalid_phone_numbers_are_rejected(self):
+        for phone in (
+            '12345',
+            '1234567890123456',
+            'call me maybe',
+            '7889570265',
+            '0000000000',
+            '0777 777 777',
+        ):
             with self.subTest(phone=phone):
                 response, _saved, _payload, create_mock = self.post_form(
                     dict(VALID_POST, phone=phone)
@@ -227,16 +370,22 @@ class ContactPhoneFormTests(SimpleTestCase):
                 self.assertContains(response, 'errorlist')
                 self.assertContains(response, FRIENDLY_ERROR)
 
-    def test_spaces_and_a_leading_plus_are_accepted(self):
-        # A leading plus, spaces, brackets and hyphens are all welcome
-        for phone in ('+256 700 123456', '256 700 123 456', '(020) 741-000-222', '0771234567'):
+    def test_accepted_phone_formats_are_saved_in_a_consistent_format(self):
+        examples = (
+            ('+256 772 123 456', '+256772123456'),
+            ('256 772 123 456', '+256772123456'),
+            ('0772 123 456', '+256772123456'),
+            ('(031) 234-5678', '+256312345678'),
+            ('+1 (202) 555-0123', '+12025550123'),
+        )
+        for phone, normalized in examples:
             with self.subTest(phone=phone):
                 response, saved, _payload, _create = self.post_form(
                     dict(VALID_POST, phone=phone)
                 )
                 self.assertEqual(response.status_code, 302)
                 self.assertEqual(len(saved), 1)
-                self.assertEqual(saved[0].phone, phone)
+                self.assertEqual(saved[0].phone, normalized)
 
     def test_a_save_failure_keeps_the_typed_input_and_shows_the_error(self):
         with mock.patch.object(
@@ -254,7 +403,7 @@ class ContactPhoneFormTests(SimpleTestCase):
         # Everything the visitor typed is still in the form
         self.assertContains(response, 'Test Person')
         self.assertContains(response, 'person@example.com')
-        self.assertContains(response, '+256 700 000000')
+        self.assertContains(response, '+256 772 123 456')
 
     def test_a_failing_email_never_reaches_the_visitor(self):
         def boom(contact_message, admin_url):
@@ -298,14 +447,14 @@ class ContactNotificationTests(SimpleTestCase):
         contact_message = ContactMessage(
             name='Test Person',
             email='person@example.com',
-            phone='+256 700 000000',
+            phone='+256772123456',
             role='parent',
             message='Hello there.',
         )
         lines = self.send(contact_message)['textContent'].split('\n')
         self.assertEqual(lines[2], 'Name: Test Person')
         self.assertEqual(lines[3], 'Email: person@example.com')
-        self.assertEqual(lines[4], 'Phone: +256 700 000000')
+        self.assertEqual(lines[4], 'Phone: +256772123456')
         self.assertEqual(lines[5], 'Role: parent')
 
     def test_an_older_message_with_no_phone_keeps_the_old_lines(self):
@@ -358,11 +507,11 @@ class ContactPhoneLeavesJoinTests(SimpleTestCase):
         )
         phone = RegistrationForm.base_fields['parent_phone']
         self.assertEqual(phone.label, 'Your phone number')
-        # The new phone field belongs to the contact form only, and the
-        # contact form kept every field it had
+        # The phone field belongs to contact only; the honeypot is not a
+        # visitor-facing field, but is included in the bound form.
         self.assertEqual(
             list(ContactForm.base_fields),
-            ['name', 'email', 'phone', 'role', 'message'],
+            ['name', 'email', 'phone', 'role', 'message', 'website'],
         )
 
     def test_the_join_page_never_asks_for_the_new_field(self):
@@ -375,7 +524,7 @@ class ContactPhoneLeavesJoinTests(SimpleTestCase):
         registration = Registration(
             parent_name='Test Parent',
             parent_email='parent@example.com',
-            parent_phone='+256 700 000000',
+            parent_phone='+256772123456',
             learner_name='Test Learner',
             learner_age=10,
             school_name='',
@@ -394,7 +543,7 @@ class ContactPhoneLeavesJoinTests(SimpleTestCase):
         body = json.loads(request.data.decode('utf-8'))['textContent']
         self.assertNotIn('Phone', body)
         # The registration email never carried any personal detail
-        for value in ('Test Parent', 'parent@example.com', '+256 700 000000'):
+        for value in ('Test Parent', 'parent@example.com', '+256772123456'):
             with self.subTest(value=value):
                 self.assertNotIn(value, body)
 

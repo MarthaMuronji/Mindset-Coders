@@ -1,19 +1,22 @@
+import time
 from unittest import mock
 
 from django.contrib import admin
+from django.core.signing import TimestampSigner
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.utils import timezone
 
 from . import admin as core_admin
 from . import views
 from .models import Registration
+from .spam import FORM_TIMESTAMP_SALT
 from .registration import STAGE_FEES
 
 
 VALID_POST = {
     'parent_name': 'Test Parent',
     'parent_email': 'parent@example.com',
-    'parent_phone': '+256 700 000000',
+    'parent_phone': '+256 772 123 456',
     'learner_name': 'Test Learner',
     'learner_age': '10',
     'school_name': '',
@@ -22,6 +25,9 @@ VALID_POST = {
     'payment_method': 'online',
     'consent': 'on',
     'website': '',
+    'form_timestamp': TimestampSigner(
+        salt=FORM_TIMESTAMP_SALT
+    ).sign(str(int(time.time()) - 4)),
 }
 
 
@@ -225,7 +231,7 @@ class PaymentMethodTests(SimpleTestCase):
         registration = Registration(
             parent_name='Private Parent',
             parent_email='private@example.com',
-            parent_phone='+256 700 000000',
+            parent_phone='+256772123456',
             learner_name='Private Learner',
             learner_age=10,
             programme='holiday',
@@ -243,7 +249,7 @@ class PaymentMethodTests(SimpleTestCase):
         for private_value in (
             'Private Parent',
             'private@example.com',
-            '+256 700 000000',
+            '+256772123456',
             'Private Learner',
             '10',
         ):

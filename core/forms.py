@@ -1,15 +1,7 @@
-import re
-
 from django import forms
 
 from .models import Story
-
-# One friendly sentence for every phone problem: an empty box, letters
-# in the number, or a number that is too short or too long
-PHONE_ERROR = 'Please enter a phone number we can call, for example +256 7XX XXX XXX.'
-
-# Digits, spaces, plus signs, hyphens and brackets, and nothing else
-PHONE_ALLOWED_CHARACTERS = re.compile(r'^[0-9 +()\-]+$')
+from .phone_numbers import PHONE_ERROR, normalize_phone_number
 
 
 class ContactForm(forms.Form):
@@ -18,7 +10,10 @@ class ContactForm(forms.Form):
     phone = forms.CharField(
         max_length=30,
         label='Phone number',
-        help_text='So our team can call you back.',
+        help_text=(
+            'So our team can call you back. For example 0772 123 456 or '
+            '+256 772 123 456.'
+        ),
         error_messages={
             'required': PHONE_ERROR,
             'max_length': PHONE_ERROR,
@@ -32,19 +27,27 @@ class ContactForm(forms.Form):
         ('other', 'Other'),
     ])
     message = forms.CharField(widget=forms.Textarea)
+    website = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'tabindex': '-1',
+            'autocomplete': 'off',
+            'aria-hidden': 'true',
+        }),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        domain = email.rsplit('@', 1)[-1].lower().rstrip('.')
+        if domain == 'mindset-group.org' or domain.endswith('.mindset-group.org'):
+            raise forms.ValidationError('Please check your email address.')
+        return email
 
     def clean_phone(self):
-        """A number the team can actually dial.
-
-        Digits, spaces, plus signs, hyphens and brackets are welcome, and
-        between 9 and 15 digits must be there once the decorations are
-        removed. Every problem gets the same friendly sentence.
-        """
-        phone = self.cleaned_data.get('phone', '').strip()
-        digits = re.sub(r'\D', '', phone)
-        if not PHONE_ALLOWED_CHARACTERS.fullmatch(phone) or not 9 <= len(digits) <= 15:
-            raise forms.ValidationError(PHONE_ERROR)
-        return phone
+        try:
+            return normalize_phone_number(self.cleaned_data['phone'])
+        except ValueError as error:
+            raise forms.ValidationError(PHONE_ERROR) from error
 
 
 class StoryForm(forms.ModelForm):

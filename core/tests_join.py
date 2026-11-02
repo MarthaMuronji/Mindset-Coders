@@ -7,12 +7,15 @@ only thing that would otherwise reach a database.
 import json
 import os
 import re
+import time
 from unittest import mock
 
 from django.contrib.messages import get_messages
+from django.core.signing import TimestampSigner
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
+from .spam import FORM_TIMESTAMP_SALT
 from .models import Registration
 from .registration import send_registration_notification
 
@@ -20,7 +23,7 @@ from .registration import send_registration_notification
 VALID_POST = {
     'parent_name': 'Test Parent',
     'parent_email': 'parent@example.com',
-    'parent_phone': '+256 700 000000',
+    'parent_phone': '+256 772 123 456',
     'learner_name': 'Test Learner',
     'learner_age': '10',
     'school_name': '',
@@ -29,6 +32,9 @@ VALID_POST = {
     'payment_method': 'online',
     'consent': 'on',
     'website': '',
+    'form_timestamp': TimestampSigner(
+        salt=FORM_TIMESTAMP_SALT
+    ).sign(str(int(time.time()) - 4)),
 }
 
 # The four programme values the select offers
@@ -133,7 +139,7 @@ class JoinPageTests(SimpleTestCase):
         registration = saved[0]
         self.assertEqual(registration.parent_name, 'Test Parent')
         self.assertEqual(registration.parent_email, 'parent@example.com')
-        self.assertEqual(registration.parent_phone, '+256 700 000000')
+        self.assertEqual(registration.parent_phone, '+256772123456')
         self.assertEqual(registration.learner_name, 'Test Learner')
         self.assertEqual(registration.learner_age, 10)
         self.assertEqual(registration.school_name, '')
@@ -178,6 +184,44 @@ class JoinPageTests(SimpleTestCase):
                 self.assertContains(response, 'errorlist')
                 self.assertContains(response, 'between 3 and 25.')
 
+    def test_registration_phone_formats_are_normalized(self):
+        examples = (
+            ('+256 772 123 456', '+256772123456'),
+            ('256 772 123 456', '+256772123456'),
+            ('0772 123 456', '+256772123456'),
+            ('(031) 234-5678', '+256312345678'),
+            ('+1 (202) 555-0123', '+12025550123'),
+        )
+        for phone, normalized in examples:
+            with self.subTest(phone=phone):
+                response, saved, _notified = self.post_form(
+                    dict(VALID_POST, parent_phone=phone)
+                )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(saved[0].parent_phone, normalized)
+
+    def test_invalid_registration_phone_numbers_are_rejected(self):
+        for phone in (
+            '12345',
+            '1234567890123456',
+            'call me maybe',
+            '7889570265',
+            '0000000000',
+            '0777 777 777',
+        ):
+            with self.subTest(phone=phone):
+                with mock.patch.object(Registration, 'save') as save_mock:
+                    response = self.client.post(
+                        '/join/', dict(VALID_POST, parent_phone=phone)
+                    )
+                save_mock.assert_not_called()
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(
+                    response,
+                    'Please enter a valid phone number, for example '
+                    '0772 123 456 or +256 772 123 456.',
+                )
+
     def test_honeypot_saves_nothing(self):
         data = dict(VALID_POST, website='https://spam.example.com')
         response, saved, notified = self.post_form(data)
@@ -186,6 +230,76 @@ class JoinPageTests(SimpleTestCase):
         # The visitor sees the same thank you page as anyone else
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/join/thanks/')
+
+    def test_honeypot_input_has_the_required_accessibility_attributes(self):
+        response = self.client.get('/join/')
+        self.assertContains(response, 'name="website"')
+        self.assertContains(response, 'autocomplete="off"')
+        self.assertContains(response, 'tabindex="-1"')
+        self.assertContains(response, 'aria-hidden="true"')
+        self.assertContains(response, 'class="honeypot-field"')
+
+    def test_a_submission_under_three_seconds_is_rejected(self):
+        now = int(time.time())
+        recent_token = TimestampSigner(
+            salt=FORM_TIMESTAMP_SALT
+        ).sign(str(now))
+        with mock.patch('core.spam.time.time', return_value=now + 1):
+            with mock.patch.object(Registration, 'save') as save_mock:
+                with mock.patch(
+                    'core.registration.send_registration_notification'
+                ) as notify:
+                    response = self.client.post(
+                        '/join/',
+                        dict(VALID_POST, form_timestamp=recent_token),
+                    )
+        save_mock.assert_not_called()
+        notify.assert_not_called()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Please check your details and send it again.')
+
+    def test_stale_timestamp_keeps_form_values_and_refreshes_timestamp(self):
+        stale_token = TimestampSigner(
+            salt=FORM_TIMESTAMP_SALT
+        ).sign(str(time.time() - (24 * 60 * 60 + 1)))
+        data = dict(VALID_POST, form_timestamp=stale_token)
+        with mock.patch.object(Registration, 'save') as save_mock:
+            response = self.client.post('/join/', data)
+
+        save_mock.assert_not_called()
+        self.assertContains(response, 'Please check your details and send it again.')
+        self.assertEqual(
+            response.context['form'].data['parent_name'],
+            VALID_POST['parent_name'],
+        )
+        self.assertEqual(
+            response.context['form'].data['parent_email'],
+            VALID_POST['parent_email'],
+        )
+        self.assertEqual(
+            response.context['form'].data['learner_name'],
+            VALID_POST['learner_name'],
+        )
+        self.assertNotEqual(response.context['form_timestamp'], stale_token)
+
+    def test_our_domain_and_its_subdomains_are_rejected_as_registration_emails(self):
+        for email in (
+            'parent@mindset-group.org',
+            'PARENT@MINDSET-GROUP.ORG',
+            'parent@team.mindset-group.org',
+            'PARENT@TEAM.MINDSET-GROUP.ORG',
+        ):
+            with self.subTest(email=email):
+                data = dict(VALID_POST, parent_email=email)
+                with mock.patch.object(Registration, 'save') as save_mock:
+                    with mock.patch(
+                        'core.registration.send_registration_notification'
+                    ) as notify:
+                        response = self.client.post('/join/', data)
+                save_mock.assert_not_called()
+                notify.assert_not_called()
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'Please check your email address.')
 
     def test_save_failure_shows_an_error_and_keeps_the_text(self):
         def broken_save(instance, *args, **kwargs):
@@ -286,7 +400,7 @@ class JoinPageTests(SimpleTestCase):
             'A Name That Must Not Travel',
             'Test Parent',
             'parent@example.com',
-            '+256 700 000000',
+            '+256772123456',
             '10',
         ):
             with self.subTest(value=value):
@@ -377,7 +491,7 @@ class RegistrationNotificationTests(SimpleTestCase):
         return Registration(
             parent_name='Test Parent',
             parent_email='parent@example.com',
-            parent_phone='+256 700 000000',
+            parent_phone='+256772123456',
             learner_name='Test Learner',
             learner_age=10,
             school_name='',
@@ -425,7 +539,7 @@ class RegistrationNotificationTests(SimpleTestCase):
         for value in (
             'Test Parent',
             'parent@example.com',
-            '+256 700 000000',
+            '+256772123456',
             'Test Learner',
             '10',
         ):
