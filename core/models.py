@@ -199,6 +199,7 @@ class AuditEvent(models.Model):
     ACTION_CHOICES = [
         ('sign_in', 'Signed in'),
         ('failed_sign_in', 'Failed sign in'),
+        ('login_locked', 'Login temporarily locked'),
         ('registration_opened', 'Opened registration'),
         ('contact_revealed', 'Revealed parent contact'),
         ('payment_recorded', 'Recorded payment'),
@@ -235,6 +236,13 @@ class AuditEvent(models.Model):
 
     def __str__(self):
         return '{}: {}'.format(self.get_action_display(), self.username or 'Unknown person')
+
+
+class LoginThrottle(models.Model):
+    key = models.CharField(max_length=64, unique=True)
+    failures = models.PositiveIntegerField(default=0)
+    locked_until = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 @receiver(post_migrate, dispatch_uid='core.create_team_role_groups')
