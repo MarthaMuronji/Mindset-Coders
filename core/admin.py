@@ -1,11 +1,58 @@
 from collections.abc import Sequence
+from functools import wraps
 from typing import ClassVar
 
 from django.contrib import admin
+from django.contrib import messages
 from django.db.models import F
+from django.shortcuts import redirect
 from django.utils import timezone
 
-from .models import AuditEvent, ContactMessage, Post, Registration, Story
+from .audit import record_audit_event
+from .models import (
+    AuditEvent,
+    ContactMessage,
+    LoginThrottle,
+    Post,
+    Registration,
+    Story,
+)
+from .throttle import (
+    locked_message,
+    locked_seconds,
+    record_failure,
+    reset_username_key,
+)
+
+
+_admin_login = admin.site.login
+
+
+@wraps(_admin_login)
+def _throttled_admin_login(request, *args, **kwargs):
+    if request.method != 'POST':
+        return _admin_login(request, *args, **kwargs)
+
+    username = request.POST.get('username', '')
+    seconds = locked_seconds(request, username)
+    if seconds:
+        messages.error(request, locked_message(seconds))
+        return redirect(request.get_full_path())
+
+    response = _admin_login(request, *args, **kwargs)
+    if response.status_code == 200:
+        record_audit_event(
+            'failed_sign_in',
+            username=username.strip(),
+            detail='Sign in failed',
+        )
+        record_failure(request, username)
+    elif 300 <= response.status_code < 400:
+        reset_username_key(request, username)
+    return response
+
+
+admin.site.login = _throttled_admin_login
 
 
 @admin.register(Post)
@@ -119,6 +166,21 @@ class AuditEventAdmin(admin.ModelAdmin):
         'created_at', 'user', 'username', 'action', 'object_type',
         'object_id', 'detail',
     )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(LoginThrottle)
+class LoginThrottleAdmin(admin.ModelAdmin):
+    list_display = ('key', 'failures', 'locked_until', 'updated_at')
+    readonly_fields = ('key', 'failures', 'locked_until', 'updated_at')
 
     def has_add_permission(self, request):
         return False

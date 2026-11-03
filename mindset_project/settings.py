@@ -52,6 +52,8 @@ DATABASES = {
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-p3lly!$zr(bx@&gp%^=e-xde5@w+e#su8kom-km_jd*q-uwfvv')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ADMIN_URL_PATH = os.environ.get('ADMIN_URL_PATH', 'admin/').strip('/')
+ADMIN_URL_PATH = '{}/'.format(ADMIN_URL_PATH or 'admin')
 
 # The STEAM Experience holiday program page. While this is False the page
 # still loads at its own address, but it is not indexed, not in the
@@ -89,6 +91,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middleware.TeamSessionExpiryMiddleware',
+    'core.middleware.AdminResponseHeadersMiddleware',
 ]
 
 ROOT_URLCONF = 'mindset_project.urls'
@@ -165,6 +169,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Render's proxy sets this header so Django knows requests are https.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SESSION_COOKIE_AGE = 7200
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'same-origin'
 
 
 # Logging

@@ -3,10 +3,12 @@ from urllib.parse import urlencode
 
 from django import forms
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db import transaction
 from django.db.models import Q
+from django.forms.utils import ErrorDict
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -17,6 +19,13 @@ from django.views.decorators.http import require_POST, require_http_methods
 
 from .audit import record_audit_event
 from .models import ContactMessage, Registration
+from .middleware import IDLE_SIGN_OUT_MESSAGE
+from .throttle import (
+    locked_message,
+    locked_seconds,
+    record_failure,
+    reset_username_key,
+)
 
 
 REGISTRATION_STATUSES = {
@@ -85,6 +94,11 @@ class TeamLoginForm(AuthenticationForm):
         'invalid_login': 'That username and password did not match. Please try again.',
     }
 
+    def add_sign_in_notice(self, message):
+        self._errors = ErrorDict()
+        self.cleaned_data = {}
+        self.add_error(None, message)
+
 
 @method_decorator(private_team_page, name='dispatch')
 class TeamLoginView(LoginView):
@@ -96,10 +110,26 @@ class TeamLoginView(LoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Team sign in'
+        pending_messages = get_messages(self.request)
+        for message in pending_messages:
+            if str(message) == IDLE_SIGN_OUT_MESSAGE:
+                context['form'].add_sign_in_notice(str(message))
         return context
+
+    def post(self, request, *args, **kwargs):
+        seconds = locked_seconds(request, request.POST.get('username', ''))
+        if seconds:
+            form = self.get_form()
+            form.add_sign_in_notice(locked_message(seconds))
+            return self.render_to_response(self.get_context_data(form=form))
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        reset_username_key(
+            self.request,
+            form.cleaned_data.get('username', ''),
+        )
         record_audit_event(
             'sign_in',
             user=self.request.user,
@@ -110,11 +140,13 @@ class TeamLoginView(LoginView):
         return response
 
     def form_invalid(self, form):
+        username = self.request.POST.get('username', '').strip()
         record_audit_event(
             'failed_sign_in',
-            username=self.request.POST.get('username', '').strip(),
+            username=username,
             detail='Sign in failed',
         )
+        record_failure(self.request, username)
         return super().form_invalid(form)
 
 
