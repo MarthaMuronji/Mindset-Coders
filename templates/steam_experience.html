@@ -170,7 +170,24 @@
             {% for paragraph in content.passport_note %}<p>{{ paragraph }}</p>{% endfor %}
             <a href="https://mpass.mindsetlearn.org/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-umami-event="go-mpass-info" data-umami-event-from="steam-experience">Discover M-Pass</a>
         </div>
-        {% comment %}M-Pass screenshot slot. Render nothing until screenshots are available.{% endcomment %}
+        <div class="steam-mpass-screens">
+            <h3>A look inside M-Pass</h3>
+            <p class="steam-mpass-note">Example screens from a demo account.</p>
+            <div class="steam-mpass-row">
+                <figure class="build-card steam-mpass-card">
+                    <img src="{% static 'images/mpass-journey.jpg' %}" alt="M-Pass journey page showing progress across Discover, Build and Innovate" width="540" height="584" loading="lazy" onerror="this.remove()">
+                    <figcaption>Where you are on your journey. Progress is shown across Discover, Build and Innovate, and a facilitator reviews the evidence a learner shares.</figcaption>
+                </figure>
+                <figure class="build-card steam-mpass-card">
+                    <img src="{% static 'images/mpass-modules.jpg' %}" alt="M-Pass modules page showing how a module moves through Discover, Build and Innovate" width="540" height="687" loading="lazy" onerror="this.remove()">
+                    <figcaption>Modules. Each module moves through Discover, Build and Innovate. The evidence a learner shares is what counts.</figcaption>
+                </figure>
+                <figure class="build-card steam-mpass-card">
+                    <img src="{% static 'images/mpass-passport.jpg' %}" alt="M-Pass learning passport card on a learner's home screen" width="540" height="807" loading="lazy" onerror="this.remove()">
+                    <figcaption>Each learner has their own passport.</figcaption>
+                </figure>
+            </div>
+        </div>
     </section>
     {% endif %}
 
