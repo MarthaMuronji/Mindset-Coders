@@ -858,6 +858,43 @@ section h2 {
     background: var(--neutral-border);
 }
 
+.trusted-logos img {
+    height: 26px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    opacity: 0.92;
+}
+
+/* ===== Partner logo strip ===== */
+.partner-logo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.partner-logo-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 96px;
+    padding: 16px 20px;
+    background: var(--white);
+    border: 1px solid var(--green-border-light);
+    border-radius: 12px;
+}
+
+.partner-logo-card img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
 /* ===== See all link ===== */
 .see-all-link {
     text-align: center;
@@ -3358,6 +3395,62 @@ a.build-card:focus-visible {
 
 .steam-passport-copy .btn {
     margin-top: 12px;
+}
+
+.steam-mpass-screens {
+    margin-top: 28px;
+}
+
+.steam-mpass-screens > h3 {
+    margin-bottom: 8px;
+}
+
+.steam-mpass-note {
+    margin-bottom: 16px;
+    color: var(--text-muted);
+    font-size: 14.5px;
+}
+
+.steam-mpass-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 8px;
+}
+
+.steam-mpass-card {
+    flex: 0 0 85%;
+    padding: 16px;
+    scroll-snap-align: start;
+}
+
+.steam-mpass-card img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--green-border-light);
+    border-radius: 10px;
+}
+
+.steam-mpass-card figcaption {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 14.5px;
+    line-height: 1.5;
+}
+
+@media (min-width: 769px) {
+    .steam-mpass-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+
+    .steam-mpass-card {
+        scroll-snap-align: unset;
+    }
 }
 
 .steam-gallery-grid {

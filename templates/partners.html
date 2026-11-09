@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Our Ecosystem | Partners of Mindset Coders Uganda{% endblock %}
 {% block meta_title_og %}Our Ecosystem | Partners of Mindset Coders Uganda{% endblock %}
@@ -14,6 +15,20 @@
     <div class="hero-actions">
         <a href="{% url 'contact' %}" class="btn btn-green" data-umami-event="contact-general" data-umami-event-from="ecosystem">Partner With Us</a>
         <a href="#partner-categories" class="btn btn-outline">Meet our partners</a>
+    </div>
+</section>
+
+<section class="home-section partner-logo-strip reveal">
+    <h2>Partner logos</h2>
+    <div class="partner-logo-grid">
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/camden-education-trust.png' %}" alt="Camden Education Trust" width="255" height="90" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/google.png' %}" alt="Google" width="288" height="96" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/innovation-village.png' %}" alt="Innovation Village" width="238" height="96" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/microbit.png' %}" alt="Micro:bit Educational Foundation" width="173" height="96" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/mtn.png' %}" alt="MTN" width="96" height="96" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/national-schools-championship.png' %}" alt="National Schools Championship" width="135" height="84" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/scratch-foundation.png' %}" alt="Scratch Foundation" width="211" height="90" loading="lazy" onerror="this.remove()"></figure>
+        <figure class="partner-logo-card"><img src="{% static 'images/partners/technovation-girls-uganda.png' %}" alt="Technovation Girls Uganda" width="360" height="94" loading="lazy" onerror="this.remove()"></figure>
     </div>
 </section>
 
@@ -83,7 +98,6 @@
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-seedling"></i></div>
             <h3>Funding and Impact Partners</h3>
             <p>Organisations supporting access and scale.</p>
-            <p class="partner-name">Mastercard Foundation</p>
             <p class="partner-name">MTN Foundation / MTN Uganda</p>
             <p class="partner-name">UNECA</p>
             <div class="logo-placeholder">Partner logos coming soon</div>

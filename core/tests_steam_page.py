@@ -319,6 +319,63 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         self.assertNotContains(self.response, 'kacyberpay')
 
 
+@override_settings(STEAM_EXPERIENCE_PUBLIC=False)
+class SteamMpassScreensTests(SimpleTestCase):
+    def setUp(self):
+        self.response = self.client.get(STEAM_URL)
+        self.html = self.response.content.decode()
+        self.mpass_block = self._mpass_block()
+
+    def _mpass_block(self):
+        start = self.html.index('<div class="steam-mpass-screens">')
+        end = self.html.index('</section>', start)
+        return self.html[start:end]
+
+    def test_three_mpass_files_exist_and_are_within_size_limit(self):
+        from pathlib import Path
+
+        from django.conf import settings
+
+        images_dir = Path(settings.BASE_DIR) / 'static' / 'images'
+        for name in ('mpass-journey.jpg', 'mpass-modules.jpg', 'mpass-passport.jpg'):
+            with self.subTest(name=name):
+                path = images_dir / name
+                self.assertTrue(path.exists(), f'{path.name} is missing')
+                self.assertLess(path.stat().st_size, 120_000, f'{path.name} exceeds 120 KB')
+
+    def test_mpass_row_heading_and_demo_line_render(self):
+        self.assertContains(self.response, '<div class="steam-mpass-row">')
+        self.assertContains(self.response, 'A look inside M-Pass')
+        self.assertContains(self.response, 'Example screens from a demo account.')
+        for name in ('mpass-journey.jpg', 'mpass-modules.jpg', 'mpass-passport.jpg'):
+            self.assertContains(self.response, f'<img src="/static/images/{name}"')
+
+    def test_mpass_images_have_meaningful_alt_text(self):
+        alts = re.findall(
+            r'<img src="/static/images/mpass-(?:journey|modules|passport)\.jpg" alt="([^"]*)"',
+            self.mpass_block,
+        )
+        self.assertEqual(len(alts), 3)
+        for alt in alts:
+            self.assertTrue(alt.strip(), 'each M-Pass image must have alt text')
+
+    def test_mindset_learn_words_do_not_appear_in_the_mpass_section(self):
+        lower_block = self.mpass_block.lower()
+        self.assertNotRegex(lower_block, r'mindset\s*learn')
+        self.assertNotIn('mindsetlearn', lower_block)
+
+    def test_page_renders_when_an_mpass_image_file_is_missing(self):
+        with mock.patch(
+            'django.contrib.staticfiles.storage.staticfiles_storage.url',
+            side_effect=lambda name: f'/static/{name}',
+        ):
+            response = self.client.get(STEAM_URL)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Example screens from a demo account.')
+        self.assertContains(response, '/static/images/mpass-journey.jpg')
+        self.assertContains(response, 'onerror="this.remove()"')
+
+
 @override_settings(STEAM_EXPERIENCE_PUBLIC=True)
 class PublicSteamEventJsonLdTests(SimpleTestCase):
     def test_event_jsonld_uses_registration_urls_and_dictionary_fees(self):
