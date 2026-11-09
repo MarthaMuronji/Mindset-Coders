@@ -60,7 +60,7 @@ class PartnerLogoTests(SimpleTestCase):
         strip = self._strip(response.content.decode(), '<div class="trusted-logos">')
         self.assertContains(response, 'images/partners/google.png')
         self.assertContains(response, 'images/partners/mtn.png')
-        self.assertIn('Mastercard Foundation', strip)
+        self.assertNotIn('Mastercard Foundation', strip)
         self.assertIn('Stanbic Bank', strip)
         self.assertIn('WRO Global', strip)
         self.assertNotIn('>Google</span>', strip)
