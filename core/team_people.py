@@ -414,3 +414,35 @@ def create_command_invitee(full_name, email, role):
     )
     path = invite_path(user)
     return user, path
+
+
+def resend_command_invitee(email):
+    validate_email(email)
+    User = get_user_model()
+    person = User._default_manager.filter(email__iexact=email).first()
+    if person is None:
+        raise forms.ValidationError(
+            'No person with this email address exists. '
+            'Run the command again without --resend to invite a new person.'
+        )
+    if not _current_team_role(person):
+        raise forms.ValidationError(
+            'A person with this email address exists but is not a team member. Nothing was changed.'
+        )
+    if not person.is_active:
+        raise forms.ValidationError(
+            'This person is switched off. Switch them on again before issuing a new invite link. Nothing was changed.'
+        )
+    if person.has_usable_password():
+        raise forms.ValidationError(
+            'This person has already set a password. Nothing was changed.'
+        )
+    with transaction.atomic():
+        record_audit_event(
+            'invite_sent',
+            object_type='User',
+            object_id=person.pk,
+            detail='Invitation link created',
+            username='management command',
+        )
+    return person, invite_path(person)

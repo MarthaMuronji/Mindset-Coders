@@ -8,7 +8,8 @@ from urllib.parse import urlsplit
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.core.management.base import CommandError
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse, resolve
 
 from .models import AuditEvent, ContactMessage, Registration
@@ -465,3 +466,162 @@ class TeamInviteEmailTests(TestCase):
         self.assertIn('https://example.test/team/welcome/example/token/', payload['textContent'])
         self.assertNotIn('Learner', payload['textContent'])
         self.assertNotIn('Parent', payload['textContent'])
+
+
+class TeamInviteResendTests(TestCase):
+    def invite_new_person(self, email, name='Command Owner'):
+        output = StringIO()
+        call_command('team_invite', name, email, 'Owner', stdout=output)
+        return get_user_model().objects.get(email=email)
+
+    def test_resend_reissues_the_link_for_a_person_without_a_password(self):
+        self.invite_new_person('resend@example.test', 'Resend Owner')
+        person = get_user_model().objects.get(email='resend@example.test')
+        self.assertFalse(person.has_usable_password())
+
+        output = StringIO()
+        call_command(
+            'team_invite',
+            'Resend Owner',
+            'resend@example.test',
+            'Owner',
+            '--resend',
+            stdout=output,
+        )
+        path = output.getvalue().strip()
+        self.assertTrue(path.startswith('/team/welcome/'))
+        self.assertEqual(resolve(path).url_name, 'team_welcome')
+
+        person.refresh_from_db()
+        self.assertFalse(person.has_usable_password())
+        self.assertFalse(person.is_staff)
+        self.assertEqual(person.groups.filter(name__in=TEAM_ROLES).count(), 1)
+        self.assertEqual(AuditEvent.objects.filter(
+            action='invite_sent',
+            object_id=str(person.pk),
+        ).count(), 2)
+
+    def test_resend_refused_when_the_person_already_has_a_password(self):
+        person = self.invite_new_person('password-owner@example.test')
+        person.set_password('A-long-team-password-782!')
+        person.save()
+
+        output = StringIO()
+        with self.assertRaises(CommandError) as caught:
+            call_command(
+                'team_invite',
+                'Resend Owner',
+                'password-owner@example.test',
+                'Owner',
+                '--resend',
+                stdout=output,
+            )
+        self.assertIn('already set a password', str(caught.exception))
+
+        person.refresh_from_db()
+        self.assertTrue(person.has_usable_password())
+        self.assertEqual(person.groups.filter(name__in=TEAM_ROLES).count(), 1)
+        self.assertEqual(AuditEvent.objects.filter(
+            action='invite_sent',
+            object_id=str(person.pk),
+        ).count(), 1)
+
+    def test_without_resend_refuses_an_existing_email(self):
+        self.invite_new_person('taken@example.test', 'First Person')
+        with self.assertRaises(CommandError) as caught:
+            call_command(
+                'team_invite',
+                'Second Person',
+                'taken@example.test',
+                'Owner',
+                stdout=StringIO(),
+            )
+        self.assertIn('already exists', str(caught.exception))
+
+        User = get_user_model()
+        self.assertEqual(User.objects.filter(email__iexact='taken@example.test').count(), 1)
+        self.assertEqual(User.objects.get(email__iexact='taken@example.test').first_name, 'First')
+        self.assertEqual(AuditEvent.objects.filter(action='invite_sent').count(), 1)
+
+    def test_resend_refused_for_a_person_who_is_not_a_team_member(self):
+        get_user_model().objects.create_user(
+            username='outsider',
+            email='outsider@example.test',
+        )
+        with self.assertRaises(CommandError) as caught:
+            call_command(
+                'team_invite',
+                'Outsider',
+                'outsider@example.test',
+                'Owner',
+                '--resend',
+                stdout=StringIO(),
+            )
+        self.assertIn('not a team member', str(caught.exception))
+        self.assertFalse(AuditEvent.objects.filter(action='invite_sent').exists())
+
+    def test_resend_refused_for_a_switched_off_person(self):
+        person = self.invite_new_person('off@example.test')
+        person.is_active = False
+        person.save(update_fields=['is_active'])
+
+        with self.assertRaises(CommandError) as caught:
+            call_command(
+                'team_invite',
+                'Off Person',
+                'off@example.test',
+                'Owner',
+                '--resend',
+                stdout=StringIO(),
+            )
+        self.assertIn('switched off', str(caught.exception))
+
+        person.refresh_from_db()
+        self.assertFalse(person.is_active)
+        self.assertEqual(AuditEvent.objects.filter(
+            action='invite_sent',
+            object_id=str(person.pk),
+        ).count(), 1)
+
+
+class LiveScriptSecretKeyTests(SimpleTestCase):
+    CONNECTION = 'postgresql://ci-user:db-pass@localhost:5432/mindset'
+    SECRET = 'live-secret-key-value-9f8e7d'
+
+    @staticmethod
+    def run_live(command_args, stdin_text):
+        import subprocess
+        import sys
+        from pathlib import Path
+
+        from django.conf import settings
+
+        environment = os.environ.copy()
+        environment['DJANGO_SETTINGS_MODULE'] = 'mindset_project.settings'
+        return subprocess.run(
+            [sys.executable, str(Path(settings.BASE_DIR) / 'live.py')] + command_args,
+            input=stdin_text,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            env=environment,
+        )
+
+    def test_live_secret_key_is_never_printed_on_success(self):
+        result = self.run_live(['check'], self.CONNECTION + '\n' + self.SECRET + '\n')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        combined = result.stdout + result.stderr
+        self.assertNotIn(self.SECRET, combined)
+        self.assertNotIn('db-pass', combined)
+        self.assertIn('Connecting to: localhost', result.stdout)
+
+    def test_live_secret_key_is_never_printed_when_the_command_fails(self):
+        result = self.run_live(
+            ['team_invite', 'A B', 'not-an-email', 'Owner'],
+            self.CONNECTION + '\n' + self.SECRET + '\n',
+        )
+        self.assertNotEqual(result.returncode, 0)
+        combined = result.stdout + result.stderr
+        self.assertNotIn(self.SECRET, combined)
+        self.assertNotIn(self.CONNECTION, combined)
+        self.assertIn('valid email', combined)
