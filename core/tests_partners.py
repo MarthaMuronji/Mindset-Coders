@@ -3,6 +3,11 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
+
+FELLOWSHIP_LINE = (
+    'Mindset Coders is a venture of the Mastercard Foundation EdTech Fellowship, Cohort 1.'
+)
+
 PARTNER_LOGOS = [
     ('camden-education-trust.png', 'Camden Education Trust'),
     ('google.png', 'Google'),
@@ -61,10 +66,30 @@ class PartnerLogoTests(SimpleTestCase):
         self.assertContains(response, 'images/partners/google.png')
         self.assertContains(response, 'images/partners/mtn.png')
         self.assertNotIn('Mastercard Foundation', strip)
+        partner_categories = self._strip(
+            self.client.get('/partners/').content.decode(),
+            '<section class="home-section section-tint section-decor reveal" id="partner-categories">',
+        )
+        self.assertNotIn('Mastercard Foundation', partner_categories)
         self.assertIn('Stanbic Bank', strip)
         self.assertIn('WRO Global', strip)
         self.assertNotIn('>Google</span>', strip)
         self.assertNotIn('>MTN Uganda</span>', strip)
+
+    def test_fellowship_line_is_plain_text_outside_partner_cards(self):
+        about_html = self.client.get('/about/').content.decode()
+        partners_html = self.client.get('/partners/').content.decode()
+
+        self.assertEqual(about_html.count(FELLOWSHIP_LINE), 1)
+        self.assertEqual(partners_html.count(FELLOWSHIP_LINE), 1)
+        self.assertNotIn('Mastercard Foundation', self._strip(
+            partners_html,
+            '<div class="partner-logo-grid">',
+        ))
+        self.assertLess(
+            partners_html.index(FELLOWSHIP_LINE),
+            partners_html.index('<section class="home-section partner-logo-strip'),
+        )
 
     def test_pages_render_when_a_logo_file_is_missing(self):
         with mock.patch(
