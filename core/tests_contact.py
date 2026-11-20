@@ -58,10 +58,9 @@ BREVO_ENVIRONMENT = {
 
 class ContactLinksTests(SimpleTestCase):
     def test_whatsapp_and_phone_links_render_on_each_page(self):
-        with override_settings(STEAM_PAYMENTS_ENABLED=True):
-            confirmation = self.client.get(
-                '/join/thanks/?programme=holiday&stage=build'
-            )
+        confirmation = self.client.get(
+            '/join/thanks/?programme=holiday&stage=build'
+        )
         responses = {
             'confirmation': confirmation,
             'STEAM Experience': self.client.get('/steam-experience/'),
@@ -75,24 +74,19 @@ class ContactLinksTests(SimpleTestCase):
                 self.assertContains(response, PHONE_LINK)
 
     def test_cash_instructions_only_appear_on_cash_confirmation(self):
-        with override_settings(STEAM_PAYMENTS_ENABLED=True):
-            online = self.client.get(
-                '/join/thanks/?programme=holiday&stage=build&method=online'
-            )
-            cash = self.client.get(
-                '/join/thanks/?programme=holiday&stage=build&method=cash'
-            )
-        with override_settings(STEAM_PAYMENTS_ENABLED=False):
-            plain = self.client.get(
-                '/join/thanks/?programme=holiday&stage=build&method=cash'
-            )
+        online = self.client.get(
+            '/join/thanks/?programme=holiday&stage=build&method=online'
+        )
+        cash = self.client.get(
+            '/join/thanks/?programme=holiday&stage=build&method=cash'
+        )
 
         self.assertContains(
             cash,
             'Pay the fee in cash at Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Monday to Saturday, 8:00 am to 6:00 pm.',
         )
         self.assertNotContains(online, 'Pay the fee in cash at')
-        self.assertNotContains(plain, 'Pay the fee in cash at')
+        self.assertContains(cash, 'Your registration is confirmed once we receive your payment.')
         self.assertNotContains(
             online, 'You can also pay in cash. Contact our team to arrange it.'
         )
@@ -100,7 +94,7 @@ class ContactLinksTests(SimpleTestCase):
     def test_payment_options_include_mobile_money_and_cash(self):
         self.assertEqual(
             STEAM_EXPERIENCE['payment_options'],
-            'Choose how to pay when you register: online by Mobile Money, or in cash.',
+            'Choose how to pay when you register: Mobile Money or cash at the venue.',
         )
 
 

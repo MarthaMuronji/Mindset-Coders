@@ -29,4 +29,4 @@ def steam_promo(request):
             name = match.url_name or ''
             if name in EXCLUDED_URL_NAMES or name.startswith('review'):
                 show = False
-    return {'steam_promo': show, 'steam_start_date': '2026-11-16'}
+    return {'steam_promo': show, 'steam_start_date': '2026-11-23'}

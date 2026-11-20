@@ -44,7 +44,6 @@ PROGRAMMES = ('holiday', 'weekend', 'school', 'unsure')
 STAGES = ('discover', 'build', 'innovate', 'full')
 
 
-@override_settings(STEAM_PAYMENTS_ENABLED=True)
 class JoinPageTests(SimpleTestCase):
     """The Join form: rendering, saving, validation and the spam trap."""
 
@@ -530,7 +529,7 @@ class RegistrationNotificationTests(SimpleTestCase):
         self.assertIn('Holiday STEAM Experience', body)
         self.assertIn('http://testserver/team/registrations/1/', body)
         self.assertNotIn('/admin/', body)
-        self.assertIn('Payment method: Cash', body)
+        self.assertIn('Payment method: Cash at the venue', body)
         self.assertIn('Amount due: UGX 400000', body)
 
     def test_body_carries_no_personal_details(self):

@@ -155,7 +155,7 @@ STEAM_EXPERIENCE = {
         'Explorers: 12 to 14 years',
         'Young Innovators: 15 to 19 years',
     ],
-    'start_date': '16 November 2026',
+    'start_date': '23 November 2026',
     'end_date': '29 January 2027',
     'schedule': 'Monday to Friday, 8:00 am to 1:00 pm',
     'duration': 'Nine teaching weeks',
@@ -163,36 +163,10 @@ STEAM_EXPERIENCE = {
     'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
     'venues': ['Amreena Mall, Level 3, Room 304, Kyanja Ring Road'],
     'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
-    'payment_options': 'Choose how to pay when you register: online by Mobile Money, or in cash.',
+    'payment_options': 'Choose how to pay when you register: Mobile Money or cash at the venue.',
     'cash_instructions': 'Pay the fee in cash at Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Monday to Saturday, 8:00 am to 6:00 pm.',
     'cash_hold_note': '',
     'discount_note': 'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
-    'payment_links': [
-        {
-            'key': 'discover',
-            'label': 'Discover, 2 weeks',
-            'amount_text': 'UGX 300,000',
-            'url': 'https://kacyberpay.com/pay/f47mjrdxje',
-        },
-        {
-            'key': 'build',
-            'label': 'Build, 3 weeks',
-            'amount_text': 'UGX 400,000',
-            'url': 'https://kacyberpay.com/pay/ys7azaf25a',
-        },
-        {
-            'key': 'innovate',
-            'label': 'Innovate, 4 weeks',
-            'amount_text': 'UGX 500,000',
-            'url': 'https://kacyberpay.com/pay/gjuffbu4je',
-        },
-        {
-            'key': 'full',
-            'label': 'Full journey, paid upfront',
-            'amount_text': 'UGX 1,100,000',
-            'url': 'https://kacyberpay.com/pay/hc6sn7yqxq',
-        },
-    ],
     'spaces_note': 'Spaces are limited.',
     'gallery': [
         {'file': 'images/gallery-1.jpg', 'alt': 'Boys assembling a LEGO robot in the computer lab'},
@@ -350,7 +324,7 @@ STEAM_EXPERIENCE = {
         },
         {
             'question': 'How do I pay?',
-            'answer': 'Pay online by Mobile Money. You can also pay in cash. Register your child first, then you will see your fee and the payment button.',
+            'answer': 'Choose Mobile Money or cash at the venue. For Mobile Money, dial *244*9#. Merchant code: 125730 (Mindset Coders Uganda).',
         },
         {
             'question': 'What happens if my child misses a session?',
@@ -369,7 +343,6 @@ def steam_experience(request):
     response = render(request, 'steam_experience.html', {
         'content': STEAM_EXPERIENCE,
         'is_public': is_public,
-        'steam_payments_enabled': getattr(settings, 'STEAM_PAYMENTS_ENABLED', False),
         'event_description': 'Give your child a holiday filled with robotics, artificial intelligence, coding, creative arts and entrepreneurship. Join the Mindset STEAM Experience in Kampala.',
         # Analytics stay off while the page is not public yet
         'hide_umami': not is_public,

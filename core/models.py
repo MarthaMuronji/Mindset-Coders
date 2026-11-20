@@ -126,6 +126,11 @@ class Registration(models.Model):
         ('cash', 'Cash'),
     ]
 
+    PAYMENT_METHOD_DISPLAY_CHOICES = [
+        ('online', 'Mobile Money (*244*9#)'),
+        ('cash', 'Cash at the venue'),
+    ]
+
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('part_paid', 'Part paid'),
@@ -160,6 +165,12 @@ class Registration(models.Model):
     consent = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     handled = models.BooleanField(default=False)
+
+    def get_payment_method_display(self):
+        return dict(self.PAYMENT_METHOD_DISPLAY_CHOICES).get(
+            self.payment_method,
+            self.payment_method,
+        )
 
     class Meta:
         ordering = ['-created_at']

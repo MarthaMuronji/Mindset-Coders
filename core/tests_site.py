@@ -12,7 +12,7 @@ SOCIAL_LINKS = {
 
 
 class SteamExperienceSiteTests(SimpleTestCase):
-    @override_settings(STEAM_EXPERIENCE_PUBLIC=False, STEAM_PAYMENTS_ENABLED=False)
+    @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
     def test_dates_and_break_appear(self):
         response = self.client.get('/steam-experience/')
 
@@ -23,35 +23,29 @@ class SteamExperienceSiteTests(SimpleTestCase):
         self.assertContains(response, 'Classes resume on Monday, 4 January 2027.')
         self.assertContains(response, 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.')
 
-    @override_settings(STEAM_EXPERIENCE_PUBLIC=False, STEAM_PAYMENTS_ENABLED=False)
-    def test_payment_links_are_hidden_and_sibling_note_is_in_journey_and_faq(self):
+    @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
+    def test_payment_options_and_sibling_note_are_in_journey_and_faq(self):
         response = self.client.get('/steam-experience/')
 
-        for payment_url in (
-            'https://kacyberpay.com/pay/f47mjrdxje',
-            'https://kacyberpay.com/pay/ys7azaf25a',
-            'https://kacyberpay.com/pay/gjuffbu4je',
-            'https://kacyberpay.com/pay/hc6sn7yqxq',
-        ):
-            self.assertNotContains(response, payment_url)
-        for payment_label in (
-            'Discover, 2 weeks - UGX 300,000',
-            'Build, 3 weeks - UGX 400,000',
-            'Innovate, 4 weeks - UGX 500,000',
-            'Full journey, paid upfront - UGX 1,100,000',
-        ):
-            self.assertNotContains(response, payment_label)
-        self.assertNotContains(response, 'Register your child first, then pay with the option you chose.')
+        self.assertNotContains(response, 'data-umami-event="pay-click"')
+        self.assertContains(
+            response,
+            'Choose how to pay when you register: Mobile Money or cash at the venue.',
+        )
+        self.assertContains(
+            response,
+            'Choose Mobile Money or cash at the venue. For Mobile Money, dial *244*9#. Merchant code: 125730 (Mindset Coders Uganda).',
+        )
         self.assertContains(
             response,
             'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
             count=2,
         )
-        self.assertContains(response, 'Register your child first. Our team will tell you how to pay.')
+        self.assertContains(response, 'Register your child first. You will see your fee and payment options on the next page.')
         self.assertContains(response, 'Read the refund and cancellation policy')
 
-    @override_settings(STEAM_EXPERIENCE_PUBLIC=False, STEAM_PAYMENTS_ENABLED=True)
-    def test_enabled_payment_copy_is_shown(self):
+    @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
+    def test_registration_copy_is_always_shown(self):
         response = self.client.get('/steam-experience/')
 
         self.assertContains(response, 'Register your child first. You will see your fee and payment options on the next page.')

@@ -117,7 +117,6 @@ class RegistrationForm(forms.ModelForm):
         choices=(),
         required=False,
         label='How will you pay?',
-        help_text='You can pay online straight after registering, or in cash during office hours.',
         widget=forms.RadioSelect,
         error_messages={'required': 'Please choose how you will pay.'},
     )
@@ -144,29 +143,21 @@ class RegistrationForm(forms.ModelForm):
     def __init__(
         self,
         *args,
-        payments_enabled=None,
-        cash_instructions='',
         **kwargs
     ):
         super().__init__(*args, **kwargs)
-        if payments_enabled is None:
-            payments_enabled = getattr(settings, 'STEAM_PAYMENTS_ENABLED', False)
         programme = (
             self.data.get('programme')
             if self.is_bound
             else self.initial.get('programme')
         )
-        self.show_payment_method = (
-            payments_enabled and programme in ('', None, 'holiday')
-        )
-        self.payment_method_required = (
-            payments_enabled and programme == 'holiday'
-        )
+        self.show_payment_method = programme in ('', None, 'holiday')
+        self.payment_method_required = programme == 'holiday'
         if self.show_payment_method:
-            choices = [('online', 'Pay online by Mobile Money')]
-            if cash_instructions:
-                choices.append(('cash', 'Pay in cash'))
-            self.fields['payment_method'].choices = choices
+            self.fields['payment_method'].choices = [
+                ('online', 'Mobile Money (*244*9#)'),
+                ('cash', 'Cash at the venue'),
+            ]
             self.fields['payment_method'].required = (
                 self.payment_method_required
             )
@@ -208,9 +199,8 @@ def _build_registration_text(registration, admin_url):
     The team can open the entry in the admin, so the email itself never
     needs a name, an age, a phone number or an address.
     """
-    payment_method = dict(Registration.PAYMENT_METHOD_CHOICES).get(
-        registration.payment_method,
-        'Not selected',
+    payment_method = (
+        registration.get_payment_method_display() or 'Not selected'
     )
     amount_due = (
         'UGX {}'.format(registration.amount_due)
@@ -289,10 +279,6 @@ def join(request):
         form_timestamp = request.POST.get('form_timestamp', '')
         form = RegistrationForm(
             request.POST,
-            payments_enabled=settings.STEAM_PAYMENTS_ENABLED,
-            cash_instructions=views.STEAM_EXPERIENCE.get(
-                'cash_instructions', ''
-            ),
         )
         if not is_form_timestamp_valid(form_timestamp):
             form.add_error(
@@ -347,10 +333,6 @@ def join(request):
             initial['stage'] = stage
         form = RegistrationForm(
             initial=initial,
-            payments_enabled=settings.STEAM_PAYMENTS_ENABLED,
-            cash_instructions=views.STEAM_EXPERIENCE.get(
-                'cash_instructions', ''
-            ),
         )
     return render(
         request,
@@ -362,43 +344,28 @@ def join(request):
 def join_thanks(request):
     """The page shown after a registration has been stored.
 
-    The Holiday STEAM Experience registration shows its payment button
-    only when the stage is one of ours and payments are switched on. The
-    matching link comes from the STEAM Experience dictionary, whose
-    entries carry a key for each stage. Every other registration lands
-    on the plain thank you page.
+    Holiday STEAM Experience registrations show their fee and payment
+    instructions for a valid stage. Every other registration lands on the
+    plain thank you page.
     """
     programme = request.GET.get('programme', '')
     stage = request.GET.get('stage', '')
     payment_method = request.GET.get('method', 'online')
     stage_labels = dict(Registration.STAGE_CHOICES)
     stage_label = stage_labels.get(stage, '')
-    payment_link = None
-    cash_confirmation = False
-    if (
-        programme == 'holiday'
-        and stage_label
-        and settings.STEAM_PAYMENTS_ENABLED
-    ):
-        for link in views.STEAM_EXPERIENCE.get('payment_links', []):
-            if link.get('key') == stage:
-                payment_link = link
-                break
-        if (
-            payment_method == 'cash'
-            and payment_link
-            and views.STEAM_EXPERIENCE.get('cash_instructions')
-        ):
-            cash_confirmation = True
-        elif payment_method != 'online':
-            payment_link = None
+    fee = STAGE_FEES.get(stage)
+    holiday_confirmation = (
+        programme == 'holiday' and bool(stage_label) and fee is not None
+    )
+    cash_confirmation = holiday_confirmation and payment_method == 'cash'
     return render(request, 'join_thanks.html', {
         # The button to the STEAM Experience page only appears once that
         # page is public, the same rule the rest of the site follows
         'steam_public': settings.STEAM_EXPERIENCE_PUBLIC,
         'programme': programme,
         'stage_label': stage_label,
-        'payment_link': payment_link,
+        'fee_text': 'UGX {:,}'.format(fee) if fee is not None else '',
+        'holiday_confirmation': holiday_confirmation,
         'cash_confirmation': cash_confirmation,
         'cash_instructions': views.STEAM_EXPERIENCE.get(
             'cash_instructions', ''
