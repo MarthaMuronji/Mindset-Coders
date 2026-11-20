@@ -4605,16 +4605,16 @@ a.build-card:focus-visible {
 }
 
 .steam-popup-register {
-    border: 1.5px solid #1E7A38;
-    background: #1E7A38;
+    border: 1.5px solid var(--green-btn);
+    background: var(--green-btn);
     color: var(--white);
-    box-shadow: 0 4px 12px rgba(30, 122, 56, 0.2);
+    box-shadow: 0 4px 14px rgba(var(--navy-rgb), 0.3);
 }
 
 .steam-popup-register:hover,
 .steam-popup-register:focus-visible {
-    border-color: #18622D;
-    background: #18622D;
+    border-color: var(--green-btn-hover);
+    background: var(--green-btn-hover);
     color: var(--white);
 }
 
