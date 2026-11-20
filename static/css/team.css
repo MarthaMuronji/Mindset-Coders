@@ -157,6 +157,13 @@
     color: #9c2c2c;
 }
 
+/* The sign in error box sits on the navy errorlist background, so the login
+   page gives it white text on the dark red instead, about 7.5 to 1. */
+.team-login-panel .team-form > .team-errors ul {
+    background: #9c2c2c;
+    color: var(--white);
+}
+
 .team-flashes {
     margin-bottom: 18px;
     padding: 12px 16px;
