@@ -4103,282 +4103,187 @@ a.build-card:focus-visible {
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 0;
+    border: none;
     border-radius: 18px;
     background: var(--white);
     color: var(--navy-dark);
+    box-shadow: 0 18px 48px rgba(var(--navy-dark-rgb), 0.35);
+    margin: auto;
+}
+
+.steam-popup::backdrop {
+    background: rgba(var(--navy-dark-rgb), 0.55);
+    backdrop-filter: blur(2px);
 }
 
 .steam-popup-body {
+    position: relative;
     padding: 0;
 }
 
-.steam-popup-top {
+.steam-popup-banner {
+    width: 100%;
+    height: 72px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 55%, var(--green-dark) 100%);
     position: relative;
-    padding: 28px;
-    border-radius: 18px 18px 0 0;
-    background: linear-gradient(135deg, var(--navy-dark), var(--navy));
-    color: var(--white);
 }
 
 .steam-popup-close {
-    z-index: 3;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(var(--white-rgb), 0.2);
     color: var(--white);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
 .steam-popup-close:hover,
 .steam-popup-close:focus-visible {
-    background: rgba(var(--white-rgb), 0.16);
+    background: rgba(var(--white-rgb), 0.4);
 }
 
-.steam-popup-kicker {
-    display: inline-flex;
-    align-items: center;
-    min-height: 28px;
-    margin-bottom: 12px;
-    padding: 4px 12px;
-    border: 1px solid rgba(var(--white-rgb), 0.5);
-    border-radius: 999px;
-    background: var(--green-light);
-    color: var(--green-dark);
+.steam-popup-content {
+    padding: 22px 24px 26px;
+}
+
+.steam-popup-eyebrow {
+    display: inline-block;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+}
+
+.steam-popup-heading {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin: 0 0 10px;
+    line-height: 1.25;
 }
 
 .steam-popup-countdown {
     display: flex;
     align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0 10px;
-    margin: 0 42px 10px 0;
-    color: var(--white);
-    font-family: 'Poppins', sans-serif;
-    font-weight: 800;
-    line-height: 1.08;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .steam-popup-countdown-value {
-    color: var(--green);
-    font-size: 56px;
-    overflow-wrap: anywhere;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--navy);
 }
 
 .steam-popup-countdown-label {
-    color: var(--white);
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 600;
+    color: var(--text-muted);
 }
 
 .steam-popup-countdown-label[hidden] {
     display: none;
 }
 
-.steam-popup h2 {
-    margin: 0;
-    padding: 0;
-    color: var(--white);
-    font-family: 'Poppins', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.steam-popup-details {
-    padding: 22px 28px 24px;
-    background: var(--white);
-    color: var(--navy-dark);
-}
-
-.steam-popup-weeks {
-    margin-bottom: 18px;
-}
-
-.steam-popup-weeks-bar {
-    display: flex;
-    align-items: stretch;
-    gap: 4px;
-    width: 100%;
-    min-height: 18px;
-}
-
-.steam-popup-week {
-    flex: 1 1 0;
-    min-width: 0;
-    min-height: 18px;
-    border-radius: 4px;
-    transform: scaleX(0);
-    transform-origin: left center;
-}
-
-.steam-popup-week--discover {
-    background: var(--green);
-}
-
-.steam-popup-week--build {
-    background: var(--green);
-}
-
-.steam-popup-week--innovate {
-    background: var(--navy);
-}
-
-.steam-popup-week-gap {
-    flex: 0 0 10px;
-    min-height: 18px;
-    border: 1px solid var(--text-muted);
-    border-radius: 3px;
-    background: repeating-linear-gradient(135deg, var(--white) 0 3px, var(--neutral-mid) 3px 5px);
-}
-
-.steam-popup-stage-labels {
-    display: flex;
-    gap: 4px;
-    margin-top: 7px;
-    color: var(--navy);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.3;
-}
-
-.steam-popup-stage-labels span:nth-child(1) {
-    flex: 2 1 0;
-}
-
-.steam-popup-stage-labels span:nth-child(2) {
-    flex: 3 1 0;
-}
-
-.steam-popup-stage-labels span:nth-child(3) {
-    flex: 4 1 0;
-    margin-left: 10px;
-}
-
-.steam-popup-facts {
-    display: grid;
-    gap: 9px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.steam-popup-facts li {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    color: var(--navy-dark);
+.steam-popup-stage {
+    display: inline-block;
     font-size: 14px;
-    line-height: 1.45;
-}
-
-.steam-popup-facts i {
-    flex: 0 0 18px;
-    margin-top: 3px;
-    color: var(--green-dark);
-    text-align: center;
-}
-
-.steam-popup-price {
-    margin: 16px 0 14px;
-    color: var(--navy);
-    font-size: 15px;
     font-weight: 700;
+    color: var(--navy);
+    background: var(--green-light);
+    border: 1px solid var(--green-border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.steam-popup-summary {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--navy);
+    margin: 0 0 20px;
 }
 
 .steam-popup-actions {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    gap: 12px;
+    align-items: center;
 }
 
-.steam-popup-primary {
-    display: flex;
+.steam-popup-learn,
+.steam-popup-register {
+    flex: 1 1 0;
+    text-align: center;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: 100%;
-    min-height: 48px;
-    border: 1px solid var(--navy);
-    border-radius: 8px;
-    background: var(--navy);
-    color: var(--white);
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    min-height: 44px;
 }
 
-.steam-popup-primary:hover,
-.steam-popup-primary:focus-visible {
+.steam-popup-learn {
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid var(--navy);
+}
+
+.steam-popup-learn:hover,
+.steam-popup-learn:focus-visible {
+    background: var(--neutral-surface);
+    color: var(--navy-dark);
+}
+
+.steam-popup-register {
+    background: var(--navy);
+    color: var(--white);
+    border: 1.5px solid var(--navy);
+}
+
+.steam-popup-register:hover,
+.steam-popup-register:focus-visible {
     background: var(--navy-dark);
     color: var(--white);
 }
 
-.steam-popup-primary i {
-    font-size: 13px;
-}
-
-.steam-popup-secondary {
-    width: 100%;
-    min-height: 44px;
-    padding: 8px;
-    border: 0;
-    background: transparent;
-    color: var(--navy);
-    font-family: 'Inter', sans-serif;
+.steam-now-running {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    border: 1px solid var(--green-border);
+    border-radius: 6px;
     font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
+    font-weight: 700;
+    margin-bottom: 14px;
 }
 
-.steam-popup-secondary:hover,
-.steam-popup-secondary:focus-visible {
-    color: var(--navy);
-    text-decoration: underline;
-}
-
-.steam-popup[open] .steam-popup-week {
-    animation: steam-popup-week-fill 0.24s ease-out both;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(2) {
-    animation-delay: 0.07s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(3) {
-    animation-delay: 0.14s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(4) {
-    animation-delay: 0.21s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(5) {
-    animation-delay: 0.28s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(7) {
-    animation-delay: 0.35s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(8) {
-    animation-delay: 0.42s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(9) {
-    animation-delay: 0.49s;
-}
-
-.steam-popup[open] .steam-popup-week:nth-child(10) {
-    animation-delay: 0.56s;
-}
-
-@keyframes steam-popup-week-fill {
-    to {
-        transform: scaleX(1);
+@media (max-width: 420px) {
+    .steam-popup-actions {
+        flex-direction: column;
+    }
+    .steam-popup-learn,
+    .steam-popup-register {
+        width: 100%;
     }
 }
 
@@ -4413,103 +4318,9 @@ a.build-card:focus-visible {
 }
 
 @media (max-width: 600px) {
-    .steam-popup {
-        width: 100%;
-        max-width: none;
-        max-height: 90vh;
-        max-height: 90dvh;
-        margin: auto 0 0;
-        border-radius: 18px 18px 0 0;
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    .steam-popup-top {
-        padding: 22px 20px 20px;
-    }
-
-    .steam-popup-countdown-value {
-        font-size: 44px;
-    }
-
-    .steam-popup-countdown-label {
-        font-size: 16px;
-    }
-
-    .steam-popup h2 {
-        font-size: 21px;
-    }
-
-    .steam-popup-details {
-        padding: 18px 20px 22px;
-    }
-
     .steam-chip-corner {
         right: 16px;
         max-width: none;
         margin-bottom: 0;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .steam-popup[open] .steam-popup-week {
-        animation: none;
-        transform: none;
-    }
-}
-
-.steam-popup-stage-labels {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(4, minmax(0, 1fr));
-    gap: 4px;
-}
-
-.steam-popup-stage-labels span {
-    min-width: 0;
-    white-space: nowrap;
-}
-
-.steam-popup-stage-labels span:nth-child(1) {
-    grid-column: 1 / span 2;
-}
-
-.steam-popup-stage-labels span:nth-child(2) {
-    grid-column: 3 / span 3;
-}
-
-.steam-popup-stage-labels span:nth-child(3) {
-    grid-column: 7 / span 4;
-    margin-left: 0;
-}
-
-.steam-popup-price {
-    margin-top: 24px;
-}
-
-@media (max-width: 599px), (max-height: 699px) {
-    .steam-popup {
-        max-height: 85vh;
-        max-height: 85dvh;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-    }
-
-    .steam-popup-top {
-        padding: 16px 18px 14px;
-    }
-
-    .steam-popup-countdown-value {
-        font-size: 40px;
-    }
-
-    .steam-popup h2 {
-        font-size: 20px;
-    }
-
-    .steam-popup-details {
-        padding: 14px 16px 16px;
-    }
-
-    .steam-popup-extra {
-        display: none !important;
     }
 }

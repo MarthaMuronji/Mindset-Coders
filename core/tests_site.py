@@ -16,12 +16,12 @@ class SteamExperienceSiteTests(SimpleTestCase):
     def test_dates_and_break_appear(self):
         response = self.client.get('/steam-experience/')
 
-        self.assertContains(response, 'Discover: 16 to 27 November 2026')
+        self.assertContains(response, 'Discover: 23 to 27 November 2026')
         self.assertContains(response, 'Build: 30 November to 18 December 2026')
-        self.assertContains(response, 'Christmas break: 21 December 2026 to 2 January 2027')
+        self.assertContains(response, 'Christmas break: 21 December 2026 to 3 January 2027')
         self.assertContains(response, 'Innovate: 4 to 29 January 2027')
         self.assertContains(response, 'Classes resume on Monday, 4 January 2027.')
-        self.assertContains(response, 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.')
+        self.assertContains(response, 'The programme follows the Discover, Build, Innovate pathway across eight teaching weeks.')
 
     @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
     def test_payment_options_and_sibling_note_are_in_journey_and_faq(self):

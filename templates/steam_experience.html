@@ -44,6 +44,9 @@
         <div class="steam-hero-layout">
             <div class="steam-hero-copy">
                 <h1>This holiday, let your child discover what they're capable of creating.</h1>
+                {% if current_stage_line %}
+                <p class="steam-now-running">{{ current_stage_line }}</p>
+                {% endif %}
                 <p>A hands-on STEAM experience where children explore robotics, artificial intelligence, coding, creative arts and entrepreneurship.</p>
                 <p>From their first discovery to building real projects and presenting their own innovations, every child gets the opportunity to think, experiment and create.</p>
                 <p class="steam-hero-facts">
@@ -93,7 +96,7 @@
                 </div>
                 <p class="steam-stage-meta">
                     {% if stage.dates %}<span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> {{ stage.name }}: {{ stage.dates }}</span>{% endif %}
-                    {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} weeks</span>{% endif %}
+                    {% if stage.weeks %}<span><i class="fa-solid fa-clock" aria-hidden="true"></i> {{ stage.weeks }} {% if stage.weeks == 1 %}week{% else %}weeks{% endif %}</span>{% endif %}
                 </p>
                 {% if stage.fee %}<p class="steam-stage-fee">{{ stage.fee }}</p>{% endif %}
                 {% if stage.blurb %}<p>{{ stage.blurb }}</p>{% endif %}
@@ -130,7 +133,7 @@
                 {% if content.break and content.break.after == stage.name %}<span class="steam-week-gap"></span>{% endif %}
                 {% endfor %}
             </div>
-            <p class="steam-sr-only">{% for stage in content.stages %}{{ stage.weeks }} weeks of {{ stage.name }}{% if content.break and content.break.after == stage.name %}, then the {{ content.break.label }} from {{ content.break.dates }}{% endif %}{% if not forloop.last %}, then {% endif %}{% endfor %}.</p>
+            <p class="steam-sr-only">{% for stage in content.stages %}{{ stage.weeks }} {% if stage.weeks == 1 %}week{% else %}weeks{% endif %} of {{ stage.name }}{% if content.break and content.break.after == stage.name %}, then the {{ content.break.label }} from {{ content.break.dates }}{% endif %}{% if not forloop.last %}, then {% endif %}{% endfor %}.</p>
             {% if content.classes_resume %}<p>{{ content.classes_resume }}</p>{% endif %}
             {% if content.pathway_note %}<p>{{ content.pathway_note }}</p>{% endif %}
         </div>
@@ -228,6 +231,7 @@
             <div class="steam-payment-card steam-payment-options">
                 <h3>How to pay</h3>
                 <p>{{ content.payment_options }}</p>
+                {% if content.cash_instructions %}<p>{{ content.cash_instructions }}</p>{% endif %}
             </div>
             {% endif %}
             <div class="steam-payment-card steam-registration-steps">

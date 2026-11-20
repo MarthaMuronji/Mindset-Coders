@@ -145,7 +145,7 @@ class JoinPageTests(SimpleTestCase):
         self.assertEqual(registration.programme, 'holiday')
         self.assertEqual(registration.stage, 'discover')
         self.assertEqual(registration.payment_method, 'online')
-        self.assertEqual(registration.amount_due, 300000)
+        self.assertEqual(registration.amount_due, 150000)
         self.assertTrue(registration.consent)
         self.assertFalse(registration.handled)
 

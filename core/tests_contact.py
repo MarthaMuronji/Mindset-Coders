@@ -83,7 +83,7 @@ class ContactLinksTests(SimpleTestCase):
 
         self.assertContains(
             cash,
-            'Pay the fee in cash at Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Monday to Saturday, 8:00 am to 6:00 pm.',
+            'Pay the fee in cash at Mindset Coders HQ, Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Kampala. Office hours Monday to Friday, 8:00 AM to 1:00 PM. Call 0752064343 for payment assistance.',
         )
         self.assertNotContains(online, 'Pay the fee in cash at')
         self.assertContains(cash, 'Your registration is confirmed once we receive your payment.')

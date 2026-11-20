@@ -10,6 +10,9 @@
 <section class="about-hero reveal">
     <h1>Join Mindset Coders</h1>
     <p>Tell us about your child and the programme you are interested in. Our team will get in touch with the next steps.</p>
+    {% if current_stage_line %}
+    <p class="steam-now-running">{{ current_stage_line }}</p>
+    {% endif %}
 </section>
 
 <section class="contact-section">

@@ -1,3 +1,4 @@
+from datetime import date
 from unittest import mock
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
@@ -5,7 +6,7 @@ from django.urls import resolve
 
 from . import views
 from .context_processors import steam_promo
-from .views import STEAM_EXPERIENCE
+from .views import STEAM_EXPERIENCE, get_current_stage
 
 # The four pages that must never carry the Home pop up.
 OTHER_PAGES = ['/about/', '/contact/', '/for-schools/', '/steam-experience/']
@@ -143,14 +144,14 @@ class SteamJourneyTests(SimpleTestCase):
         innovate = html.index('<h3>Innovate</h3>')
         self.assertLess(innovate, marker)
 
-    def test_week_bar_has_nine_weeks(self):
+    def test_week_bar_has_eight_weeks(self):
         response = self.client.get(self.url)
-        self.assertContains(response, 'class="steam-week steam-week--', count=9)
+        self.assertContains(response, 'class="steam-week steam-week--', count=8)
 
     def test_full_journey_card_renders(self):
         response = self.client.get(self.url)
         self.assertContains(response, 'The complete holiday journey')
-        self.assertContains(response, 'UGX 1,100,000')
+        self.assertContains(response, 'UGX 1,200,000')
 
     def test_staged_payment_cards_render(self):
         response = self.client.get(self.url)
@@ -200,35 +201,29 @@ class SteamPopupTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<dialog class="steam-popup"')
         self.assertContains(response, 'id="steam-popup-title"')
-        self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
+        self.assertContains(response, 'Holiday Makers')
+        self.assertContains(response, 'STEAM Experience')
         self.assertContains(response, 'Starts 23 November')
-        self.assertContains(response, 'class="steam-popup-week ', count=9)
-        self.assertContains(response, 'class="steam-popup-week-gap"', count=1)
-        for stage in ('Discover', 'Build', 'Innovate'):
-            self.assertContains(response, f'<span>{stage}</span>')
-        self.assertContains(response, '23 November 2026 to 29 January 2027')
         self.assertContains(response, 'Ages 8 to 19')
+        self.assertContains(response, '23 November 2026 to 29 January 2027')
+        self.assertContains(response, 'UGX 150,000 per week')
         self.assertContains(response, 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road')
-        self.assertContains(response, 'Stages from UGX 300,000')
-        self.assertContains(response, 'class="steam-popup-extra"', count=2)
-        self.assertContains(response, 'class="steam-popup-price steam-popup-extra"')
-        self.assertContains(response, 'Explore the experience')
-        self.assertNotContains(response, 'Register your child')
+        self.assertContains(response, 'Spaces are limited.')
+        self.assertContains(response, 'Learn more')
+        self.assertContains(response, 'Register now')
 
     def test_shared_script_uses_per_visit_state(self):
         response = self.client.get('/')
         self.assertContains(response, "'steam-promo-visit'")
         self.assertNotContains(response, 'popupSeen')
 
-    def test_explore_button_links_to_steam_experience(self):
+    def test_buttons_link_to_steam_experience_and_registration(self):
         response = self.client.get('/')
         html = response.content.decode()
-        self.assertRegex(
-            html,
-            r'<a href="/steam-experience/" class="btn steam-popup-primary"'
-            r'[^>]*data-umami-event="steam-popup-register"[^>]*>'
-            r'Explore the experience <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>',
-        )
+        self.assertIn('class="btn steam-popup-learn"', html)
+        self.assertIn('href="/steam-experience/"', html)
+        self.assertIn('class="btn steam-popup-register"', html)
+        self.assertIn('href="/join/?programme=holiday"', html)
 
     def test_shared_script_ignores_persistent_promo_storage(self):
         response = self.client.get('/')
@@ -241,13 +236,13 @@ class SteamPopupTests(SimpleTestCase):
         response = self.client.get('/')
         # One on the pop up, one on the corner chip
         self.assertContains(response, 'aria-label="Close"', count=2)
-        self.assertContains(response, 'Maybe later')
-        self.assertContains(response, 'data-umami-event="steam-popup-close"', count=2)
+        self.assertContains(response, 'data-umami-event="steam-popup-close"', count=1)
+        self.assertContains(response, 'data-umami-event="steam-chip-close"', count=1)
 
     def test_corner_close_is_a_button_outside_the_link(self):
         response = self.client.get('/')
         html = response.content.decode()
-        link_start = html.index('<a href="/steam-experience/" class="steam-chip-link"')
+        link_start = html.index('class="steam-chip-link"')
         link_end = html.index('</a>', link_start)
         close_start = html.index('<button type="button" class="steam-chip-close"', link_end)
         close_end = html.index('>', close_start)
@@ -265,6 +260,33 @@ class SteamPopupTests(SimpleTestCase):
         response = self.client.get('/')
         self.assertContains(response, 'steam-strip')
         self.assertContains(response, 'Learn more')
+
+
+class CurrentStageHelperTests(SimpleTestCase):
+    """Test get_current_stage helper across all required dates."""
+
+    def test_current_stage_helper_all_dates(self):
+        cases = [
+            (date(2026, 11, 20), 'before', '', False, False),
+            (date(2026, 11, 23), 'discover', 'Now running: Discover, 23 to 27 November', True, False),
+            (date(2026, 11, 27), 'discover', 'Now running: Discover, 23 to 27 November', True, False),
+            (date(2026, 11, 28), 'discover', 'Now running: Discover, 23 to 27 November', True, False),
+            (date(2026, 11, 30), 'build', 'Now running: Build, 30 November to 18 December', True, False),
+            (date(2026, 12, 18), 'build', 'Now running: Build, 30 November to 18 December', True, False),
+            (date(2026, 12, 20), 'build', 'Now running: Build, 30 November to 18 December', True, False),
+            (date(2026, 12, 21), 'break', 'Innovate starts 4 January', True, False),
+            (date(2027, 1, 3), 'break', 'Innovate starts 4 January', True, False),
+            (date(2027, 1, 4), 'innovate', 'Now running: Innovate, 4 to 29 January', True, False),
+            (date(2027, 1, 29), 'innovate', 'Now running: Innovate, 4 to 29 January', True, False),
+            (date(2027, 1, 30), 'ended', '', False, True),
+        ]
+        for test_date, expected_state, expected_line, expected_running, expected_ended in cases:
+            with self.subTest(date=test_date):
+                result = get_current_stage(test_date)
+                self.assertEqual(result['state'], expected_state)
+                self.assertEqual(result['line'], expected_line)
+                self.assertEqual(result['is_running'], expected_running)
+                self.assertEqual(result['is_ended'], expected_ended)
 
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
@@ -291,11 +313,8 @@ class SteamChipTests(SimpleTestCase):
         self.assertContains(response, 'id="steam-chip-corner"')
         self.assertContains(response, 'data-umami-event="steam-chip-click"')
         self.assertContains(response, '<dialog class="steam-popup"')
-        self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
-        self.assertContains(response, 'class="steam-popup-week ', count=9)
-        self.assertContains(response, 'class="steam-popup-week-gap"', count=1)
-        for stage in ('Discover', 'Build', 'Innovate'):
-            self.assertContains(response, f'<span>{stage}</span>')
+        self.assertContains(response, 'Holiday Makers')
+        self.assertContains(response, 'STEAM Experience')
 
     def test_about_and_schools_have_the_chip_but_no_dialog(self):
         for url in ('/about/', '/for-schools/'):

@@ -101,7 +101,7 @@
     script that drives both the chip and the Home pop up.{% endcomment %}
     <aside class="steam-chip-corner" id="steam-chip-corner" hidden>
         <span class="steam-chip-dot" aria-hidden="true"></span>
-        <a href="{% url 'steam_experience' %}" class="steam-chip-link" data-umami-event="steam-chip-click" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">STEAM Experience starts <span id="steam-chip-days" data-steam-start="{{ steam_start_date }}"></span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        <a href="{% if steam_stage.is_running %}{% url 'join' %}?programme=holiday{% else %}{% url 'steam_experience' %}{% endif %}" class="steam-chip-link" data-umami-event="steam-chip-click" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}"><span id="steam-chip-text">{% if steam_stage.is_running %}STEAM Experience is now running. Register{% else %}STEAM Experience starts <span id="steam-chip-days" data-steam-start="{{ steam_start_date }}"></span>{% endif %}</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         <button type="button" class="steam-chip-close" aria-label="Close" data-umami-event="steam-chip-close" data-umami-event-from="{{ request.resolver_match.url_name|default:'page' }}">&times;</button>
     </aside>
     <script>
@@ -112,8 +112,26 @@
 
         var chip = document.getElementById('steam-chip-corner');
         var chipDays = document.getElementById('steam-chip-days');
+        var chipText = document.getElementById('steam-chip-text');
+        var chipLink = chip ? chip.querySelector('.steam-chip-link') : null;
         var dialog = document.querySelector('.steam-popup');
         var footer = document.querySelector('.site-footer');
+
+        var endRaw = '2027-01-29';
+        function isEnded() {
+            var parts = endRaw.split('-');
+            if (parts.length !== 3) return false;
+            var now = new Date();
+            var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var end = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            return today.getTime() > end.getTime();
+        }
+
+        if (isEnded()) {
+            if (dialog) dialog.remove();
+            if (chip) chip.remove();
+            return;
+        }
 
         /* Nothing to drive, and no dialog support means no pop up at all. */
         if (!chip && !dialog) return;
@@ -177,21 +195,28 @@
         }
 
         function fillCountdown(days) {
-            if (chipDays) chipDays.textContent = countdown(days);
-            if (dialog) {
-                var countdownValue = dialog.querySelector('.steam-popup-countdown-value');
-                var countdownLabel = dialog.querySelector('.steam-popup-countdown-label');
-                if (countdownValue && countdownLabel) {
-                    if (days === 1) {
-                        countdownValue.textContent = 'Starts tomorrow';
-                        countdownLabel.hidden = true;
-                    } else if (days === 0) {
-                        countdownValue.textContent = 'Starts today';
-                        countdownLabel.hidden = true;
-                    } else {
-                        countdownValue.textContent = String(days);
-                        countdownLabel.hidden = false;
+            if (days !== null && days > 0) {
+                if (chipDays) chipDays.textContent = countdown(days);
+                if (dialog) {
+                    var countdownValue = dialog.querySelector('.steam-popup-countdown-value');
+                    var countdownLabel = dialog.querySelector('.steam-popup-countdown-label');
+                    if (countdownValue && countdownLabel) {
+                        if (days === 1) {
+                            countdownValue.textContent = 'Starts tomorrow';
+                            countdownLabel.hidden = true;
+                        } else if (days === 0) {
+                            countdownValue.textContent = 'Starts today';
+                            countdownLabel.hidden = true;
+                        } else {
+                            countdownValue.textContent = String(days);
+                            countdownLabel.hidden = false;
+                        }
                     }
+                }
+            } else if (days !== null && days <= 0) {
+                if (chipText && chipLink) {
+                    chipText.textContent = 'STEAM Experience is now running. Register';
+                    chipLink.setAttribute('href', '/join/?programme=holiday');
                 }
             }
         }
@@ -226,15 +251,28 @@
                 opener = null;
             });
 
+            /* Focus trap within dialog */
+            dialog.addEventListener('keydown', function (event) {
+                if (event.key !== 'Tab') return;
+                var focusables = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (!focusables.length) return;
+                var first = focusables[0];
+                var last = focusables[focusables.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            });
+
             var closeButton = dialog.querySelector('.steam-popup-close');
             if (closeButton) closeButton.addEventListener('click', closePopup);
 
-            var laterButton = dialog.querySelector('.steam-popup-secondary');
-            if (laterButton) laterButton.addEventListener('click', closePopup);
-
             window.setTimeout(function () {
                 var days = daysLeft();
-                if (days === null || days < 1) return;
+                if (isEnded()) return;
                 if (visitState.popupShown) return;
                 if (menuOpen()) return;
                 var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -242,6 +280,8 @@
                 fillCountdown(days);
                 opener = document.activeElement;
                 dialog.showModal();
+                var firstBtn = dialog.querySelector('.steam-popup-close, .steam-popup-learn, .steam-popup-register');
+                if (firstBtn && typeof firstBtn.focus === 'function') firstBtn.focus();
                 visitState.popupShown = true;
                 saveVisitState();
             }, 1500);
@@ -269,7 +309,7 @@
 
             window.setTimeout(function () {
                 var days = daysLeft();
-                if (days === null || days < 1) return;
+                if (isEnded()) return;
                 if (!visitState.popupShown || visitState.chipClosed) return;
                 if (menuOpen()) return;
                 if (dialog && dialog.open) return;

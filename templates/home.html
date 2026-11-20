@@ -283,52 +283,33 @@
     </div>
 </section>
 
-{% if steam_public %}
+{% if steam_public and not steam_stage.is_ended %}
 {% comment %}A holiday invitation that opens on its own a moment after the
 page loads, driven by the shared promo script in base.html. It is only
 ever rendered while the program is public.{% endcomment %}
-<dialog class="steam-popup" aria-labelledby="steam-popup-title">
+<dialog class="steam-popup" role="dialog" aria-modal="true" aria-labelledby="steam-popup-title">
     <div class="steam-popup-body">
-        <section class="steam-popup-top">
-            <button type="button" class="steam-popup-close" aria-label="Close" data-umami-event="steam-popup-close" data-umami-event-from="home">&times;</button>
-            <span class="steam-popup-kicker">Holiday program</span>
+        <button type="button" class="steam-popup-close" aria-label="Close" data-umami-event="steam-popup-close" data-umami-event-from="home">&times;</button>
+        <div class="steam-popup-banner" aria-hidden="true">
+            <!-- <div class="img-slot img-slot--flyer"></div> -->
+        </div>
+        <div class="steam-popup-content">
+            <span class="steam-popup-eyebrow">Holiday Makers</span>
+            <h2 id="steam-popup-title" class="steam-popup-title">STEAM Experience</h2>
+            {% if steam_stage.is_running and steam_stage.line %}
+            <p class="steam-popup-stage">{{ steam_stage.line }}</p>
+            {% else %}
             <div class="steam-popup-countdown" data-steam-start="{{ steam_start_date }}" role="status" aria-live="polite">
                 <span class="steam-popup-countdown-value">Starts 23 November</span>
                 <span class="steam-popup-countdown-label" hidden>days to go</span>
             </div>
-            <h2 id="steam-popup-title">Build it, code it, test it, and see your ideas come to life.</h2>
-        </section>
-        <section class="steam-popup-details">
-            <div class="steam-popup-weeks">
-                <div class="steam-popup-weeks-bar" aria-hidden="true">
-                    <span class="steam-popup-week steam-popup-week--discover"></span>
-                    <span class="steam-popup-week steam-popup-week--discover"></span>
-                    <span class="steam-popup-week steam-popup-week--build"></span>
-                    <span class="steam-popup-week steam-popup-week--build"></span>
-                    <span class="steam-popup-week steam-popup-week--build"></span>
-                    <span class="steam-popup-week-gap"></span>
-                    <span class="steam-popup-week steam-popup-week--innovate"></span>
-                    <span class="steam-popup-week steam-popup-week--innovate"></span>
-                    <span class="steam-popup-week steam-popup-week--innovate"></span>
-                    <span class="steam-popup-week steam-popup-week--innovate"></span>
-                </div>
-                <div class="steam-popup-stage-labels">
-                    <span>Discover</span>
-                    <span>Build</span>
-                    <span>Innovate</span>
-                </div>
-            </div>
-            <ul class="steam-popup-facts">
-                <li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>23 November 2026 to 29 January 2027</span></li>
-                <li class="steam-popup-extra"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Ages 8 to 19</span></li>
-                <li class="steam-popup-extra"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>Amreena Mall, Level 3, Room 304, Kyanja Ring Road</span></li>
-            </ul>
-            <p class="steam-popup-price steam-popup-extra">Stages from UGX 300,000</p>
+            {% endif %}
+            <p class="steam-popup-summary">Ages 8 to 19. 23 November 2026 to 29 January 2027. UGX 150,000 per week. Amreena Mall, Level 3, Room 304, Kyanja Ring Road. Spaces are limited.</p>
             <div class="steam-popup-actions">
-                <a href="{% url 'steam_experience' %}" class="btn steam-popup-primary" data-umami-event="steam-popup-register" data-umami-event-from="home">Explore the experience <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-                <button type="button" class="btn steam-popup-secondary" data-umami-event="steam-popup-close" data-umami-event-from="home">Maybe later</button>
+                <a href="{% url 'steam_experience' %}" class="btn steam-popup-learn" data-umami-event="steam-popup-learn" data-umami-event-from="home">Learn more</a>
+                <a href="{% url 'join' %}?programme=holiday" class="btn steam-popup-register" data-umami-event="steam-popup-register" data-umami-event-from="home">Register now</a>
             </div>
-        </section>
+        </div>
     </div>
 </dialog>
 {% endif %}
