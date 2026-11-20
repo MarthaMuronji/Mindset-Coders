@@ -290,24 +290,57 @@ ever rendered while the program is public.{% endcomment %}
 <dialog class="steam-popup" role="dialog" aria-modal="true" aria-labelledby="steam-popup-title">
     <div class="steam-popup-body">
         <button type="button" class="steam-popup-close" aria-label="Close" data-umami-event="steam-popup-close" data-umami-event-from="home">&times;</button>
-        <div class="steam-popup-banner" aria-hidden="true">
+        <div class="steam-popup-banner">
+            <svg class="steam-popup-circuit" viewBox="0 0 640 220" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <path d="M330 0v45h58v32h54M418 0v28h46v45h62M520 0v40h48v43h72M374 220v-52h45v-36h64M494 220v-45h46v-39h64" fill="none" stroke="#32CD32" stroke-width="3" />
+                <path d="M280 0v30h30v32h45M450 220v-28h28v-34h47" fill="none" stroke="#1E7A38" stroke-width="3" />
+                <circle cx="442" cy="77" r="6" fill="#32CD32" />
+                <circle cx="526" cy="73" r="6" fill="#32CD32" />
+                <circle cx="568" cy="83" r="6" fill="#32CD32" />
+                <circle cx="483" cy="132" r="6" fill="#32CD32" />
+                <circle cx="540" cy="136" r="6" fill="#32CD32" />
+                <circle cx="419" cy="132" r="5" fill="#1E7A38" />
+                <circle cx="478" cy="158" r="5" fill="#1E7A38" />
+            </svg>
             <!-- <div class="img-slot img-slot--flyer"></div> -->
+            <div class="steam-popup-banner-copy">
+                <span class="steam-popup-eyebrow">HOLIDAY MAKERS</span>
+                <h2 id="steam-popup-title" class="steam-popup-title">STEAM Experience</h2>
+                <p class="steam-popup-age">Ages 8 to 19</p>
+            </div>
         </div>
         <div class="steam-popup-content">
-            <span class="steam-popup-eyebrow">Holiday Makers</span>
-            <h2 id="steam-popup-title" class="steam-popup-title">STEAM Experience</h2>
-            {% if steam_stage.is_running and steam_stage.line %}
-            <p class="steam-popup-stage">{{ steam_stage.line }}</p>
-            {% else %}
             <div class="steam-popup-countdown" data-steam-start="{{ steam_start_date }}" role="status" aria-live="polite">
+                {% if steam_stage.is_running and steam_stage.line %}
+                <span class="steam-popup-stage">{{ steam_stage.line }}</span>
+                {% else %}
                 <span class="steam-popup-countdown-value">Starts 23 November</span>
                 <span class="steam-popup-countdown-label" hidden>days to go</span>
+                {% endif %}
             </div>
-            {% endif %}
-            <p class="steam-popup-summary">Ages 8 to 19. 23 November 2026 to 29 January 2027. UGX 150,000 per week. Amreena Mall, Level 3, Room 304, Kyanja Ring Road. Spaces are limited.</p>
+            <ul class="steam-popup-facts">
+                <li><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>23 November 2026 to 29 January 2027</span></li>
+                <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>Mindset Coders HQ, Kyanja, Kampala</span></li>
+                <li><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i><span>UGX 150,000 per week</span></li>
+            </ul>
+            <div class="steam-popup-stages" aria-label="Programme stages">
+                <div class="steam-popup-step{% if steam_stage.state == 'discover' %} is-current{% endif %}"{% if steam_stage.state == 'discover' %} aria-current="step"{% endif %}>
+                    <span class="steam-popup-step-name">Discover</span>
+                    <span class="steam-popup-step-date">23 to 27 November</span>
+                </div>
+                <div class="steam-popup-step{% if steam_stage.state == 'build' %} is-current{% endif %}"{% if steam_stage.state == 'build' %} aria-current="step"{% endif %}>
+                    <span class="steam-popup-step-name">Build</span>
+                    <span class="steam-popup-step-date">30 November to 18 December</span>
+                </div>
+                <div class="steam-popup-step{% if steam_stage.state == 'innovate' %} is-current{% endif %}"{% if steam_stage.state == 'innovate' %} aria-current="step"{% endif %}>
+                    <span class="steam-popup-step-name">Innovate</span>
+                    <span class="steam-popup-step-date">4 to 29 January</span>
+                </div>
+            </div>
+            <p class="steam-popup-spaces">Spaces are limited.</p>
             <div class="steam-popup-actions">
-                <a href="{% url 'steam_experience' %}" class="btn steam-popup-learn" data-umami-event="steam-popup-learn" data-umami-event-from="home">Learn more</a>
                 <a href="{% url 'join' %}?programme=holiday" class="btn steam-popup-register" data-umami-event="steam-popup-register" data-umami-event-from="home">Register now</a>
+                <a href="{% url 'steam_experience' %}" class="btn steam-popup-learn" data-umami-event="steam-popup-learn" data-umami-event-from="home">Learn more</a>
             </div>
         </div>
     </div>
