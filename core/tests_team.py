@@ -87,7 +87,9 @@ class TeamPagesTests(TestCase):
             kwargs={'pk': self.registration.pk},
         ))
         self.assertContains(list_response, 'Learner Example')
+        self.assertContains(list_response, 'Cash at the venue')
         self.assertContains(detail_response, 'Parent Example')
+        self.assertContains(detail_response, 'Cash at the venue')
         self.assertContains(detail_response, '+256 700 123456')
         self.assertContains(detail_response, 'wa.me/256700123456')
         self.assertContains(detail_response, 'Example School')
@@ -200,6 +202,8 @@ class TeamPagesTests(TestCase):
             'method': 'cash',
         })
         self.assertContains(response, 'Learner Example')
+        self.assertContains(response, 'Cash at the venue')
+        self.assertContains(response, 'Mobile Money (*244*9#)')
         self.assertNotContains(response, 'Other Learner')
         response = self.client.get(reverse('team_registrations'), {
             'q': 'ONLINE-22',

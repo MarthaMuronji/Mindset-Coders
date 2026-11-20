@@ -3,7 +3,7 @@ from unittest import mock
 
 from django.contrib import admin
 from django.core.signing import TimestampSigner
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase
 from django.utils import timezone
 
 from . import admin as core_admin
@@ -31,41 +31,35 @@ VALID_POST = {
 }
 
 
-@override_settings(STEAM_PAYMENTS_ENABLED=True)
 class PaymentMethodTests(SimpleTestCase):
-    def submit(self, data, cash_instructions=None):
+    def submit(self, data):
         saved = []
 
         def fake_save(registration, *args, **kwargs):
             registration.pk = 42
             saved.append(registration)
 
-        instructions = (
-            views.STEAM_EXPERIENCE['cash_instructions']
-            if cash_instructions is None
-            else cash_instructions
-        )
-        with mock.patch.dict(
-            views.STEAM_EXPERIENCE, {'cash_instructions': instructions}
-        ):
-            with mock.patch.object(Registration, 'save', fake_save):
-                with mock.patch(
-                    'core.registration.send_registration_notification'
-                ):
-                    response = self.client.post('/join/', data)
+        with mock.patch.object(Registration, 'save', fake_save):
+            with mock.patch(
+                'core.registration.send_registration_notification'
+            ):
+                response = self.client.post('/join/', data)
         return response, saved
 
     def test_form_shows_required_payment_choice_and_hint_for_holiday(self):
         response = self.client.get('/join/?programme=holiday')
 
         self.assertContains(response, 'How will you pay?')
-        self.assertContains(response, 'Pay online by Mobile Money')
-        self.assertContains(response, 'Pay in cash')
-        self.assertContains(
-            response,
-            'You can pay online straight after registering, or in cash during office hours.',
-        )
+        self.assertContains(response, 'Mobile Money (*244*9#)')
+        self.assertContains(response, 'Cash at the venue')
         self.assertTrue(response.context['form'].fields['payment_method'].required)
+        self.assertEqual(
+            response.context['form'].fields['payment_method'].choices,
+            [
+                ('online', 'Mobile Money (*244*9#)'),
+                ('cash', 'Cash at the venue'),
+            ],
+        )
         html = response.content.decode()
         self.assertLess(
             html.index('id="id_stage"'),
@@ -78,17 +72,20 @@ class PaymentMethodTests(SimpleTestCase):
         self.assertContains(response, 'id="payment-method-group" hidden')
         self.assertContains(response, "programme.addEventListener('change'")
 
-    def test_cash_option_is_hidden_without_cash_instructions(self):
+    def test_both_choices_remain_when_cash_instructions_are_empty(self):
         with mock.patch.dict(
             views.STEAM_EXPERIENCE, {'cash_instructions': ''}
         ):
             response = self.client.get('/join/?programme=holiday')
 
-        self.assertContains(response, 'Pay online by Mobile Money')
-        self.assertNotContains(response, 'Pay in cash')
+        self.assertContains(response, 'Mobile Money (*244*9#)')
+        self.assertContains(response, 'Cash at the venue')
         self.assertEqual(
             response.context['form'].fields['payment_method'].choices,
-            [('online', 'Pay online by Mobile Money')],
+            [
+                ('online', 'Mobile Money (*244*9#)'),
+                ('cash', 'Cash at the venue'),
+            ],
         )
 
     def test_cash_registration_redirects_to_cash_confirmation_without_payment_address(self):
@@ -103,7 +100,6 @@ class PaymentMethodTests(SimpleTestCase):
         self.assertEqual(saved[0].payment_method, 'cash')
         self.assertEqual(saved[0].amount_due, 300000)
         confirmation = self.client.get(response['Location'])
-        html = confirmation.content.decode()
         self.assertContains(
             confirmation,
             'We have received your registration for the Holiday STEAM Experience, Discover (2 weeks).',
@@ -123,7 +119,6 @@ class PaymentMethodTests(SimpleTestCase):
         )
         self.assertContains(confirmation, 'Read our refund and cancellation policy')
         self.assertContains(confirmation, 'Register another child')
-        self.assertNotIn('kacyberpay', html.lower())
         self.assertNotContains(confirmation, 'data-umami-event="pay-click"')
         self.assertNotContains(
             confirmation, 'You can also pay in cash. Contact our team to arrange it.'
@@ -144,20 +139,35 @@ class PaymentMethodTests(SimpleTestCase):
         self.assertContains(cash, hold_note)
         self.assertNotContains(online, hold_note)
 
-    def test_online_registration_shows_only_the_stage_payment_button(self):
+    def test_mobile_money_registration_shows_instructions_without_a_button(self):
         response, saved = self.submit(dict(VALID_POST, payment_method='online'))
 
         self.assertEqual(saved[0].payment_method, 'online')
         confirmation = self.client.get(response['Location'])
+        html = confirmation.content.decode()
         self.assertContains(
             confirmation,
-            'Pay UGX 300,000 with Mobile Money',
+            'Fee: UGX 300,000',
         )
         self.assertContains(
             confirmation,
-            'href="https://kacyberpay.com/pay/f47mjrdxje"',
+            'To pay, dial *244*9#. Merchant code: 125730 (Mindset Coders Uganda).',
         )
+        self.assertContains(
+            confirmation,
+            'Your registration is confirmed once we receive your payment.',
+        )
+        self.assertNotContains(confirmation, 'data-umami-event="pay-click"')
         self.assertNotContains(confirmation, 'Pay the fee in cash at')
+        fee_position = html.index('Fee: UGX 300,000')
+        instructions_position = html.index(
+            'To pay, dial *244*9#. Merchant code: 125730 (Mindset Coders Uganda).'
+        )
+        confirmed_position = html.index(
+            'Your registration is confirmed once we receive your payment.'
+        )
+        self.assertLess(fee_position, instructions_position)
+        self.assertLess(instructions_position, confirmed_position)
 
     def test_missing_payment_choice_fails_with_friendly_error(self):
         data = dict(VALID_POST)
@@ -179,28 +189,6 @@ class PaymentMethodTests(SimpleTestCase):
         page = self.client.get('/join/?programme=weekend')
         self.assertNotContains(page, 'How will you pay?')
 
-    @override_settings(STEAM_PAYMENTS_ENABLED=False)
-    def test_payments_off_hide_and_do_not_save_payment_choice(self):
-        response = self.client.get('/join/?programme=holiday')
-        self.assertNotContains(response, 'How will you pay?')
-
-        data = dict(VALID_POST)
-        saved = []
-
-        def fake_save(registration, *args, **kwargs):
-            registration.pk = 42
-            saved.append(registration)
-
-        with mock.patch.object(Registration, 'save', fake_save):
-            with mock.patch(
-                'core.registration.send_registration_notification'
-            ):
-                posted = self.client.post('/join/', data)
-
-        self.assertEqual(posted.status_code, 302)
-        self.assertEqual(saved[0].payment_method, '')
-        self.assertEqual(saved[0].amount_due, 300000)
-
     def test_amount_due_tracks_each_holiday_stage(self):
         for stage, amount in STAGE_FEES.items():
             with self.subTest(stage=stage):
@@ -210,19 +198,35 @@ class PaymentMethodTests(SimpleTestCase):
                 self.assertEqual(response.status_code, 302)
                 self.assertEqual(saved[0].amount_due, amount)
 
-    def test_fee_constant_matches_steam_payment_link_amounts(self):
-        payment_link_fees = {
-            entry['key']: int(
-                entry['amount_text'].replace('UGX ', '').replace(',', '')
-            )
-            for entry in views.STEAM_EXPERIENCE['payment_links']
-        }
-        self.assertEqual(STAGE_FEES, payment_link_fees)
+    def test_fee_constant_keeps_the_current_stage_amounts(self):
+        self.assertEqual(
+            STAGE_FEES,
+            {
+                'discover': 300000,
+                'build': 400000,
+                'innovate': 500000,
+                'full': 1100000,
+            },
+        )
 
     def test_fee_constant_covers_all_registration_stages(self):
         self.assertEqual(
             set(STAGE_FEES),
             {key for key, _label in Registration.STAGE_CHOICES},
+        )
+
+    def test_payment_method_display_labels_keep_the_existing_values(self):
+        self.assertEqual(
+            Registration.PAYMENT_METHOD_CHOICES,
+            [('online', 'Online'), ('cash', 'Cash')],
+        )
+        self.assertEqual(
+            Registration(payment_method='online').get_payment_method_display(),
+            'Mobile Money (*244*9#)',
+        )
+        self.assertEqual(
+            Registration(payment_method='cash').get_payment_method_display(),
+            'Cash at the venue',
         )
 
     def test_registration_email_has_payment_lines_without_personal_details(self):
@@ -244,7 +248,7 @@ class PaymentMethodTests(SimpleTestCase):
             registration, 'https://example.test/admin/registration/1/'
         )
 
-        self.assertIn('Payment method: Online', body)
+        self.assertIn('Payment method: Mobile Money (*244*9#)', body)
         self.assertIn('Amount due: UGX 300000', body)
         for private_value in (
             'Private Parent',
@@ -300,8 +304,14 @@ class PaymentMethodTests(SimpleTestCase):
         self.assertIsNone(old_registration.amount_due)
         self.assertEqual(model_admin.balance(old_registration), 0)
         fields = model_admin.get_fields(request, old_registration)
+        self.assertEqual(
+            model_admin.payment_method_display(
+                Registration(payment_method='cash')
+            ),
+            'Cash at the venue',
+        )
         for field in (
-            'payment_method', 'payment_status', 'amount_due',
+            'payment_method_display', 'payment_status', 'amount_due',
             'amount_paid', 'receipt_number', 'payment_note', 'paid_at',
             'balance',
         ):

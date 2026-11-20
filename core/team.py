@@ -266,7 +266,7 @@ def registration_list(request):
         'stage': stage,
         'search': search,
         'status_choices': REGISTRATION_STATUSES.items(),
-        'method_choices': Registration.PAYMENT_METHOD_CHOICES,
+        'method_choices': Registration.PAYMENT_METHOD_DISPLAY_CHOICES,
         'stage_choices': Registration.STAGE_CHOICES,
         'counts': {
             'pending': Registration.objects.filter(

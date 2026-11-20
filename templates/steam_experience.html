@@ -19,7 +19,7 @@
   "@type": "Event",
   "name": "Mindset STEAM Experience",
   "description": "{{ event_description|escapejs }}",
-  "startDate": "2026-11-16",
+  "startDate": "2026-11-23",
   "endDate": "2027-01-29",
   "location": {
     "@type": "Place",
@@ -34,18 +34,7 @@
   "organizer": {
     "@type": "Organization",
     "name": "Mindset Coders Uganda"
-  },
-  "offers": [
-    {% for offer in content.payment_links %}
-    {
-      "@type": "Offer",
-      "name": "{{ offer.label|escapejs }}",
-      "price": "{{ offer.amount_text|cut:'UGX '|cut:','|escapejs }}",
-      "priceCurrency": "UGX",
-      "url": "https://mindset-group.org/join/?programme=holiday"
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-  ]
+  }
 }
 </script>
 {% endif %}
@@ -243,11 +232,7 @@
             {% endif %}
             <div class="steam-payment-card steam-registration-steps">
                 <h3>How to register</h3>
-                {% if steam_payments_enabled %}
                 <p>Register your child first. You will see your fee and payment options on the next page.</p>
-                {% else %}
-                <p>Register your child first. Our team will tell you how to pay.</p>
-                {% endif %}
                 {% if content.payment_note %}<p class="steam-payment-note">{{ content.payment_note }}</p>{% endif %}
                 <p><a href="{% url 'refund_policy' %}">Read the refund and cancellation policy</a></p>
             </div>

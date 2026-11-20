@@ -290,18 +290,17 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         )
 
     def test_build_and_innovate_confirmation_pages_explain_discover_first(self):
-        with override_settings(STEAM_PAYMENTS_ENABLED=True):
-            for stage in ('build', 'innovate'):
-                with self.subTest(stage=stage):
-                    response = self.client.get(
-                        f'/join/thanks/?programme=holiday&stage={stage}'
-                    )
-                    html = response.content.decode()
-                    fee_position = html.index('class="join-thanks-fee"')
-                    note_position = html.index(
-                        'Learners must complete the Discover stage first.'
-                    )
-                    self.assertLess(fee_position, note_position)
+        for stage in ('build', 'innovate'):
+            with self.subTest(stage=stage):
+                response = self.client.get(
+                    f'/join/thanks/?programme=holiday&stage={stage}'
+                )
+                html = response.content.decode()
+                fee_position = html.index('class="join-thanks-fee"')
+                note_position = html.index(
+                    'Learners must complete the Discover stage first.'
+                )
+                self.assertLess(fee_position, note_position)
 
     def test_complete_journey_is_prominent_and_repeated_in_final_cta(self):
         self.assertContains(self.response, 'UGX 1,100,000')
@@ -315,8 +314,8 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         )
         self.assertContains(self.response, 'Register for the complete journey')
 
-    def test_payment_addresses_do_not_appear_on_the_page_or_jsonld(self):
-        self.assertNotContains(self.response, 'kacyberpay')
+    def test_no_payment_button_appears_on_the_page_or_jsonld(self):
+        self.assertNotContains(self.response, 'data-umami-event="pay-click"')
 
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=False)
@@ -378,12 +377,12 @@ class SteamMpassScreensTests(SimpleTestCase):
 
 @override_settings(STEAM_EXPERIENCE_PUBLIC=True)
 class PublicSteamEventJsonLdTests(SimpleTestCase):
-    def test_event_jsonld_uses_registration_urls_and_dictionary_fees(self):
+    def test_event_jsonld_has_the_current_programme_dates_without_provider_offers(self):
         response = self.client.get(STEAM_URL)
         html = response.content.decode()
 
         self.assertContains(response, 'type="application/ld+json"')
-        self.assertNotIn('kacyberpay', html.lower())
+        self.assertNotIn('"offers"', html.lower())
         match = re.search(
             r'<script type="application/ld\+json">\s*(.*?)\s*</script>',
             html,
@@ -394,7 +393,7 @@ class PublicSteamEventJsonLdTests(SimpleTestCase):
 
         self.assertEqual(event['@type'], 'Event')
         self.assertEqual(event['description'], META_DESCRIPTION)
-        self.assertEqual(event['startDate'], '2026-11-16')
+        self.assertEqual(event['startDate'], '2026-11-23')
         self.assertEqual(event['endDate'], '2027-01-29')
         self.assertEqual(
             event['location'],
@@ -412,33 +411,4 @@ class PublicSteamEventJsonLdTests(SimpleTestCase):
         self.assertEqual(
             event['organizer'],
             {'@type': 'Organization', 'name': 'Mindset Coders Uganda'},
-        )
-        self.assertEqual(len(event['offers']), 4)
-        self.assertEqual(
-            {
-                offer['name']: (offer['price'], offer['priceCurrency'], offer['url'])
-                for offer in event['offers']
-            },
-            {
-                'Discover, 2 weeks': (
-                    '300000',
-                    'UGX',
-                    'https://mindset-group.org/join/?programme=holiday',
-                ),
-                'Build, 3 weeks': (
-                    '400000',
-                    'UGX',
-                    'https://mindset-group.org/join/?programme=holiday',
-                ),
-                'Innovate, 4 weeks': (
-                    '500000',
-                    'UGX',
-                    'https://mindset-group.org/join/?programme=holiday',
-                ),
-                'Full journey, paid upfront': (
-                    '1100000',
-                    'UGX',
-                    'https://mindset-group.org/join/?programme=holiday',
-                ),
-            },
         )

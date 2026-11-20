@@ -55,6 +55,19 @@ def _throttled_admin_login(request, *args, **kwargs):
 admin.site.login = _throttled_admin_login
 
 
+class PaymentMethodFilter(admin.SimpleListFilter):
+    title = 'payment method'
+    parameter_name = 'payment_method'
+
+    def lookups(self, request, model_admin):
+        return Registration.PAYMENT_METHOD_DISPLAY_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(payment_method=self.value())
+        return queryset
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'published', 'created_at')
@@ -80,7 +93,7 @@ class RegistrationAdmin(admin.ModelAdmin):
         'balance', 'created_at', 'handled',
     )
     list_filter = (
-        'handled', 'programme', 'stage', 'payment_method', 'payment_status',
+        'handled', 'programme', 'stage', PaymentMethodFilter, 'payment_status',
     )
     search_fields = (
         'parent_name', 'learner_name', 'parent_email', 'receipt_number',
@@ -88,10 +101,14 @@ class RegistrationAdmin(admin.ModelAdmin):
     readonly_fields = (
         'parent_name', 'parent_email', 'parent_phone', 'learner_name',
         'learner_age', 'school_name', 'programme', 'stage', 'consent', 'created_at',
-        'payment_method', 'amount_due', 'paid_at', 'balance',
+        'payment_method_display', 'amount_due', 'paid_at', 'balance',
         'payment_recorded_by',
     )
     actions = ('mark_as_paid', 'mark_as_cancelled')
+
+    @admin.display(description='Payment method')
+    def payment_method_display(self, registration):
+        return registration.get_payment_method_display()
 
     @admin.display(description='Balance')
     def balance(self, registration):

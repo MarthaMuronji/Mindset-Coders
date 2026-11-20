@@ -201,12 +201,12 @@ class SteamPopupTests(SimpleTestCase):
         self.assertContains(response, '<dialog class="steam-popup"')
         self.assertContains(response, 'id="steam-popup-title"')
         self.assertContains(response, 'Build it, code it, test it, and see your ideas come to life.')
-        self.assertContains(response, 'Starts 16 November')
+        self.assertContains(response, 'Starts 23 November')
         self.assertContains(response, 'class="steam-popup-week ', count=9)
         self.assertContains(response, 'class="steam-popup-week-gap"', count=1)
         for stage in ('Discover', 'Build', 'Innovate'):
             self.assertContains(response, f'<span>{stage}</span>')
-        self.assertContains(response, '16 November 2026 to 29 January 2027')
+        self.assertContains(response, '23 November 2026 to 29 January 2027')
         self.assertContains(response, 'Ages 8 to 19')
         self.assertContains(response, 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road')
         self.assertContains(response, 'Stages from UGX 300,000')
@@ -327,7 +327,7 @@ class SteamPromoContextTests(SimpleTestCase):
     def test_about_is_offered_the_promo(self):
         result = self.promo_for('/about/')
         self.assertTrue(result['steam_promo'])
-        self.assertEqual(result['steam_start_date'], '2026-11-16')
+        self.assertEqual(result['steam_start_date'], '2026-11-23')
 
     def test_excluded_pages_get_no_promo(self):
         for path in ('/steam-experience/', '/contact/', '/privacy/',
