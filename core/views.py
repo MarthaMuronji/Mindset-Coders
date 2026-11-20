@@ -1,7 +1,9 @@
 import logging
+from datetime import date, datetime
 from functools import wraps
 from typing import ClassVar
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.contrib import messages
@@ -49,9 +51,41 @@ TOPIC_STARTERS = {
 STORY_SUCCESS_MESSAGE = 'Thank you for sharing your story. We will read it and may contact you before anything is published.'
 
 
+def get_current_stage(today=None):
+    """Determine the current stage of the STEAM Experience from Africa/Kampala time.
+
+    States: before the start, Discover, Build, Christmas break, Innovate, ended.
+    """
+    if today is None:
+        today = timezone.now().astimezone(ZoneInfo('Africa/Kampala')).date()
+    elif isinstance(today, datetime):
+        today = today.astimezone(ZoneInfo('Africa/Kampala')).date()
+
+    if today < date(2026, 11, 23):
+        return {'state': 'before', 'line': '', 'is_running': False, 'is_ended': False}
+    if today <= date(2026, 11, 29):
+        return {'state': 'discover', 'line': 'Now running: Discover, 23 to 27 November', 'is_running': True, 'is_ended': False}
+    if today <= date(2026, 12, 20):
+        return {'state': 'build', 'line': 'Now running: Build, 30 November to 18 December', 'is_running': True, 'is_ended': False}
+    if today <= date(2027, 1, 3):
+        return {'state': 'break', 'line': 'Innovate starts 4 January', 'is_running': True, 'is_ended': False}
+    if today <= date(2027, 1, 29):
+        return {'state': 'innovate', 'line': 'Now running: Innovate, 4 to 29 January', 'is_running': True, 'is_ended': False}
+    return {'state': 'ended', 'line': '', 'is_running': False, 'is_ended': True}
+
+
 # Create your views here.
 def home(request):
-    return render(request, 'home.html', {'steam_public': settings.STEAM_EXPERIENCE_PUBLIC})
+    stage_info = get_current_stage()
+    return render(
+        request,
+        'home.html',
+        {
+            'steam_public': settings.STEAM_EXPERIENCE_PUBLIC,
+            'steam_stage': stage_info,
+            'current_stage_line': stage_info['line'],
+        },
+    )
 
 def mindset_learn(request):
     return render(request, 'mindset_learn.html')
@@ -158,13 +192,13 @@ STEAM_EXPERIENCE = {
     'start_date': '23 November 2026',
     'end_date': '29 January 2027',
     'schedule': 'Monday to Friday, 8:00 am to 1:00 pm',
-    'duration': 'Nine teaching weeks',
+    'duration': 'Eight teaching weeks',
     'classes_resume': 'Classes resume on Monday, 4 January 2027.',
-    'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across nine teaching weeks.',
+    'pathway_note': 'The programme follows the Discover, Build, Innovate pathway across eight teaching weeks.',
     'venues': ['Amreena Mall, Level 3, Room 304, Kyanja Ring Road'],
-    'price': 'Discover UGX 300,000. Build UGX 400,000. Innovate UGX 500,000. The Complete Holiday Journey is UGX 1,100,000 when paid upfront, a saving of UGX 100,000.',
+    'price': 'UGX 150,000 per week. Discover UGX 150,000. Build UGX 450,000. Innovate UGX 600,000. Complete journey (8 weeks) UGX 1,200,000.',
     'payment_options': 'Choose how to pay when you register: Mobile Money or cash at the venue.',
-    'cash_instructions': 'Pay the fee in cash at Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Monday to Saturday, 8:00 am to 6:00 pm.',
+    'cash_instructions': 'Pay the fee in cash at Mindset Coders HQ, Amreena Mall, Level 3, Room 304, Kyanja Ring Road, Kampala. Office hours Monday to Friday, 8:00 AM to 1:00 PM. Call 0752064343 for payment assistance.',
     'cash_hold_note': '',
     'discount_note': 'Registering more than one child? Contact our team to arrange your 10% sibling discount before making payment.',
     'spaces_note': 'Spaces are limited.',
@@ -247,9 +281,9 @@ STEAM_EXPERIENCE = {
         {
             'name': 'Discover',
             'key': 'discover',
-            'weeks': 2,
-            'dates': '16 to 27 November 2026',
-            'fee': 'UGX 300,000',
+            'weeks': 1,
+            'dates': '23 to 27 November 2026',
+            'fee': 'UGX 150,000',
             'blurb': 'Children explore different STEAM disciplines, experiment with ideas and discover their interests.',
             'note': None,
         },
@@ -258,7 +292,7 @@ STEAM_EXPERIENCE = {
             'key': 'build',
             'weeks': 3,
             'dates': '30 November to 18 December 2026',
-            'fee': 'UGX 400,000',
+            'fee': 'UGX 450,000',
             'blurb': 'Children move into practical projects, building robots, experimenting with AI and developing their creative and technical skills.',
             'note': 'Kits for use during the Build stage',
         },
@@ -267,7 +301,7 @@ STEAM_EXPERIENCE = {
             'key': 'innovate',
             'weeks': 4,
             'dates': '4 to 29 January 2027',
-            'fee': 'UGX 500,000',
+            'fee': 'UGX 600,000',
             'blurb': 'Children apply what they have learned to develop solutions, create projects and present their innovations.',
             'note': 'A kit to take home in the Innovate stage',
         },
@@ -276,14 +310,14 @@ STEAM_EXPERIENCE = {
     # the stage whose name matches "after", and leaves a gap in the week bar.
     'break': {
         'label': 'Christmas break',
-        'dates': '21 December 2026 to 2 January 2027',
+        'dates': '21 December 2026 to 3 January 2027',
         'after': 'Build',
     },
     # The price for taking the whole pathway in one payment.
     'full_journey': {
-        'fee': 'UGX 1,100,000',
+        'fee': 'UGX 1,200,000',
         'note': 'when paid upfront',
-        'saving': 'Save UGX 100,000',
+        'saving': '',
     },
     'faq': [
         {
@@ -300,11 +334,11 @@ STEAM_EXPERIENCE = {
         },
         {
             'question': 'Can my child participate in the complete programme?',
-            'answer': 'Yes. The complete journey is UGX 1,100,000 when paid upfront.',
+            'answer': 'Yes. The complete journey is UGX 1,200,000 when paid upfront.',
         },
         {
             'question': 'What happens during the Christmas break?',
-            'answer': 'There are no classes from 21 December 2026 to 2 January 2027. Classes resume on Monday, 4 January 2027.',
+            'answer': 'There are no classes from 21 December 2026 to 3 January 2027. Classes resume on Monday, 4 January 2027.',
         },
         {
             'question': 'Are learning materials and robotics kits included?',
@@ -340,9 +374,12 @@ STEAM_EXPERIENCE = {
 def steam_experience(request):
     """The STEAM Experience holiday program landing page."""
     is_public = settings.STEAM_EXPERIENCE_PUBLIC
+    stage_info = get_current_stage()
     response = render(request, 'steam_experience.html', {
         'content': STEAM_EXPERIENCE,
         'is_public': is_public,
+        'current_stage': stage_info,
+        'current_stage_line': stage_info['line'],
         'event_description': 'Give your child a holiday filled with robotics, artificial intelligence, coding, creative arts and entrepreneurship. Join the Mindset STEAM Experience in Kampala.',
         # Analytics stay off while the page is not public yet
         'hide_umami': not is_public,

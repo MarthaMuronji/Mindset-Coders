@@ -303,9 +303,8 @@ class SteamExperienceRedesignTests(SimpleTestCase):
                 self.assertLess(fee_position, note_position)
 
     def test_complete_journey_is_prominent_and_repeated_in_final_cta(self):
-        self.assertContains(self.response, 'UGX 1,100,000')
+        self.assertContains(self.response, 'UGX 1,200,000')
         self.assertContains(self.response, 'when paid upfront')
-        self.assertContains(self.response, 'Save UGX 100,000')
         self.assertContains(self.response, 'Covers Discover, Build and Innovate.')
         self.assertContains(
             self.response,

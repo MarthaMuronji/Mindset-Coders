@@ -36,11 +36,18 @@ PRESELECTABLE_STAGES = tuple(
     value for value, _label in Registration.STAGE_CHOICES
 )
 
+STAGE_DISPLAY_CHOICES = [
+    ('discover', 'Discover (1 week)'),
+    ('build', 'Build (3 weeks)'),
+    ('innovate', 'Innovate (4 weeks)'),
+    ('full', 'Full journey (paid upfront)'),
+]
+
 STAGE_FEES = {
-    'discover': 300000,
-    'build': 400000,
-    'innovate': 500000,
-    'full': 1100000,
+    'discover': 150000,
+    'build': 450000,
+    'innovate': 600000,
+    'full': 1200000,
 }
 
 # Shown on the Join page when saving fails, so the visitor can retry
@@ -107,7 +114,7 @@ class RegistrationForm(forms.ModelForm):
     # it when the programme is holiday, and clears it for every other
     # programme, which keeps one rule in one place.
     stage = forms.ChoiceField(
-        choices=Registration.STAGE_CHOICES,
+        choices=STAGE_DISPLAY_CHOICES,
         required=False,
         label='Stage',
         help_text='Every learner begins with Discover. Choose Build or Innovate only if your child has already completed Discover.',
@@ -334,10 +341,16 @@ def join(request):
         form = RegistrationForm(
             initial=initial,
         )
+    current_stage = views.get_current_stage()
     return render(
         request,
         'join.html',
-        {'form': form, 'form_timestamp': form_timestamp},
+        {
+            'form': form,
+            'form_timestamp': form_timestamp,
+            'current_stage': current_stage,
+            'current_stage_line': current_stage['line'],
+        },
     )
 
 
@@ -351,7 +364,7 @@ def join_thanks(request):
     programme = request.GET.get('programme', '')
     stage = request.GET.get('stage', '')
     payment_method = request.GET.get('method', 'online')
-    stage_labels = dict(Registration.STAGE_CHOICES)
+    stage_labels = dict(STAGE_DISPLAY_CHOICES)
     stage_label = stage_labels.get(stage, '')
     fee = STAGE_FEES.get(stage)
     holiday_confirmation = (

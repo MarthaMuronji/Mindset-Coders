@@ -98,13 +98,13 @@ class PaymentMethodTests(SimpleTestCase):
             '/join/thanks/?programme=holiday&stage=discover&method=cash',
         )
         self.assertEqual(saved[0].payment_method, 'cash')
-        self.assertEqual(saved[0].amount_due, 300000)
+        self.assertEqual(saved[0].amount_due, 150000)
         confirmation = self.client.get(response['Location'])
         self.assertContains(
             confirmation,
-            'We have received your registration for the Holiday STEAM Experience, Discover (2 weeks).',
+            'We have received your registration for the Holiday STEAM Experience, Discover (1 week).',
         )
-        self.assertContains(confirmation, 'Amount to pay: UGX 300,000')
+        self.assertContains(confirmation, 'Amount to pay: UGX 150,000')
         self.assertContains(
             confirmation,
             'Your registration is confirmed once we receive your payment.',
@@ -147,7 +147,7 @@ class PaymentMethodTests(SimpleTestCase):
         html = confirmation.content.decode()
         self.assertContains(
             confirmation,
-            'Fee: UGX 300,000',
+            'Fee: UGX 150,000',
         )
         self.assertContains(
             confirmation,
@@ -159,7 +159,7 @@ class PaymentMethodTests(SimpleTestCase):
         )
         self.assertNotContains(confirmation, 'data-umami-event="pay-click"')
         self.assertNotContains(confirmation, 'Pay the fee in cash at')
-        fee_position = html.index('Fee: UGX 300,000')
+        fee_position = html.index('Fee: UGX 150,000')
         instructions_position = html.index(
             'To pay, dial *244*9#. Merchant code: 125730 (Mindset Coders Uganda).'
         )
@@ -202,10 +202,10 @@ class PaymentMethodTests(SimpleTestCase):
         self.assertEqual(
             STAGE_FEES,
             {
-                'discover': 300000,
-                'build': 400000,
-                'innovate': 500000,
-                'full': 1100000,
+                'discover': 150000,
+                'build': 450000,
+                'innovate': 600000,
+                'full': 1200000,
             },
         )
 
@@ -241,7 +241,7 @@ class PaymentMethodTests(SimpleTestCase):
             programme='holiday',
             stage='discover',
             payment_method='online',
-            amount_due=300000,
+            amount_due=150000,
             consent=True,
         )
         body = _build_registration_text(
@@ -249,7 +249,7 @@ class PaymentMethodTests(SimpleTestCase):
         )
 
         self.assertIn('Payment method: Mobile Money (*244*9#)', body)
-        self.assertIn('Amount due: UGX 300000', body)
+        self.assertIn('Amount due: UGX 150000', body)
         for private_value in (
             'Private Parent',
             'private@example.com',

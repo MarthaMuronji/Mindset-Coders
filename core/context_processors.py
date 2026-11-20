@@ -1,5 +1,7 @@
 from django.conf import settings
 
+from .views import get_current_stage
+
 # Pages that must never carry the STEAM Experience promotion: the
 # experience page itself, both ways of contacting the team, the privacy
 # page, the story form, and the whole private review area (every url
@@ -20,7 +22,8 @@ def steam_promo(request):
     and the pop up, so this only adds the shared chip variables. The
     start date is the one fact the countdown wording is built from.
     """
-    show = settings.STEAM_EXPERIENCE_PUBLIC
+    stage_info = get_current_stage()
+    show = settings.STEAM_EXPERIENCE_PUBLIC and not stage_info['is_ended']
     if show:
         match = getattr(request, 'resolver_match', None)
         if match is None or match.namespace == 'admin':
@@ -29,4 +32,9 @@ def steam_promo(request):
             name = match.url_name or ''
             if name in EXCLUDED_URL_NAMES or name.startswith('review'):
                 show = False
-    return {'steam_promo': show, 'steam_start_date': '2026-11-23'}
+    return {
+        'steam_promo': show,
+        'steam_start_date': '2026-11-23',
+        'steam_stage': stage_info,
+        'current_stage_line': stage_info['line'],
+    }
