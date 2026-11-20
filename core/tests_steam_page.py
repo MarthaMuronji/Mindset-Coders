@@ -224,13 +224,13 @@ class SteamExperienceRedesignTests(SimpleTestCase):
         )
         self.assertContains(response, 'images/missing-slot-test.jpg')
 
-    def test_venue_is_consistent_across_steam_contact_and_home(self):
+    def test_venue_is_consistent_across_steam_and_contact(self):
         venue = 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road'
         self.assertContains(self.response, venue)
         self.assertContains(self.client.get('/contact/'), venue)
         with override_settings(STEAM_EXPERIENCE_PUBLIC=True):
             home = self.client.get('/')
-        self.assertContains(home, venue)
+        self.assertContains(home, 'Mindset Coders HQ, Kyanja, Kampala')
 
     def test_confirmed_age_groups_spaces_and_purchase_note_render(self):
         for group in (

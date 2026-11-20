@@ -197,20 +197,67 @@ class SteamPopupTests(SimpleTestCase):
     """The Home pop up invites visitors to the STEAM Experience."""
 
     def test_home_shows_the_dialog(self):
-        response = self.client.get('/')
+        before_start = {
+            'state': 'before',
+            'line': '',
+            'is_running': False,
+            'is_ended': False,
+        }
+        with mock.patch(
+            'core.views.get_current_stage',
+            return_value=before_start,
+        ):
+            response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<dialog class="steam-popup"')
+        self.assertContains(
+            response,
+            '<dialog class="steam-popup" role="dialog" aria-modal="true"',
+        )
         self.assertContains(response, 'id="steam-popup-title"')
-        self.assertContains(response, 'Holiday Makers')
+        self.assertContains(response, 'HOLIDAY MAKERS')
         self.assertContains(response, 'STEAM Experience')
         self.assertContains(response, 'Starts 23 November')
+        self.assertContains(response, 'days to go')
         self.assertContains(response, 'Ages 8 to 19')
         self.assertContains(response, '23 November 2026 to 29 January 2027')
+        self.assertContains(response, 'Mindset Coders HQ, Kyanja, Kampala')
         self.assertContains(response, 'UGX 150,000 per week')
-        self.assertContains(response, 'Amreena Mall, Level 3, Room 304, Kyanja Ring Road')
+        self.assertContains(response, 'Discover')
+        self.assertContains(response, '23 to 27 November')
+        self.assertContains(response, 'Build')
+        self.assertContains(response, '30 November to 18 December')
+        self.assertContains(response, 'Innovate')
+        self.assertContains(response, '4 to 29 January')
         self.assertContains(response, 'Spaces are limited.')
         self.assertContains(response, 'Learn more')
         self.assertContains(response, 'Register now')
+        self.assertContains(response, 'img-slot--flyer')
+        self.assertNotContains(response, 'Amreena Mall')
+
+    def test_running_stage_uses_the_badge_and_highlights_its_step(self):
+        running_stage = {
+            'state': 'discover',
+            'line': 'Now running: Discover, 23 to 27 November',
+            'is_running': True,
+            'is_ended': False,
+        }
+        with mock.patch(
+            'core.views.get_current_stage',
+            return_value=running_stage,
+        ):
+            response = self.client.get('/')
+
+        html = response.content.decode()
+        popup_start = html.index('<dialog class="steam-popup"')
+        popup_end = html.index('</dialog>', popup_start)
+        popup = html[popup_start:popup_end]
+        self.assertIn('class="steam-popup-countdown"', popup)
+        self.assertIn(running_stage['line'], popup)
+        self.assertIn(
+            'class="steam-popup-step is-current" aria-current="step"',
+            popup,
+        )
+        self.assertNotIn('class="steam-popup-countdown-value"', popup)
 
     def test_shared_script_uses_per_visit_state(self):
         response = self.client.get('/')
@@ -313,7 +360,7 @@ class SteamChipTests(SimpleTestCase):
         self.assertContains(response, 'id="steam-chip-corner"')
         self.assertContains(response, 'data-umami-event="steam-chip-click"')
         self.assertContains(response, '<dialog class="steam-popup"')
-        self.assertContains(response, 'Holiday Makers')
+        self.assertContains(response, 'HOLIDAY MAKERS')
         self.assertContains(response, 'STEAM Experience')
 
     def test_about_and_schools_have_the_chip_but_no_dialog(self):

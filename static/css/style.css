@@ -4324,3 +4324,388 @@ a.build-card:focus-visible {
         margin-bottom: 0;
     }
 }
+
+.steam-popup {
+    box-sizing: border-box;
+    width: min(560px, calc(100vw - 24px));
+    max-width: 560px;
+    max-height: min(90dvh, 760px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    background: var(--white);
+    color: var(--navy-dark);
+    box-shadow: 0 20px 56px rgba(var(--navy-dark-rgb), 0.3);
+}
+
+.steam-popup::backdrop {
+    background: rgba(var(--navy-dark-rgb), 0.62);
+    backdrop-filter: blur(2px);
+}
+
+.steam-popup-body {
+    position: relative;
+    padding: 0;
+}
+
+.steam-popup-banner {
+    position: relative;
+    min-height: 194px;
+    overflow: hidden;
+    padding: 27px 68px 42px 28px;
+    border-radius: 20px 20px 0 0;
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+    color: var(--white);
+}
+
+.steam-popup-circuit {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.steam-popup-banner-copy {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.steam-popup-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid rgba(var(--white-rgb), 0.75);
+    border-radius: 50%;
+    background: var(--navy-dark);
+    color: var(--white);
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.steam-popup-close:hover,
+.steam-popup-close:focus-visible {
+    background: var(--green-dark);
+}
+
+.steam-popup-close:focus-visible {
+    outline: 3px solid var(--white);
+    outline-offset: 3px;
+}
+
+.steam-popup-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: 13px;
+    padding: 4px 12px;
+    border: 1px solid var(--green-border);
+    border-radius: 999px;
+    background: var(--green-light);
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.steam-popup .steam-popup-title {
+    max-width: 100%;
+    margin: 0 0 4px;
+    padding: 0;
+    color: var(--white);
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: clamp(26px, 6vw, 34px);
+    font-weight: 700;
+    line-height: 1.16;
+    overflow-wrap: anywhere;
+}
+
+.steam-popup .steam-popup-age {
+    margin: 0;
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.steam-popup-content {
+    min-width: 0;
+    padding: 0 28px 26px;
+    color: var(--navy-dark);
+}
+
+.steam-popup-countdown {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 48px;
+    margin: -24px auto 18px;
+    padding: 10px 20px;
+    border: 2px solid var(--white);
+    border-radius: 999px;
+    background: var(--green-light);
+    box-shadow: 0 5px 16px rgba(var(--navy-rgb), 0.16);
+    color: var(--navy);
+    text-align: center;
+}
+
+.steam-popup-countdown-value {
+    color: var(--navy);
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.steam-popup-countdown-label {
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.steam-popup-countdown-label[hidden] {
+    display: none;
+}
+
+.steam-popup-stage {
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.steam-popup-facts {
+    display: grid;
+    gap: 9px;
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+}
+
+.steam-popup-facts li {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    min-width: 0;
+    color: var(--navy-dark);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.steam-popup-facts i {
+    flex: 0 0 19px;
+    margin-top: 3px;
+    color: var(--green-dark);
+    text-align: center;
+}
+
+.steam-popup-facts span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.steam-popup-stages {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 16px;
+}
+
+.steam-popup-step {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    min-height: 70px;
+    padding: 9px 10px;
+    border: 1px solid var(--neutral-border);
+    border-radius: 10px;
+    background: var(--surface-soft);
+    color: var(--navy-dark);
+}
+
+.steam-popup-step.is-current {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+    box-shadow: inset 0 0 0 1px var(--green-dark);
+}
+
+.steam-popup-step-name {
+    color: var(--navy);
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.steam-popup-step.is-current .steam-popup-step-name {
+    color: var(--green-dark);
+}
+
+.steam-popup-step-date {
+    color: var(--navy-dark);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.steam-popup-spaces {
+    margin: 0 0 16px;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.steam-popup-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.steam-popup-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 48px;
+    padding: 10px 16px;
+    border-radius: 9px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    text-decoration: none;
+}
+
+.steam-popup-register {
+    border: 1.5px solid var(--green-btn);
+    background: var(--green-btn);
+    color: var(--white);
+    box-shadow: 0 4px 14px rgba(var(--navy-rgb), 0.3);
+}
+
+.steam-popup-register:hover,
+.steam-popup-register:focus-visible {
+    border-color: var(--green-btn-hover);
+    background: var(--green-btn-hover);
+    color: var(--white);
+}
+
+.steam-popup-learn {
+    border: 1.5px solid var(--navy);
+    background: var(--white);
+    color: var(--navy);
+}
+
+.steam-popup-learn:hover,
+.steam-popup-learn:focus-visible {
+    background: var(--surface-soft);
+    color: var(--navy);
+}
+
+.steam-popup-actions .btn:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 3px;
+}
+
+@keyframes steam-popup-arrive {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.steam-popup[open] {
+    animation: steam-popup-arrive 0.24s ease-out;
+}
+
+@media (max-width: 479px) {
+    .steam-popup-banner {
+        min-height: 180px;
+        padding: 24px 62px 38px 20px;
+    }
+
+    .steam-popup-content {
+        padding: 0 18px 20px;
+    }
+
+    .steam-popup-countdown {
+        margin-bottom: 16px;
+        padding-right: 14px;
+        padding-left: 14px;
+    }
+
+    .steam-popup-stages {
+        gap: 6px;
+    }
+
+    .steam-popup-step {
+        min-height: 76px;
+        padding: 8px 7px;
+    }
+
+    .steam-popup-step-name {
+        font-size: 11px;
+    }
+
+    .steam-popup-step-date {
+        font-size: 10px;
+    }
+
+    .steam-popup-actions {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+    }
+}
+
+@media (max-height: 700px) {
+    .steam-popup {
+        max-height: 85dvh;
+        overflow-y: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .steam-popup,
+    .steam-popup *,
+    .steam-popup::backdrop {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .steam-popup .btn:hover,
+    .steam-popup-close:hover {
+        transform: none;
+    }
+}
