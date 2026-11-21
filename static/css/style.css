@@ -2463,6 +2463,70 @@ a.build-card:focus-visible {
     margin: 6px 0 0;
 }
 
+.payment-method-group {
+    min-width: 0;
+    border: 0;
+}
+
+.payment-method-group legend {
+    margin-bottom: 0.4rem;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-weight: 600;
+}
+
+.payment-method-options {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+.form-group .payment-method-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 72px;
+    margin: 0;
+    padding: 12px 16px;
+    border: 1px solid var(--text-muted);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--navy);
+    cursor: pointer;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.payment-method-card input[type="radio"] {
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--navy);
+}
+
+.payment-method-card:hover {
+    border-color: var(--navy);
+    background: var(--surface-soft);
+}
+
+.payment-method-card:has(input[type="radio"]:checked) {
+    border: 2px solid var(--navy);
+    background: var(--green-light);
+    font-weight: 600;
+}
+
+.payment-method-card:focus-within {
+    outline: 3px solid var(--navy);
+    outline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+    .payment-method-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 /* Consent: the tick sits beside its long label instead of stretching to
    the full field width, which the shared input rule above would give it */
 .form-group input[type="checkbox"] {

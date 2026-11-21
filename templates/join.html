@@ -74,14 +74,21 @@
                 {% endif %}
             </div>
             {% if form.show_payment_method %}
-            <div class="form-group" id="payment-method-group"{% if not form.payment_method_required %} hidden{% endif %}>
-                <p>{{ form.payment_method.label }}</p>
+            <fieldset class="form-group payment-method-group" id="payment-method-group"{% if not form.payment_method_required %} hidden{% endif %}>
+                <legend>{{ form.payment_method.label }}</legend>
                 {{ form.payment_method.errors }}
-                {{ form.payment_method }}
+                <div class="payment-method-options">
+                    {% for option in form.payment_method %}
+                    <label class="payment-method-card">
+                        {{ option.tag }}
+                        <span>{{ option.choice_label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
                 {% if form.payment_method.help_text %}
                 <p class="field-hint">{{ form.payment_method.help_text }}</p>
                 {% endif %}
-            </div>
+            </fieldset>
             {% endif %}
             <div class="form-group">
                 <label for="{{ form.consent.id_for_label }}" class="consent-label">{{ form.consent }} {{ form.consent.label }}</label>
