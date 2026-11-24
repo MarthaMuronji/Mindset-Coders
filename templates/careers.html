@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Careers | Associate STEM Instructor | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Careers | Associate STEM Instructor | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.{% endblock %}
+{% block og_description %}Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero careers-hero reveal">
+    <span class="badge">Careers</span>
+    <h1>We are hiring!</h1>
+</section>
+
+{% if careers %}
+{% for role in careers %}
+<section class="home-section careers-role-section reveal">
+    <div class="careers-role-header">
+        <h2>{{ role.title }}</h2>
+        <div class="careers-chips">
+            {% for chip in role.chips %}
+            <span class="careers-chip">{{ chip }}</span>
+            {% endfor %}
+        </div>
+        <p class="careers-intro">{{ role.intro }}</p>
+    </div>
+
+    <div class="careers-areas-block">
+        <p class="section-lead">{{ role.lead_in }}</p>
+        <div class="build-cards-grid careers-areas-grid">
+            {% for area in role.areas %}
+            <div class="build-card reveal">
+                <div class="why-icon" aria-hidden="true"><i class="{{ area.icon }}"></i></div>
+                <h3>{{ area.name }}</h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- <div class="img-slot img-slot--wide"></div> -->
+
+    <div class="careers-two-col">
+        <div class="careers-col">
+            <h2>Who should apply?</h2>
+            <ul class="careers-list">
+                {% for item in role.who_should_apply %}
+                <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
+                {% endfor %}
+            </ul>
+            <p class="careers-note"><strong>Note:</strong> {{ role.experience_note }}</p>
+        </div>
+        <div class="careers-col">
+            <h2>What we offer</h2>
+            <ul class="careers-list">
+                {% for item in role.offers %}
+                <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="careers-closing-block">
+        <p class="careers-paragraph">{{ role.closing_paragraph }}</p>
+        <p class="careers-location">Location: {{ role.location }}</p>
+    </div>
+
+    <div class="careers-apply-section" id="apply">
+        <h2>How to apply</h2>
+        <p class="careers-apply-text">{{ role.apply_text }}</p>
+        <div class="careers-apply-action">
+            <a href="mailto:{{ role.apply_email }}?subject={{ role.apply_subject|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="apply-instructor" data-umami-event-from="careers">Apply by email</a>
+            <p class="careers-apply-email">{{ role.apply_email }}</p>
+            <p class="careers-apply-subject">Subject: {{ role.apply_subject }}</p>
+        </div>
+        <p class="careers-sign-off">{{ role.sign_off }}</p>
+    </div>
+</section>
+{% endfor %}
+{% else %}
+<section class="home-section careers-empty-section reveal">
+    <div class="trusted-by innovators-empty">
+        <p>No open roles right now. You are welcome to write to info@mindset-group.org.</p>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

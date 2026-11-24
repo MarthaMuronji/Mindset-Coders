@@ -43,6 +43,7 @@ urlpatterns = [
     path('innovators-circle/', views.innovators_circle, name='innovators_circle'),
     path('university-preparation/', _redirect_to('home'), name='university_preparation'),
     path('privacy/', views.privacy, name='privacy'),
+    path('careers/', views.careers, name='careers'),
     path('refund-policy/', views.refund_policy, name='refund_policy'),
     path('shop/', views.shop, name='shop'),
     path('steam-experience/', views.steam_experience, name='steam_experience'),

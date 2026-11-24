@@ -166,6 +166,59 @@ def privacy(request):
     """The privacy page. It reads from settings and the environment only, so it needs no database."""
     return render(request, 'privacy.html')
 
+CAREERS = [
+    {
+        'title': 'Associate STEM Instructors',
+        'chips': ['Part-Time', 'Entry-Level', 'Kampala'],
+        'intro': 'Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.',
+        'lead_in': 'We are looking for enthusiastic, reliable and curious individuals interested in teaching children and young people in the following areas:',
+        'areas': [
+            {
+                'name': 'Coding and software programming',
+                'icon': 'fa-solid fa-laptop-code',
+            },
+            {
+                'name': 'Robotics and electronics',
+                'icon': 'fa-solid fa-robot',
+            },
+            {
+                'name': 'Foundational STEM education',
+                'icon': 'fa-solid fa-flask',
+            },
+            {
+                'name': 'Design thinking and innovation',
+                'icon': 'fa-solid fa-lightbulb',
+            },
+        ],
+        'who_should_apply': [
+            'Recent graduates and early-career professionals in STEM, computer science, engineering, IT, education or related fields.',
+            'Individuals with practical technical skills and a willingness to learn.',
+            'Individuals who enjoy working with children and young people.',
+            'Reliable, punctual and proactive individuals with strong communication skills.',
+            'Individuals available for scheduled weekday and/or weekend teaching assignments.',
+        ],
+        'experience_note': 'Previous teaching experience is an advantage but is not mandatory.',
+        'offers': [
+            'Instructor training and professional development.',
+            'Access to structured curricula and teaching resources.',
+            'Practical experience delivering STEM education programmes.',
+            'Paid teaching assignments.',
+            'Opportunities for professional growth within Mindset Coders.',
+        ],
+        'closing_paragraph': 'This is a part-time, assignment-based opportunity for individuals who are committed to learning, delivering quality work and growing with an ambitious education technology company.',
+        'location': 'Kampala, Uganda',
+        'apply_heading': 'How to apply',
+        'apply_text': 'Send your CV and a brief introduction highlighting your technical skills, interests and availability to info@mindset-group.org.',
+        'apply_email': 'info@mindset-group.org',
+        'apply_subject': 'Associate STEM Instructor Application',
+        'sign_off': 'Mindset Coders | BIG IDEAS START HERE',
+    },
+]
+
+def careers(request):
+    """The careers page advertising open roles. Needs no database to render."""
+    return render(request, 'careers.html', {'careers': CAREERS})
+
 def refund_policy(request):
     """Render the refund policy using the STEAM Experience publication setting."""
     is_public = getattr(settings, 'STEAM_EXPERIENCE_PUBLIC', False)
