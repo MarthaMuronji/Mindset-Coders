@@ -3,7 +3,7 @@ import logging
 from datetime import date, datetime
 from functools import wraps
 from typing import ClassVar
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 from zoneinfo import ZoneInfo
 
 from django.conf import settings
@@ -14,6 +14,7 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import Paginator
 from django.db import DatabaseError, transaction
+from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -31,7 +32,7 @@ from .forms import (
     ReviewStoryForm,
     StoryForm,
 )
-from .models import ContactMessage, JobApplication, Post, Story
+from .models import CareerRoleState, ContactMessage, JobApplication, Post, Story
 from .notifications import send_contact_notification
 from .spam import (
     contact_rate_limit_exceeded,
@@ -60,6 +61,20 @@ TOPIC_STARTERS = {
 # Shown only after a story has been stored, or after the spam trap has
 # silently swallowed the submission
 STORY_SUCCESS_MESSAGE = 'Thank you for sharing your story. We will read it and may contact you before anything is published.'
+DECLINE_EMAIL_SUBJECT = 'Your application for {role} at Mindset Coders'
+DECLINE_EMAIL_BODY = """Dear {name},
+
+Thank you for applying for the {role} position at Mindset Coders and for the time you took to apply.
+
+After careful review, we will not be taking your application forward at this time. We appreciate your interest in our work and wish you every success.
+
+Kind regards,
+Mindset Coders"""
+
+
+def get_open_careers():
+    closed_slugs = set(CareerRoleState.objects.filter(is_open=False).values_list('slug', flat=True))
+    return [role for role in CAREERS if role['slug'] not in closed_slugs]
 
 
 def get_current_stage(today=None):
@@ -260,14 +275,21 @@ CAREERS = [
 ]
 
 def careers(request):
-    """The careers page advertising open roles. Needs no database to render."""
-    return render(request, 'careers.html', {'careers': CAREERS})
+    """The careers page advertising open roles."""
+    return render(request, 'careers.html', {'careers': get_open_careers()})
 
 
 def careers_apply(request):
-    role_choices = [(role['title'], role['title']) for role in CAREERS]
+    open_roles = get_open_careers()
+    role_choices = [(role['title'], role['title']) for role in open_roles]
+    requested_role = request.GET.get('role', '')
+    closed_role = requested_role in {role['title'] for role in CAREERS} and requested_role not in dict(role_choices)
     if request.method == 'POST':
         form = JobApplicationForm(request.POST, role_choices=role_choices)
+        submitted_role = request.POST.get('role', '')
+        if submitted_role in {role['title'] for role in CAREERS} and submitted_role not in dict(role_choices):
+            form.add_error('role', 'This position is no longer accepting applications. Please choose an open role.')
+            closed_role = True
         form_timestamp = request.POST.get('form_timestamp', '')
         if not is_form_timestamp_valid(form_timestamp):
             form.add_error(
@@ -298,7 +320,6 @@ def careers_apply(request):
                     messages.success(request, 'Your application has been received.')
                     return redirect('careers_apply')
     else:
-        requested_role = request.GET.get('role', '')
         initial = (
             {'role': requested_role}
             if requested_role in dict(role_choices)
@@ -313,6 +334,8 @@ def careers_apply(request):
     return render(request, 'careers_apply.html', {
         'form': form,
         'form_timestamp': form_timestamp,
+        'closed_role': closed_role,
+        'open_roles': open_roles,
     })
 
 
@@ -338,6 +361,8 @@ def _job_application_queryset(request):
             applications = applications.filter(role=filters['role'])
         if filters['status']:
             applications = applications.filter(status=filters['status'])
+        if filters['informed'] == 'declined_uninformed':
+            applications = applications.filter(status='declined', informed_at__isnull=True)
         export_query = urlencode({
             key: value
             for key, value in filters.items()
@@ -352,6 +377,8 @@ def team_applications(request):
     if denied:
         return denied
     filter_form, applications, export_query = _job_application_queryset(request)
+    counts = {row['role']: row['total'] for row in JobApplication.objects.values('role').annotate(total=Count('pk'))}
+    state_by_slug = dict(CareerRoleState.objects.values_list('slug', 'is_open'))
     page = Paginator(applications, 50).get_page(request.GET.get('page'))
     previous_params = request.GET.copy()
     next_params = request.GET.copy()
@@ -366,6 +393,10 @@ def team_applications(request):
         'export_query': export_query,
         'previous_query': previous_params.urlencode(),
         'next_query': next_params.urlencode(),
+        'role_states': [
+            {'role': role, 'is_open': state_by_slug.get(role['slug'], True), 'count': counts.get(role['title'], 0)}
+            for role in CAREERS
+        ],
     })
 
 
@@ -380,6 +411,13 @@ def team_application_detail(request, pk):
         pk=pk,
     )
     if request.method == 'POST':
+        if request.POST.get('action') == 'informed':
+            if application.status == 'declined' and application.informed_at is None:
+                application.informed_at = timezone.now()
+                application.save(update_fields=['informed_at'])
+                record_audit_event('application_informed', user=request.user, object_type='JobApplication', object_id=application.pk, detail='Applicant informed')
+                messages.success(request, 'Applicant marked as informed.')
+            return redirect('team_application_detail', pk=application.pk)
         status_form = JobApplicationStatusForm(request.POST)
         if status_form.is_valid():
             changed = False
@@ -413,11 +451,53 @@ def team_application_detail(request, pk):
         status_form = JobApplicationStatusForm(
             initial={'status': application.status}
         )
+    subject = DECLINE_EMAIL_SUBJECT.format(name=application.full_name, role=application.role)
+    body = DECLINE_EMAIL_BODY.format(name=application.full_name, role=application.role)
     return render(request, 'team/application_detail.html', {
         'page_title': 'Application',
         'application': application,
         'status_form': status_form,
+        'decline_subject': subject,
+        'decline_body': body,
+        'mailto_url': 'mailto:{}?subject={}&body={}'.format(quote(application.email, safe='@'), quote(subject), quote(body)),
+        'is_owner': request.user.groups.filter(name='Owner').exists(),
     })
+
+
+@private_team_page
+@require_http_methods(['GET', 'POST'])
+def team_application_delete(request, pk):
+    if not request.user.groups.filter(name='Owner').exists():
+        return render(request, 'team/denied.html', {'page_title': 'No access'}, status=403)
+    application = get_object_or_404(JobApplication, pk=pk)
+    if request.method == 'POST' and request.POST.get('confirmed') == 'true':
+        application_id = application.pk
+        with transaction.atomic():
+            application.delete()
+            record_audit_event('application_deleted', user=request.user, object_type='JobApplication', object_id=application_id, detail='Application deleted')
+        messages.success(request, 'Application deleted.')
+        return redirect('team_applications')
+    return render(request, 'team/application_delete_confirm.html', {'page_title': 'Delete application', 'application': application})
+
+
+@private_team_page
+@require_POST
+def team_career_role_toggle(request, slug):
+    denied = _require_permission(request, 'core.manage_team')
+    if denied:
+        return denied
+    role = next((item for item in CAREERS if item['slug'] == slug), None)
+    if role is None:
+        raise Http404
+    state, _created = CareerRoleState.objects.get_or_create(slug=slug)
+    target_open = request.POST.get('is_open') == 'true'
+    if state.is_open != target_open:
+        state.is_open = target_open
+        state.updated_by = request.user
+        state.save(update_fields=['is_open', 'updated_by', 'updated_at'])
+        action = 'career_role_reopened' if target_open else 'career_role_filled'
+        record_audit_event(action, user=request.user, object_type='CareerRoleState', object_id=slug, detail='Role {}'.format('reopened' if target_open else 'marked filled'))
+    return redirect('team_applications')
 
 
 def _csv_safe_value(value):

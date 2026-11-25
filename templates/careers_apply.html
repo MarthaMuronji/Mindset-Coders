@@ -19,6 +19,10 @@
             {% endfor %}
         {% endif %}
 
+        {% if closed_role %}<div class="careers-closed-notice" role="status">This position is no longer accepting applications. You can apply for an open role below.</div>{% endif %}
+        {% if not open_roles %}<div class="careers-closed-notice" role="status">There are no open roles right now.</div>{% endif %}
+        {% if closed_role and open_roles %}<ul>{% for role in open_roles %}<li><a href="{% url 'careers_apply' %}?role={{ role.title|urlencode }}">{{ role.title }}</a></li>{% endfor %}</ul>{% endif %}
+
         <form method="post" novalidate>
             {% csrf_token %}
             <input type="hidden" name="form_timestamp" value="{{ form_timestamp }}">
