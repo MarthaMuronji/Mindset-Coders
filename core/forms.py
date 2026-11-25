@@ -97,6 +97,7 @@ class JobApplicationForm(forms.ModelForm):
 
 class JobApplicationFilterForm(forms.Form):
     role = forms.ChoiceField(required=False)
+    informed = forms.ChoiceField(required=False, choices=(('', 'All applications'), ('declined_uninformed', 'Declined, not yet informed')))
     status = forms.ChoiceField(required=False, choices=(
         ('', 'All statuses'),
     ) + tuple(JobApplication.STATUS_CHOICES))

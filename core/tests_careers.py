@@ -1,22 +1,25 @@
 import csv
+import html
 import time
 from io import StringIO
 from unittest import mock
+from urllib.parse import parse_qs, unquote, urlparse
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.signing import TimestampSigner
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import TestCase, override_settings
+from django.utils import timezone
 from django.urls import reverse
 
 from . import views
-from .models import AuditEvent, JobApplication
+from .models import AuditEvent, CareerRoleState, JobApplication
 from .spam import FORM_TIMESTAMP_SALT
 from .sitemaps import StaticViewSitemap
 
 
-class CareersPageTests(SimpleTestCase):
-    def test_careers_page_renders_without_a_database_and_returns_200(self):
+class CareersPageTests(TestCase):
+    def test_careers_page_renders_and_returns_200(self):
         response = self.client.get(reverse('careers'))
         self.assertEqual(response.status_code, 200)
 
@@ -34,7 +37,7 @@ class CareersPageTests(SimpleTestCase):
         )
         self.assertContains(
             response,
-            '<meta name="description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.">',
+            '<meta name="description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing &amp; Communications.">',
         )
         self.assertContains(
             response,
@@ -42,7 +45,7 @@ class CareersPageTests(SimpleTestCase):
         )
         self.assertContains(
             response,
-            '<meta property="og:description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.">',
+            '<meta property="og:description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing &amp; Communications.">',
         )
         self.assertContains(
             response,
@@ -309,6 +312,97 @@ class JobApplicationTests(TestCase):
         application = JobApplication.objects.get(role=marketing_role)
         self.assertEqual(application.role, marketing_role)
         self.assertContains(response, 'Your application has been received.')
+
+    def test_closed_role_disappears_and_direct_apply_is_rejected(self):
+        role = views.CAREERS[0]
+        CareerRoleState.objects.create(slug=role['slug'], is_open=False)
+        careers = self.client.get(reverse('careers'))
+        self.assertNotIn(role, careers.context['careers'])
+        form = self.client.get(reverse('careers_apply'))
+        self.assertNotContains(form, f'<option value="{role["title"]}"')
+        direct = self.client.get(reverse('careers_apply'), {'role': role['title']})
+        self.assertContains(direct, 'This position is no longer accepting applications')
+        self.assertNotContains(direct, f'<option value="{role["title"]}"')
+        posted = self.post_application(self.valid_post())
+        self.assertContains(posted, 'This position is no longer accepting applications')
+        self.assertEqual(JobApplication.objects.count(), 0)
+
+    def test_reopen_role_and_all_roles_closed_empty_state(self):
+        CareerRoleState.objects.create(slug=views.CAREERS[0]['slug'], is_open=False)
+        self.client.force_login(self.owner)
+        response = self.client.post(reverse('team_career_role_toggle', kwargs={'slug': views.CAREERS[0]['slug']}), {'is_open': 'true'})
+        self.assertRedirects(response, reverse('team_applications'))
+        self.assertTrue(AuditEvent.objects.filter(action='career_role_reopened', object_id=views.CAREERS[0]['slug']).exists())
+        self.assertContains(self.client.get(reverse('careers')), views.CAREERS[0]['title'])
+        CareerRoleState.objects.update(is_open=False)
+        for role in views.CAREERS:
+            CareerRoleState.objects.get_or_create(slug=role['slug'], defaults={'is_open': False})
+        self.assertContains(self.client.get(reverse('careers')), 'No open roles right now.')
+
+    def test_only_applications_permission_can_toggle_role(self):
+        finance = get_user_model().objects.create_user(username='toggle-finance', password='test-password')
+        finance.groups.add(Group.objects.get(name='Finance'))
+        role = views.CAREERS[0]
+        self.client.force_login(finance)
+        response = self.client.post(reverse('team_career_role_toggle', kwargs={'slug': role['slug']}), {'is_open': 'false'})
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(CareerRoleState.objects.filter(slug=role['slug'], is_open=False).exists())
+
+    def test_decline_email_mailto_encodes_address_and_name(self):
+        role = views.CAREERS[1]['title']
+        app = JobApplication.objects.create(role=role, full_name="O'Neil & Co", email='a&b@example.test', phone='0700123456', cv_link='https://example.test/cv', consent=True, status='declined')
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse('team_application_detail', kwargs={'pk': app.pk}))
+        self.assertContains(response, 'Email applicant')
+        link = next(fragment for fragment in html.unescape(response.content.decode()).split('href="') if fragment.startswith('mailto:') and '?subject=' in fragment).split('"', 1)[0]
+        parsed = urlparse(link)
+        self.assertEqual(unquote(parsed.path), 'a&b@example.test')
+        query = parse_qs(parsed.query)
+        self.assertIn("O'Neil & Co", query['body'][0])
+        self.assertIn(role, query['subject'][0])
+        app.status = 'new'
+        app.save(update_fields=['status'])
+        self.assertNotContains(self.client.get(reverse('team_application_detail', kwargs={'pk': app.pk})), 'Email applicant')
+
+    def test_informed_mark_and_audit_are_private(self):
+        app = JobApplication.objects.create(role=views.CAREERS[0]['title'], full_name='Private Person', email='private@example.test', phone='0700123456', cv_link='https://example.test/private', consent=True, status='declined')
+        self.client.force_login(self.owner)
+        response = self.client.post(reverse('team_application_detail', kwargs={'pk': app.pk}), {'action': 'informed'})
+        self.assertRedirects(response, reverse('team_application_detail', kwargs={'pk': app.pk}))
+        app.refresh_from_db()
+        self.assertIsNotNone(app.informed_at)
+        self.assertContains(self.client.get(reverse('team_application_detail', kwargs={'pk': app.pk})), 'Informed')
+        event = AuditEvent.objects.get(action='application_informed')
+        for private in ('Private Person', 'private@example.test', 'https://example.test/private'):
+            self.assertNotIn(private, event.detail)
+            self.assertNotIn(private, event.username)
+
+    def test_declined_not_informed_filter(self):
+        not_informed = JobApplication.objects.create(role=views.CAREERS[0]['title'], full_name='Waiting Person', email='waiting@example.test', phone='0700123456', cv_link='https://example.test/waiting', consent=True, status='declined')
+        JobApplication.objects.create(role=views.CAREERS[0]['title'], full_name='Done Person', email='done@example.test', phone='0700123456', cv_link='https://example.test/done', consent=True, status='declined', informed_at=timezone.now())
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse('team_applications'), {'informed': 'declined_uninformed'})
+        self.assertEqual(response.context['applications'].paginator.count, 1)
+        self.assertEqual(response.context['applications'][0], not_informed)
+
+    def test_delete_confirmation_owner_only_post_and_audit(self):
+        app = JobApplication.objects.create(role=views.CAREERS[0]['title'], full_name='Delete Person', email='delete@example.test', phone='0700123456', cv_link='https://example.test/delete', consent=True)
+        delete_url = reverse('team_application_delete', kwargs={'pk': app.pk})
+        finance = get_user_model().objects.create_user(username='delete-finance', password='test-password')
+        finance.groups.add(Group.objects.get(name='Finance'))
+        self.client.force_login(finance)
+        self.assertEqual(self.client.get(delete_url).status_code, 403)
+        self.assertEqual(self.client.post(delete_url, {'confirmed': 'true'}).status_code, 403)
+        self.client.force_login(self.owner)
+        self.assertEqual(self.client.post(delete_url, {}).status_code, 200)
+        self.assertTrue(JobApplication.objects.filter(pk=app.pk).exists())
+        self.assertEqual(self.client.get(delete_url).status_code, 200)
+        self.assertRedirects(self.client.post(delete_url, {'confirmed': 'true'}), reverse('team_applications'))
+        self.assertFalse(JobApplication.objects.filter(pk=app.pk).exists())
+        event = AuditEvent.objects.get(action='application_deleted')
+        for private in ('Delete Person', 'delete@example.test', 'https://example.test/delete'):
+            self.assertNotIn(private, event.detail)
+            self.assertNotIn(private, event.username)
 
     def test_get_careers_apply_with_preselected_marketing_role(self):
         marketing_role = views.CAREERS[1]['title']

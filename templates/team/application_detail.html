@@ -32,4 +32,30 @@
       <div class="team-errors" role="alert">{{ status_form.errors }}</div>
     {% endif %}
   </section>
+  {% if application.status == 'declined' %}
+    <section class="team-panel">
+      <h2>Email applicant</h2>
+      <p>{{ decline_body|linebreaksbr }}</p>
+      <div class="team-filter-actions">
+        <a class="btn btn-primary" href="{{ mailto_url }}">Email applicant</a>
+        <button class="btn btn-outline" type="button" id="copy-decline-message">Copy message</button>
+      </div>
+      <textarea id="decline-message" readonly aria-label="Decline email message">Subject: {{ decline_subject }}
+
+{{ decline_body }}</textarea>
+    </section>
+    <section class="team-panel">
+      <h2>Applicant notification</h2>
+      {% if application.informed_at %}<p><span class="team-status">Informed</span> {{ application.informed_at|date:"j M Y, g:i a" }}</p>
+      {% else %}<form method="post">{% csrf_token %}<button class="btn btn-outline" name="action" value="informed" type="submit">Mark as informed</button></form>{% endif %}
+    </section>
+  {% endif %}
+  {% if is_owner %}<section class="team-panel"><h2>Delete application</h2><a class="btn btn-danger" href="{% url 'team_application_delete' application.pk %}">Delete application</a></section>{% endif %}
+  {% if application.status == 'declined' %}<script>
+    document.getElementById('copy-decline-message').addEventListener('click', function () {
+      var text = document.getElementById('decline-message');
+      text.select();
+      navigator.clipboard.writeText(text.value).then(function () { this.textContent = 'Copied'; }.bind(this));
+    });
+  </script>{% endif %}
 {% endblock %}

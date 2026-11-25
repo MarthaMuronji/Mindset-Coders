@@ -90,6 +90,8 @@ urlpatterns = [
         views.team_application_detail,
         name='team_application_detail',
     ),
+    path('team/applications/<int:pk>/delete/', views.team_application_delete, name='team_application_delete'),
+    path('team/careers/<slug:slug>/toggle/', views.team_career_role_toggle, name='team_career_role_toggle'),
     path(
         'team/applications/',
         views.team_applications,

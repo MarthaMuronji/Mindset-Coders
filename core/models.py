@@ -226,6 +226,7 @@ class JobApplication(models.Model):
         default='new',
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    informed_at = models.DateTimeField(null=True, blank=True)
     handled_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -263,6 +264,10 @@ class AuditEvent(models.Model):
         ('person_switched_on', 'Switched on team member'),
         ('message_followed_up', 'Marked message followed up'),
         ('job_application_status_changed', 'Changed application status'),
+        ('career_role_filled', 'Marked role filled'),
+        ('career_role_reopened', 'Reopened role'),
+        ('application_informed', 'Marked applicant informed'),
+        ('application_deleted', 'Deleted application'),
     ]
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -289,6 +294,16 @@ class AuditEvent(models.Model):
 
     def __str__(self):
         return '{}: {}'.format(self.get_action_display(), self.username or 'Unknown person')
+
+
+class CareerRoleState(models.Model):
+    slug = models.SlugField(max_length=100, unique=True)
+    is_open = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='updated_career_roles',
+    )
 
 
 class LoginThrottle(models.Model):

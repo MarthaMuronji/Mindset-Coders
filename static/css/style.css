@@ -5074,6 +5074,27 @@ a.build-card:focus-visible {
     padding: 0 20px;
 }
 
+.careers-closed-notice {
+    margin: 0 0 20px;
+    padding: 14px 18px;
+    border: 1px solid var(--green-border);
+    border-radius: 8px;
+    background: var(--green-light);
+    color: var(--navy);
+}
+
+#decline-message {
+    display: block;
+    width: 100%;
+    min-height: 240px;
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px solid var(--green-border);
+    border-radius: 8px;
+    background: var(--surface-soft);
+    color: var(--navy);
+}
+
 @media (max-width: 480px) {
     .careers-card {
         padding: 24px 16px;

@@ -3,8 +3,8 @@
 
 {% block title %}Careers | Mindset Coders Uganda{% endblock %}
 {% block meta_title_og %}Careers | Mindset Coders Uganda{% endblock %}
-{% block meta_description %}{% if careers %}Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.{% else %}Careers at Mindset Coders Uganda.{% endif %}{% endblock %}
-{% block og_description %}{% if careers %}Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.{% else %}Careers at Mindset Coders Uganda.{% endif %}{% endblock %}
+{% block meta_description %}{% if careers %}Open roles at Mindset Coders Uganda: {% for role in careers %}{{ role.title }}{% if not forloop.last %} and {% endif %}{% endfor %}.{% else %}Careers at Mindset Coders Uganda.{% endif %}{% endblock %}
+{% block og_description %}{% if careers %}Open roles at Mindset Coders Uganda: {% for role in careers %}{{ role.title }}{% if not forloop.last %} and {% endif %}{% endfor %}.{% else %}Careers at Mindset Coders Uganda.{% endif %}{% endblock %}
 
 {% block content %}
 
