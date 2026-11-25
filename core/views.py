@@ -179,6 +179,9 @@ def privacy(request):
 
 CAREERS = [
     {
+        'slug': 'associate-stem-instructors',
+        'apply_anchor': 'apply',
+        'apply_event': 'apply-instructor',
         'title': 'Associate STEM Instructors',
         'chips': ['Part-Time', 'Entry-Level', 'Kampala'],
         'intro': 'Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.',
@@ -222,6 +225,36 @@ CAREERS = [
         'apply_text': 'Send your CV and a brief introduction highlighting your technical skills, interests and availability to info@mindset-group.org.',
         'apply_email': 'info@mindset-group.org',
         'apply_subject': 'Associate STEM Instructor Application',
+        'sign_off': 'Mindset Coders | BIG IDEAS START HERE',
+    },
+    {
+        'slug': 'marketing-communications',
+        'apply_anchor': 'apply-marketing',
+        'apply_event': 'apply-marketing',
+        'title': 'Junior Associate, Marketing & Communications',
+        'chips': ['Full-Time', 'Early Career', 'Kampala'],
+        'intro': 'Are you creative, curious and passionate about digital marketing, technology and storytelling?',
+        'intro_secondary': 'Mindset Coders is looking for a proactive individual to help us grow our brand, market our products and tell the stories behind our work in STEM education.',
+        'duties_heading': 'What you will do',
+        'duties': [
+            'Create engaging digital content, including graphics, photos and videos.',
+            'Manage our social media platforms.',
+            'Plan and execute marketing campaigns.',
+            'Promote our products, programmes and events.',
+            'Support lead generation and track marketing performance.',
+        ],
+        'who_should_apply': [
+            'Recent graduates and early-career professionals in Marketing, Communications, Multimedia, Business or related fields.',
+            'Creative individuals with practical content creation and video editing skills.',
+            'Individuals familiar with social media platforms and digital marketing tools.',
+            'Strong communicators who are proactive, organised, reliable and willing to learn.',
+        ],
+        'experience_note': 'A strong portfolio and practical skills are highly valued.',
+        'location': 'Kyanja, Kampala',
+        'apply_heading': 'How to apply',
+        'apply_text': 'Send your CV, a brief introduction and samples of your work to info@mindset-group.org.',
+        'apply_email': 'info@mindset-group.org',
+        'apply_subject': 'Marketing & Communications Associate Application',
         'sign_off': 'Mindset Coders | BIG IDEAS START HERE',
     },
 ]
