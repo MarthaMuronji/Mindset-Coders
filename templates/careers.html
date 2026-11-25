@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Careers | Associate STEM Instructor | Mindset Coders Uganda{% endblock %}
-{% block meta_title_og %}Careers | Associate STEM Instructor | Mindset Coders Uganda{% endblock %}
-{% block meta_description %}Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.{% endblock %}
-{% block og_description %}Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.{% endblock %}
+{% block title %}Careers | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Careers | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.{% endblock %}
+{% block og_description %}Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.{% endblock %}
 
 {% block content %}
 
@@ -14,8 +14,18 @@
 </section>
 
 {% if careers %}
+{% if careers|length > 1 %}
+<nav class="careers-open-roles" aria-label="Open roles">
+    <h2>Open roles</h2>
+    <ul>
+        {% for role in careers %}
+        <li><a href="#{{ role.slug }}">{{ role.title }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
 {% for role in careers %}
-<section class="home-section careers-role-section reveal">
+<section class="home-section careers-role-section reveal" id="{{ role.slug }}">
     <div class="careers-role-header">
         <h2>{{ role.title }}</h2>
         <div class="careers-chips">
@@ -24,8 +34,12 @@
             {% endfor %}
         </div>
         <p class="careers-intro">{{ role.intro }}</p>
+        {% if role.intro_secondary %}
+        <p class="careers-intro">{{ role.intro_secondary }}</p>
+        {% endif %}
     </div>
 
+    {% if role.areas %}
     <div class="careers-areas-block">
         <p class="section-lead">{{ role.lead_in }}</p>
         <div class="build-cards-grid careers-areas-grid">
@@ -37,10 +51,21 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 
     <!-- <div class="img-slot img-slot--wide"></div> -->
 
     <div class="careers-two-col">
+        {% if role.duties %}
+        <div class="careers-col">
+            <h2>{{ role.duties_heading }}</h2>
+            <ul class="careers-list">
+                {% for item in role.duties %}
+                <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
         <div class="careers-col">
             <h2>Who should apply?</h2>
             <ul class="careers-list">
@@ -48,8 +73,11 @@
                 <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
                 {% endfor %}
             </ul>
+            {% if role.experience_note %}
             <p class="careers-note"><strong>Note:</strong> {{ role.experience_note }}</p>
+            {% endif %}
         </div>
+        {% if role.offers %}
         <div class="careers-col">
             <h2>What we offer</h2>
             <ul class="careers-list">
@@ -58,18 +86,21 @@
                 {% endfor %}
             </ul>
         </div>
+        {% endif %}
     </div>
 
     <div class="careers-closing-block">
+        {% if role.closing_paragraph %}
         <p class="careers-paragraph">{{ role.closing_paragraph }}</p>
+        {% endif %}
         <p class="careers-location">Location: {{ role.location }}</p>
     </div>
 
-    <div class="careers-apply-section" id="apply">
-        <h2>How to apply</h2>
+    <div class="careers-apply-section" id="{{ role.apply_anchor }}">
+        <h2>{{ role.apply_heading }}</h2>
         <p class="careers-apply-text">{{ role.apply_text }}</p>
         <div class="careers-apply-action">
-            <a href="mailto:{{ role.apply_email }}?subject={{ role.apply_subject|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="apply-instructor" data-umami-event-from="careers">Apply by email</a>
+            <a href="mailto:{{ role.apply_email }}?subject={{ role.apply_subject|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="{{ role.apply_event }}" data-umami-event-from="careers">Apply by email</a>
             <p class="careers-apply-email">{{ role.apply_email }}</p>
             <p class="careers-apply-subject">Subject: {{ role.apply_subject }}</p>
         </div>

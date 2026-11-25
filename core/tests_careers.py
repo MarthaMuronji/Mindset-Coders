@@ -23,19 +23,19 @@ class CareersPageTests(SimpleTestCase):
         response = self.client.get(reverse('careers'))
         self.assertContains(
             response,
-            '<title>Careers | Associate STEM Instructor | Mindset Coders Uganda</title>',
+            '<title>Careers | Mindset Coders Uganda</title>',
         )
         self.assertContains(
             response,
-            '<meta name="description" content="Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.">',
+            '<meta name="description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.">',
         )
         self.assertContains(
             response,
-            '<meta property="og:title" content="Careers | Associate STEM Instructor | Mindset Coders Uganda">',
+            '<meta property="og:title" content="Careers | Mindset Coders Uganda">',
         )
         self.assertContains(
             response,
-            '<meta property="og:description" content="Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.">',
+            '<meta property="og:description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.">',
         )
         self.assertContains(
             response,
@@ -135,6 +135,60 @@ class CareersPageTests(SimpleTestCase):
         self.assertContains(response, 'data-umami-event="apply-instructor"')
         self.assertContains(response, 'data-umami-event-from="careers"')
         self.assertContains(response, 'Apply by email')
+        self.assertContains(response, 'id="apply"')
+
+    def test_second_role_shows_all_copy_and_lists(self):
+        response = self.client.get(reverse('careers'))
+
+        for item in (
+            'Junior Associate, Marketing &amp; Communications',
+            'Full-Time',
+            'Early Career',
+            'Are you creative, curious and passionate about digital marketing, technology and storytelling?',
+            'Mindset Coders is looking for a proactive individual to help us grow our brand, market our products and tell the stories behind our work in STEM education.',
+            'What you will do',
+            'Create engaging digital content, including graphics, photos and videos.',
+            'Manage our social media platforms.',
+            'Plan and execute marketing campaigns.',
+            'Promote our products, programmes and events.',
+            'Support lead generation and track marketing performance.',
+            'Recent graduates and early-career professionals in Marketing, Communications, Multimedia, Business or related fields.',
+            'Creative individuals with practical content creation and video editing skills.',
+            'Individuals familiar with social media platforms and digital marketing tools.',
+            'Strong communicators who are proactive, organised, reliable and willing to learn.',
+            'Note:</strong> A strong portfolio and practical skills are highly valued.',
+            'Location: Kyanja, Kampala',
+            'Send your CV, a brief introduction and samples of your work to info@mindset-group.org.',
+            'Subject: Marketing &amp; Communications Associate Application',
+        ):
+            self.assertContains(response, item)
+
+    def test_second_role_mailto_subject_and_tracking_event(self):
+        response = self.client.get(reverse('careers'))
+        self.assertContains(
+            response,
+            'href="mailto:info@mindset-group.org?subject=Marketing%20%26%20Communications%20Associate%20Application"',
+        )
+        self.assertContains(response, 'data-umami-event="apply-marketing"')
+
+    def test_open_roles_links_point_to_role_anchors(self):
+        response = self.client.get(reverse('careers'))
+        self.assertContains(
+            response,
+            '<a href="#associate-stem-instructors">Associate STEM Instructors</a>',
+        )
+        self.assertContains(response, 'id="associate-stem-instructors"')
+        self.assertContains(
+            response,
+            '<a href="#marketing-communications">Junior Associate, Marketing &amp; Communications</a>',
+        )
+        self.assertContains(response, 'id="marketing-communications"')
+
+    def test_open_roles_list_is_hidden_for_one_role(self):
+        with mock.patch.object(views, 'CAREERS', [views.CAREERS[0]]):
+            response = self.client.get(reverse('careers'))
+            self.assertNotContains(response, 'class="careers-open-roles"')
+            self.assertContains(response, 'Associate STEM Instructors')
 
     def test_commented_wide_img_slot_exists(self):
         response = self.client.get(reverse('careers'))
@@ -161,10 +215,11 @@ class CareersPageTests(SimpleTestCase):
                 'No open roles right now. You are welcome to write to info@mindset-group.org.',
             )
             # Nothing else of the role is shown
-            self.assertNotContains(response, 'Associate STEM Instructors')
+            self.assertNotContains(response, '<h2>Associate STEM Instructors</h2>')
             self.assertNotContains(response, 'Who should apply?')
             self.assertNotContains(response, 'What we offer')
             self.assertNotContains(response, 'How to apply')
             self.assertNotContains(response, 'Coding and software programming')
             self.assertNotContains(response, 'Apply by email')
             self.assertNotContains(response, 'BIG IDEAS START HERE')
+            self.assertNotContains(response, 'class="careers-open-roles"')

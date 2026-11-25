@@ -4779,10 +4779,45 @@ a.build-card:focus-visible {
     margin-bottom: 24px;
 }
 
+.careers-open-roles {
+    max-width: 900px;
+    margin: 0 auto 36px;
+    padding: 0 20px;
+}
+
+.careers-open-roles h2 {
+    margin-bottom: 12px;
+    color: var(--navy);
+    font-size: 18px;
+}
+
+.careers-open-roles ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.careers-open-roles a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--green-border);
+    border-radius: 20px;
+    background: var(--green-light);
+    color: var(--navy);
+    font-weight: 600;
+}
+
+.careers-open-roles a:hover {
+    background: var(--green-light-alt);
+}
+
 .careers-role-section {
     max-width: 900px;
     margin: 0 auto 60px;
     padding: 0 20px;
+    scroll-margin-top: 100px;
 }
 
 .careers-role-header {
@@ -4817,6 +4852,10 @@ a.build-card:focus-visible {
     font-size: 17px;
     color: var(--navy);
     line-height: 1.6;
+}
+
+.careers-intro + .careers-intro {
+    margin-top: 12px;
 }
 
 .careers-areas-block {
