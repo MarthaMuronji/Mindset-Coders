@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply | Careers | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Apply | Careers | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}Apply for a role at Mindset Coders Uganda.{% endblock %}
+{% block og_description %}Apply for a role at Mindset Coders Uganda.{% endblock %}
+
+{% block content %}
+
+<section class="about-hero reveal">
+    <h1>Apply for a role</h1>
+</section>
+
+<section class="contact-section">
+    <div class="contact-form-wrap story-form-wrap reveal reveal-delay-1">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-success{% if message.tags == 'error' %} form-error{% endif %}" role="status">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="form_timestamp" value="{{ form_timestamp }}">
+            {{ form.non_field_errors }}
+            <div class="form-group">
+                <label for="{{ form.role.id_for_label }}">{{ form.role.label }}</label>
+                {{ form.role.errors }}
+                {{ form.role }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+                {{ form.full_name.errors }}
+                {{ form.full_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email.errors }}
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                {{ form.phone.errors }}
+                {{ form.phone }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.cv_link.id_for_label }}">{{ form.cv_link.label }}</label>
+                {{ form.cv_link.errors }}
+                {{ form.cv_link }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+                {{ form.note.errors }}
+                {{ form.note }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.consent.id_for_label }}" class="consent-label">{{ form.consent }} {{ form.consent.label }}</label>
+                {{ form.consent.errors }}
+            </div>
+            <div class="honeypot-field" aria-hidden="true">
+                {{ form.website }}
+            </div>
+            <button type="submit" class="btn btn-green">Submit application</button>
+        </form>
+        <p class="story-share-note">info@mindset-group.org</p>
+    </div>
+</section>
+
+{% endblock %}

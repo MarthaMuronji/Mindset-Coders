@@ -1,0 +1,35 @@
+{% extends "team/base.html" %}
+
+{% block content %}
+  <div class="team-heading">
+    <a class="team-back-link" href="{% url 'team_applications' %}">Applications</a>
+    <h1>{{ application.full_name }}</h1>
+    <span class="team-status">{{ application.get_status_display }}</span>
+  </div>
+  <section class="team-panel">
+    <h2>Application details</h2>
+    <dl class="team-details">
+      <dt>Name</dt><dd>{{ application.full_name }}</dd>
+      <dt>Role</dt><dd>{{ application.role }}</dd>
+      <dt>Email</dt><dd><a href="mailto:{{ application.email }}">{{ application.email }}</a></dd>
+      <dt>Phone</dt><dd>{{ application.phone }}</dd>
+      <dt>CV link</dt><dd><a href="{{ application.cv_link }}" target="_blank" rel="noopener noreferrer">{{ application.cv_link }}</a></dd>
+      <dt>Short note</dt><dd class="team-note">{{ application.note|default:"Not provided" }}</dd>
+      <dt>Consent</dt><dd>{% if application.consent %}Yes{% else %}No{% endif %}</dd>
+      <dt>Date</dt><dd>{{ application.created_at|date:"j M Y, g:i a" }}</dd>
+      <dt>Handled by</dt><dd>{% if application.handled_by %}{{ application.handled_by.get_full_name|default:application.handled_by.get_username }}{% else %}Not handled{% endif %}</dd>
+    </dl>
+  </section>
+  <section class="team-panel">
+    <h2>Change status</h2>
+    <form method="post" class="team-action-links">
+      {% csrf_token %}
+      {% for value, label in status_form.fields.status.choices %}
+        <button class="btn btn-outline" type="submit" name="status" value="{{ value }}">Set status to {{ label }}</button>
+      {% endfor %}
+    </form>
+    {% if status_form.errors %}
+      <div class="team-errors" role="alert">{{ status_form.errors }}</div>
+    {% endif %}
+  </section>
+{% endblock %}

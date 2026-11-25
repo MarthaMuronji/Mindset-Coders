@@ -44,6 +44,7 @@ urlpatterns = [
     path('university-preparation/', _redirect_to('home'), name='university_preparation'),
     path('privacy/', views.privacy, name='privacy'),
     path('careers/', views.careers, name='careers'),
+    path('careers/apply/', views.careers_apply, name='careers_apply'),
     path('refund-policy/', views.refund_policy, name='refund_policy'),
     path('shop/', views.shop, name='shop'),
     path('steam-experience/', views.steam_experience, name='steam_experience'),
@@ -79,6 +80,21 @@ urlpatterns = [
     ),
     path('team/roster/', team.roster_list, name='team_roster'),
     path('team/roster/<int:pk>/', team.roster_detail, name='team_roster_detail'),
+    path(
+        'team/applications/export/',
+        views.team_applications_export,
+        name='team_applications_export',
+    ),
+    path(
+        'team/applications/<int:pk>/',
+        views.team_application_detail,
+        name='team_application_detail',
+    ),
+    path(
+        'team/applications/',
+        views.team_applications,
+        name='team_applications',
+    ),
     path('team/people/', team_people.people_list, name='team_people'),
     path(
         'team/welcome/<uidb64>/<token>/',

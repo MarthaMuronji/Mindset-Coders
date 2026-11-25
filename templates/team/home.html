@@ -34,6 +34,11 @@
         <p>Invite and manage team members.</p>
         <span>Manage people</span>
       </a>
+      <a class="team-area-card" href="{% url 'team_applications' %}">
+        <h2>Applications</h2>
+        <p>Review job applications.</p>
+        <span>Open applications</span>
+      </a>
     {% endif %}
     {% if can_view_audit %}
       <a class="team-area-card" href="{% url 'team_audit' %}">

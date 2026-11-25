@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Story
+from .models import JobApplication, Story
 from .phone_numbers import PHONE_ERROR, normalize_phone_number
 
 
@@ -48,6 +48,68 @@ class ContactForm(forms.Form):
             return normalize_phone_number(self.cleaned_data['phone'])
         except ValueError as error:
             raise forms.ValidationError(PHONE_ERROR) from error
+
+
+class JobApplicationForm(forms.ModelForm):
+    role = forms.ChoiceField(choices=(), label='Role')
+    consent = forms.BooleanField(
+        required=True,
+        label='I agree that Mindset Coders may use these details to consider my application.',
+    )
+    website = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'tabindex': '-1',
+            'autocomplete': 'off',
+            'aria-hidden': 'true',
+        }),
+    )
+
+    class Meta:
+        model = JobApplication
+        fields = (
+            'role', 'full_name', 'email', 'phone', 'cv_link', 'note',
+            'consent',
+        )
+        labels = {
+            'full_name': 'Full name',
+            'email': 'Email',
+            'phone': 'Phone',
+            'cv_link': 'Link to your CV',
+            'note': 'Short note (optional)',
+        }
+        widgets = {
+            'note': forms.Textarea(attrs={'rows': 4}),
+        }
+
+    def __init__(self, *args, role_choices=(), **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['role'].choices = [('', 'Choose a role')] + list(role_choices)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('website'):
+            raise forms.ValidationError(
+                'Please check your details and send it again.'
+            )
+        return cleaned_data
+
+
+class JobApplicationFilterForm(forms.Form):
+    role = forms.ChoiceField(required=False)
+    status = forms.ChoiceField(required=False, choices=(
+        ('', 'All statuses'),
+    ) + tuple(JobApplication.STATUS_CHOICES))
+
+    def __init__(self, *args, roles=(), **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['role'].choices = [('', 'All roles')] + [
+            (role, role) for role in roles
+        ]
+
+
+class JobApplicationStatusForm(forms.Form):
+    status = forms.ChoiceField(choices=JobApplication.STATUS_CHOICES)
 
 
 class StoryForm(forms.ModelForm):
