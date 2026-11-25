@@ -206,6 +206,47 @@ class ContactMessage(models.Model):
         return f'{self.name} ({self.email})'
 
 
+class JobApplication(models.Model):
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('shortlisted', 'Shortlisted'),
+        ('declined', 'Declined'),
+    ]
+
+    role = models.CharField(max_length=200)
+    full_name = models.CharField(max_length=150)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30)
+    cv_link = models.URLField(max_length=500)
+    note = models.TextField(max_length=1000, blank=True)
+    consent = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    handled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='handled_job_applications',
+    )
+
+    class Meta:
+        ordering = ['-created_at', '-pk']
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(consent=True),
+                name='jobapp_consent_true',
+            ),
+        ]
+
+    def __str__(self):
+        return '{} ({})'.format(self.full_name, self.role)
+
+
 class AuditEvent(models.Model):
     ACTION_CHOICES = [
         ('sign_in', 'Signed in'),
@@ -221,6 +262,7 @@ class AuditEvent(models.Model):
         ('person_switched_off', 'Switched off team member'),
         ('person_switched_on', 'Switched on team member'),
         ('message_followed_up', 'Marked message followed up'),
+        ('job_application_status_changed', 'Changed application status'),
     ]
 
     created_at = models.DateTimeField(auto_now_add=True)

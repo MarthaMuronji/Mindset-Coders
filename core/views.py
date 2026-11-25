@@ -1,3 +1,4 @@
+import csv
 import logging
 from datetime import date, datetime
 from functools import wraps
@@ -11,23 +12,33 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DatabaseError
+from django.core.paginator import Paginator
+from django.db import DatabaseError, transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST
 
-from .forms import ContactForm, ReviewStoryForm, StoryForm
-from .models import ContactMessage, Post, Story
+from .audit import record_audit_event
+from .forms import (
+    ContactForm,
+    JobApplicationFilterForm,
+    JobApplicationForm,
+    JobApplicationStatusForm,
+    ReviewStoryForm,
+    StoryForm,
+)
+from .models import ContactMessage, JobApplication, Post, Story
 from .notifications import send_contact_notification
 from .spam import (
     contact_rate_limit_exceeded,
     create_form_timestamp,
     is_form_timestamp_valid,
 )
+from .team import _require_permission, private_team_page
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +262,215 @@ CAREERS = [
 def careers(request):
     """The careers page advertising open roles. Needs no database to render."""
     return render(request, 'careers.html', {'careers': CAREERS})
+
+
+def careers_apply(request):
+    role_choices = [(role['title'], role['title']) for role in CAREERS]
+    if request.method == 'POST':
+        form = JobApplicationForm(request.POST, role_choices=role_choices)
+        form_timestamp = request.POST.get('form_timestamp', '')
+        if not is_form_timestamp_valid(form_timestamp):
+            form.add_error(
+                None,
+                'Please check your details and send it again.',
+            )
+            form_timestamp = create_form_timestamp()
+        elif form.is_valid():
+            if contact_rate_limit_exceeded(request):
+                form.add_error(
+                    None,
+                    'Please wait a while before submitting another application.',
+                )
+            else:
+                try:
+                    form.save()
+                except DatabaseError as error:
+                    logger.warning(
+                        'Job application save failed (%s)',
+                        type(error).__name__,
+                    )
+                    form.add_error(
+                        None,
+                        'Sorry, your application could not be saved. Please try again in a moment.',
+                    )
+                    form_timestamp = create_form_timestamp()
+                else:
+                    messages.success(request, 'Your application has been received.')
+                    return redirect('careers_apply')
+    else:
+        requested_role = request.GET.get('role', '')
+        initial = (
+            {'role': requested_role}
+            if requested_role in dict(role_choices)
+            else {}
+        )
+        form = JobApplicationForm(
+            initial=initial,
+            role_choices=role_choices,
+        )
+        form_timestamp = create_form_timestamp()
+
+    return render(request, 'careers_apply.html', {
+        'form': form,
+        'form_timestamp': form_timestamp,
+    })
+
+
+def _job_application_queryset(request):
+    stored_roles = JobApplication.objects.order_by().values_list(
+        'role',
+        flat=True,
+    ).distinct()
+    roles = list(dict.fromkeys(
+        [role['title'] for role in CAREERS] + list(stored_roles)
+    ))
+    filter_form = JobApplicationFilterForm(
+        request.GET or None,
+        roles=roles,
+    )
+    applications = JobApplication.objects.select_related(
+        'handled_by'
+    ).order_by('-created_at', '-pk')
+    export_query = ''
+    if filter_form.is_valid():
+        filters = filter_form.cleaned_data
+        if filters['role']:
+            applications = applications.filter(role=filters['role'])
+        if filters['status']:
+            applications = applications.filter(status=filters['status'])
+        export_query = urlencode({
+            key: value
+            for key, value in filters.items()
+            if value
+        })
+    return filter_form, applications, export_query
+
+
+@private_team_page
+def team_applications(request):
+    denied = _require_permission(request, 'core.manage_team')
+    if denied:
+        return denied
+    filter_form, applications, export_query = _job_application_queryset(request)
+    page = Paginator(applications, 50).get_page(request.GET.get('page'))
+    previous_params = request.GET.copy()
+    next_params = request.GET.copy()
+    previous_params['page'] = (
+        page.previous_page_number() if page.has_previous() else 1
+    )
+    next_params['page'] = page.next_page_number() if page.has_next() else page.number
+    return render(request, 'team/applications.html', {
+        'page_title': 'Applications',
+        'filter_form': filter_form,
+        'applications': page,
+        'export_query': export_query,
+        'previous_query': previous_params.urlencode(),
+        'next_query': next_params.urlencode(),
+    })
+
+
+@private_team_page
+@require_http_methods(['GET', 'POST'])
+def team_application_detail(request, pk):
+    denied = _require_permission(request, 'core.manage_team')
+    if denied:
+        return denied
+    application = get_object_or_404(
+        JobApplication.objects.select_related('handled_by'),
+        pk=pk,
+    )
+    if request.method == 'POST':
+        status_form = JobApplicationStatusForm(request.POST)
+        if status_form.is_valid():
+            changed = False
+            with transaction.atomic():
+                application = get_object_or_404(
+                    JobApplication.objects.select_for_update(),
+                    pk=pk,
+                )
+                new_status = status_form.cleaned_data['status']
+                if application.status != new_status:
+                    application.status = new_status
+                    application.handled_by = request.user
+                    application.save(update_fields=['status', 'handled_by'])
+                    changed = True
+                    record_audit_event(
+                        'job_application_status_changed',
+                        user=request.user,
+                        object_type='JobApplication',
+                        object_id=application.pk,
+                        detail='Application status changed to {}'.format(
+                            application.get_status_display()
+                        ),
+                    )
+            if changed:
+                messages.success(request, 'Application status updated.')
+            return redirect(
+                'team_application_detail',
+                pk=application.pk,
+            )
+    else:
+        status_form = JobApplicationStatusForm(
+            initial={'status': application.status}
+        )
+    return render(request, 'team/application_detail.html', {
+        'page_title': 'Application',
+        'application': application,
+        'status_form': status_form,
+    })
+
+
+def _csv_safe_value(value):
+    value = str(value or '')
+    if value.lstrip(' \t\r\n')[:1] in ('=', '+', '-', '@'):
+        return "'{}".format(value)
+    return value
+
+
+@private_team_page
+def team_applications_export(request):
+    denied = _require_permission(request, 'core.manage_team')
+    if denied:
+        return denied
+    _filter_form, applications, _export_query = _job_application_queryset(request)
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="applications.csv"'
+    writer = csv.writer(response)
+    writer.writerow((
+        'Date',
+        'Name',
+        'Role',
+        'Email',
+        'Phone',
+        'CV link',
+        'Note',
+        'Consent',
+        'Status',
+        'Handled by',
+    ))
+    for application in applications.iterator():
+        handled_by = ''
+        if application.handled_by:
+            handled_by = (
+                application.handled_by.get_full_name()
+                or application.handled_by.get_username()
+            )
+        writer.writerow(_csv_safe_value(value) for value in (
+            timezone.localtime(application.created_at).strftime(
+                '%Y-%m-%d %H:%M:%S %Z'
+            ),
+            application.full_name,
+            application.role,
+            application.email,
+            application.phone,
+            application.cv_link,
+            application.note,
+            'Yes' if application.consent else 'No',
+            application.get_status_display(),
+            handled_by,
+        ))
+    return response
+
 
 def refund_policy(request):
     """Render the refund policy using the STEAM Experience publication setting."""

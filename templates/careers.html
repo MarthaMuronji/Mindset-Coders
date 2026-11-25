@@ -100,7 +100,11 @@
         <h2>{{ role.apply_heading }}</h2>
         <p class="careers-apply-text">{{ role.apply_text }}</p>
         <div class="careers-apply-action">
+<<<<<<< HEAD
             <a href="mailto:{{ role.apply_email }}?subject={{ role.apply_subject|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="{{ role.apply_event }}" data-umami-event-from="careers">Apply by email</a>
+=======
+            <a href="{% url 'careers_apply' %}?role={{ role.title|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="apply-instructor" data-umami-event-from="careers">Apply</a>
+>>>>>>> origin/main
             <p class="careers-apply-email">{{ role.apply_email }}</p>
             <p class="careers-apply-subject">Subject: {{ role.apply_subject }}</p>
         </div>
