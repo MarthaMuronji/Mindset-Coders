@@ -30,49 +30,87 @@ class CareersPageTests(SimpleTestCase):
         response = self.client.get(reverse('careers'))
         self.assertContains(
             response,
-            '<title>Careers | Associate STEM Instructor | Mindset Coders Uganda</title>',
+            '<title>Careers | Mindset Coders Uganda</title>',
         )
         self.assertContains(
             response,
-            '<meta name="description" content="Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.">',
+            '<meta name="description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.">',
         )
         self.assertContains(
             response,
-            '<meta property="og:title" content="Careers | Associate STEM Instructor | Mindset Coders Uganda">',
+            '<meta property="og:title" content="Careers | Mindset Coders Uganda">',
         )
         self.assertContains(
             response,
-            '<meta property="og:description" content="Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.">',
+            '<meta property="og:description" content="Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.">',
         )
         self.assertContains(
             response,
             '<link rel="canonical" href="http://testserver/careers/">',
         )
 
-    def test_careers_page_shows_headings_and_exact_role_copy(self):
+    def test_both_roles_appear_and_hero_banner(self):
         response = self.client.get(reverse('careers'))
 
-        # Badge and headings
+        # Hero badge, heading, circuit SVG
         self.assertContains(response, '<span class="badge">Careers</span>')
         self.assertContains(response, '<h1>We are hiring!</h1>')
-        self.assertContains(response, 'Associate STEM Instructors')
+        self.assertContains(response, 'careers-hero-circuit')
 
-        # Chips
+        # Role 1: Associate STEM Instructors
+        self.assertContains(response, 'Associate STEM Instructors')
         self.assertContains(response, 'Part-Time')
         self.assertContains(response, 'Entry-Level')
         self.assertContains(response, 'Kampala')
-
-        # Intro and lead in
         self.assertContains(
             response,
             'Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.',
         )
+
+        # Role 2: Junior Associate, Marketing & Communications
+        self.assertContains(response, 'Junior Associate, Marketing &amp; Communications')
+        self.assertContains(response, 'Full-Time')
+        self.assertContains(response, 'Early Career')
+        self.assertContains(
+            response,
+            'Are you creative, curious and passionate about digital marketing, technology and storytelling?',
+        )
+
+    def test_each_apply_link_points_to_form_with_right_role(self):
+        response = self.client.get(reverse('careers'))
+
+        # Role 1 Apply link
+        self.assertContains(
+            response,
+            'href="/careers/apply/?role=Associate%20STEM%20Instructors"',
+        )
+        self.assertContains(response, 'data-umami-event="apply-instructor"')
+
+        # Role 2 Apply link
+        self.assertContains(
+            response,
+            'href="/careers/apply/?role=Junior%20Associate%2C%20Marketing%20%26%20Communications"',
+        )
+        self.assertContains(response, 'data-umami-event="apply-marketing"')
+        self.assertContains(response, 'data-umami-event-from="careers"')
+        self.assertContains(response, 'Apply')
+
+    def test_details_content_for_both_roles_is_present(self):
+        response = self.client.get(reverse('careers'))
+
+        # Native details and summary controls
+        self.assertContains(response, '<details class="careers-details">')
+        self.assertContains(response, '<summary class="careers-summary">')
+        self.assertContains(response, 'View details')
+
+        # Both roles are closed by default (no open attribute on details)
+        self.assertNotContains(response, '<details class="careers-details" open>')
+
+        # Role 1 details content
         self.assertContains(
             response,
             'We are looking for enthusiastic, reliable and curious individuals interested in teaching children and young people in the following areas:',
         )
-
-        # 4 Area cards
         for card_title in (
             'Coding and software programming',
             'Robotics and electronics',
@@ -81,8 +119,6 @@ class CareersPageTests(SimpleTestCase):
         ):
             self.assertContains(response, card_title)
 
-        # Who should apply section and every list item
-        self.assertContains(response, '<h2>Who should apply?</h2>')
         for item in (
             'Recent graduates and early-career professionals in STEM, computer science, engineering, IT, education or related fields.',
             'Individuals with practical technical skills and a willingness to learn.',
@@ -92,14 +128,11 @@ class CareersPageTests(SimpleTestCase):
         ):
             self.assertContains(response, item)
 
-        # Note
         self.assertContains(
             response,
             'Previous teaching experience is an advantage but is not mandatory.',
         )
 
-        # What we offer section and every list item
-        self.assertContains(response, '<h2>What we offer</h2>')
         for item in (
             'Instructor training and professional development.',
             'Access to structured curricula and teaching resources.',
@@ -109,38 +142,66 @@ class CareersPageTests(SimpleTestCase):
         ):
             self.assertContains(response, item)
 
-        # Paragraph and Location
         self.assertContains(
             response,
             'This is a part-time, assignment-based opportunity for individuals who are committed to learning, delivering quality work and growing with an ambitious education technology company.',
         )
-        self.assertContains(response, 'Kampala, Uganda')
+        self.assertContains(response, 'Location: Kampala, Uganda')
 
-        # How to apply section
-        self.assertContains(response, '<h2>How to apply</h2>')
+        # Role 2 details content
         self.assertContains(
             response,
-            'Send your CV and a brief introduction highlighting your technical skills, interests and availability to info@mindset-group.org.',
+            'Mindset Coders is looking for a proactive individual to help us grow our brand, market our products and tell the stories behind our work in STEM education.',
         )
-        self.assertContains(response, 'info@mindset-group.org')
-        self.assertContains(
-            response,
-            'Subject: Associate STEM Instructor Application',
-        )
-        self.assertContains(
-            response,
-            'Mindset Coders | BIG IDEAS START HERE',
-        )
+        self.assertContains(response, '<h2>What you will do</h2>')
+        for item in (
+            'Create engaging digital content, including graphics, photos and videos.',
+            'Manage our social media platforms.',
+            'Plan and execute marketing campaigns.',
+            'Promote our products, programmes and events.',
+            'Support lead generation and track marketing performance.',
+        ):
+            self.assertContains(response, item)
 
-    def test_apply_button_link_and_umami_tracking(self):
+        for item in (
+            'Recent graduates and early-career professionals in Marketing, Communications, Multimedia, Business or related fields.',
+            'Creative individuals with practical content creation and video editing skills.',
+            'Individuals familiar with social media platforms and digital marketing tools.',
+            'Strong communicators who are proactive, organised, reliable and willing to learn.',
+        ):
+            self.assertContains(response, item)
+
+        self.assertContains(
+            response,
+            'A strong portfolio and practical skills are highly valued.',
+        )
+        self.assertContains(response, 'Location: Kyanja, Kampala')
+
+    def test_how_to_apply_box_removed_and_fallback_line_present(self):
         response = self.client.get(reverse('careers'))
-        self.assertContains(
-            response,
-            'href="/careers/apply/?role=Associate%20STEM%20Instructors"',
-        )
-        self.assertContains(response, 'data-umami-event="apply-instructor"')
-        self.assertContains(response, 'data-umami-event-from="careers"')
-        self.assertContains(response, 'Apply')
+
+        # Old long box is removed
+        self.assertNotContains(response, '<h2>How to apply</h2>')
+        self.assertNotContains(response, 'Subject: Associate STEM Instructor Application')
+        self.assertNotContains(response, 'Subject: Marketing & Communications Associate Application')
+        self.assertNotContains(response, 'Mindset Coders | BIG IDEAS START HERE')
+
+        # Fallback short line with plain text email
+        self.assertContains(response, 'info@mindset-group.org')
+        self.assertNotContains(response, 'href="mailto:info@mindset-group.org"')
+
+    def test_role_anchors_and_apply_anchor_exist(self):
+        response = self.client.get(reverse('careers'))
+        self.assertContains(response, 'id="associate-stem-instructors"')
+        self.assertContains(response, 'id="marketing-communications"')
+        self.assertContains(response, 'id="apply"')
+        self.assertContains(response, 'id="apply-marketing"')
+
+    def test_no_long_dashes_in_page(self):
+        response = self.client.get(reverse('careers'))
+        content = response.content.decode('utf-8')
+        self.assertNotIn('\u2014', content, 'Found em dash in page')
+        self.assertNotIn('\u2013', content, 'Found en dash in page')
 
     def test_commented_wide_img_slot_exists(self):
         response = self.client.get(reverse('careers'))
@@ -168,12 +229,13 @@ class CareersPageTests(SimpleTestCase):
             )
             # Nothing else of the role is shown
             self.assertNotContains(response, 'Associate STEM Instructors')
+            self.assertNotContains(response, 'Junior Associate, Marketing & Communications')
             self.assertNotContains(response, 'Who should apply?')
             self.assertNotContains(response, 'What we offer')
+            self.assertNotContains(response, 'What you will do')
             self.assertNotContains(response, 'How to apply')
             self.assertNotContains(response, 'Coding and software programming')
-            self.assertNotContains(response, 'Apply by email')
-            self.assertNotContains(response, 'BIG IDEAS START HERE')
+            self.assertNotContains(response, 'View details')
 
 
 class JobApplicationTests(TestCase):
@@ -235,6 +297,30 @@ class JobApplicationTests(TestCase):
         self.assertContains(response, 'Your application has been received.')
         self.assertNotContains(response, 'Test Applicant')
         self.assertNotContains(response, 'applicant@example.test')
+
+    def test_valid_application_for_second_role_is_saved(self):
+        marketing_role = views.CAREERS[1]['title']
+        response = self.client.post(
+            reverse('careers_apply'),
+            self.valid_post(role=marketing_role),
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        application = JobApplication.objects.get(role=marketing_role)
+        self.assertEqual(application.role, marketing_role)
+        self.assertContains(response, 'Your application has been received.')
+
+    def test_get_careers_apply_with_preselected_marketing_role(self):
+        marketing_role = views.CAREERS[1]['title']
+        response = self.client.get(
+            reverse('careers_apply'),
+            {'role': marketing_role},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            'selected>Junior Associate, Marketing &amp; Communications</option>',
+        )
 
     def test_missing_consent_bad_email_and_bad_url_are_rejected(self):
         invalid_submissions = (

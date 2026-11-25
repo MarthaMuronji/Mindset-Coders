@@ -1,82 +1,149 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Careers | Associate STEM Instructor | Mindset Coders Uganda{% endblock %}
-{% block meta_title_og %}Careers | Associate STEM Instructor | Mindset Coders Uganda{% endblock %}
-{% block meta_description %}Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.{% endblock %}
-{% block og_description %}Mindset Coders is expanding its team of instructors passionate about technology, education and inspiring the next generation of innovators.{% endblock %}
+{% block title %}Careers | Mindset Coders Uganda{% endblock %}
+{% block meta_title_og %}Careers | Mindset Coders Uganda{% endblock %}
+{% block meta_description %}{% if careers %}Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.{% else %}Careers at Mindset Coders Uganda.{% endif %}{% endblock %}
+{% block og_description %}{% if careers %}Open roles at Mindset Coders Uganda: Associate STEM Instructors and Junior Associate, Marketing & Communications.{% else %}Careers at Mindset Coders Uganda.{% endif %}{% endblock %}
 
 {% block content %}
 
-<section class="about-hero careers-hero reveal">
-    <span class="badge">Careers</span>
-    <h1>We are hiring!</h1>
+<section class="careers-hero reveal">
+    <svg class="careers-hero-circuit" viewBox="0 0 640 220" preserveAspectRatio="xMidYMid slice" focusable="false" aria-hidden="true">
+        <path d="M330 0v45h58v32h54M418 0v28h46v45h62M520 0v40h48v43h72M374 220v-52h45v-36h64M494 220v-45h46v-39h64" fill="none" stroke="var(--green)" stroke-width="3" />
+        <path d="M280 0v30h30v32h45M450 220v-28h28v-34h47" fill="none" stroke="var(--green)" stroke-width="3" />
+        <circle cx="442" cy="77" r="6" fill="var(--green)" />
+        <circle cx="526" cy="73" r="6" fill="var(--green)" />
+        <circle cx="568" cy="83" r="6" fill="var(--green)" />
+        <circle cx="483" cy="132" r="6" fill="var(--green)" />
+        <circle cx="540" cy="136" r="6" fill="var(--green)" />
+        <circle cx="419" cy="132" r="5" fill="var(--green)" />
+        <circle cx="478" cy="158" r="5" fill="var(--green)" />
+    </svg>
+    <div class="careers-hero-content">
+        <span class="badge">Careers</span>
+        <h1>We are hiring!</h1>
+    </div>
 </section>
 
 {% if careers %}
-{% for role in careers %}
-<section class="home-section careers-role-section reveal">
-    <div class="careers-role-header">
-        <h2>{{ role.title }}</h2>
-        <div class="careers-chips">
-            {% for chip in role.chips %}
-            <span class="careers-chip">{{ chip }}</span>
-            {% endfor %}
-        </div>
-        <p class="careers-intro">{{ role.intro }}</p>
-    </div>
-
-    <div class="careers-areas-block">
-        <p class="section-lead">{{ role.lead_in }}</p>
-        <div class="build-cards-grid careers-areas-grid">
-            {% for area in role.areas %}
-            <div class="build-card reveal">
-                <div class="why-icon" aria-hidden="true"><i class="{{ area.icon }}"></i></div>
-                <h3>{{ area.name }}</h3>
+<div class="careers-roles-container">
+    {% for role in careers %}
+    <article class="careers-card reveal" id="{{ role.slug }}">
+        <span id="{{ role.apply_anchor }}" class="careers-anchor-target" aria-hidden="true"></span>
+        <div class="careers-card-header">
+            <div class="careers-card-title-group">
+                <h2 class="careers-card-title">{{ role.title }}</h2>
+                <div class="careers-chips">
+                    {% for chip in role.chips %}
+                    <span class="careers-chip">{{ chip }}</span>
+                    {% endfor %}
+                </div>
             </div>
-            {% endfor %}
+            <a href="{% url 'careers_apply' %}?role={{ role.title|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="{{ role.apply_event }}" data-umami-event-from="careers">Apply</a>
         </div>
-    </div>
 
-    <!-- <div class="img-slot img-slot--wide"></div> -->
+        <p class="careers-card-intro">{{ role.intro }}</p>
 
-    <div class="careers-two-col">
-        <div class="careers-col">
-            <h2>Who should apply?</h2>
-            <ul class="careers-list">
-                {% for item in role.who_should_apply %}
-                <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
-                {% endfor %}
-            </ul>
-            <p class="careers-note"><strong>Note:</strong> {{ role.experience_note }}</p>
-        </div>
-        <div class="careers-col">
-            <h2>What we offer</h2>
-            <ul class="careers-list">
-                {% for item in role.offers %}
-                <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
+        <details class="careers-details">
+            <summary class="careers-summary">
+                <span class="careers-summary-text">View details</span>
+                <i class="fa-solid fa-chevron-down careers-summary-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="careers-details-content">
+                {% if role.intro_secondary %}
+                <p class="careers-intro-secondary">{{ role.intro_secondary }}</p>
+                {% endif %}
 
-    <div class="careers-closing-block">
-        <p class="careers-paragraph">{{ role.closing_paragraph }}</p>
-        <p class="careers-location">Location: {{ role.location }}</p>
-    </div>
+                {% if role.areas %}
+                <div class="careers-areas-block">
+                    <p class="section-lead">{{ role.lead_in }}</p>
+                    <div class="build-cards-grid careers-areas-grid">
+                        {% for area in role.areas %}
+                        <div class="build-card reveal">
+                            <div class="why-icon" aria-hidden="true"><i class="{{ area.icon }}"></i></div>
+                            <h3>{{ area.name }}</h3>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
 
-    <div class="careers-apply-section" id="apply">
-        <h2>How to apply</h2>
-        <p class="careers-apply-text">{{ role.apply_text }}</p>
-        <div class="careers-apply-action">
-            <a href="{% url 'careers_apply' %}?role={{ role.title|urlencode }}" class="btn btn-primary careers-apply-btn" data-umami-event="apply-instructor" data-umami-event-from="careers">Apply</a>
-            <p class="careers-apply-email">{{ role.apply_email }}</p>
-            <p class="careers-apply-subject">Subject: {{ role.apply_subject }}</p>
-        </div>
-        <p class="careers-sign-off">{{ role.sign_off }}</p>
-    </div>
-</section>
-{% endfor %}
+                <!-- <div class="img-slot img-slot--wide"></div> -->
+
+                <div class="careers-two-col">
+                    {% if role.duties %}
+                    <div class="careers-col">
+                        <h2>{{ role.duties_heading }}</h2>
+                        <ul class="careers-list">
+                            {% for item in role.duties %}
+                            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if role.who_should_apply %}
+                    <div class="careers-col">
+                        <h2>Who should apply?</h2>
+                        <ul class="careers-list">
+                            {% for item in role.who_should_apply %}
+                            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
+                            {% endfor %}
+                        </ul>
+                        {% if role.experience_note %}
+                        <p class="careers-note"><strong>Note:</strong> {{ role.experience_note }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% if role.offers %}
+                    <div class="careers-col">
+                        <h2>What we offer</h2>
+                        <ul class="careers-list">
+                            {% for item in role.offers %}
+                            <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> <span>{{ item }}</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="careers-closing-block">
+                    {% if role.closing_paragraph %}
+                    <p class="careers-paragraph">{{ role.closing_paragraph }}</p>
+                    {% endif %}
+                    <p class="careers-location">Location: {{ role.location }}</p>
+                </div>
+            </div>
+        </details>
+    </article>
+    {% endfor %}
+</div>
+
+<p class="careers-fallback-note">Questions about our roles or having trouble with the form? Write to info@mindset-group.org.</p>
+
+<script>
+    (function () {
+        function openRoleFromHash() {
+            var rawHash = window.location.hash;
+            if (!rawHash) return;
+            var targetId = rawHash.slice(1);
+            var target = document.getElementById(targetId);
+            if (!target) return;
+            var card = target.closest('.careers-card') || target;
+            var details = card.querySelector('details') || (card.tagName === 'DETAILS' ? card : null);
+            if (details) {
+                details.open = true;
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', openRoleFromHash);
+        } else {
+            openRoleFromHash();
+        }
+        window.addEventListener('hashchange', openRoleFromHash);
+    })();
+</script>
+
 {% else %}
 <section class="home-section careers-empty-section reveal">
     <div class="trusted-by innovators-empty">
