@@ -13,7 +13,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import Paginator
-from django.db import DatabaseError, transaction
+from django.db import Error, transaction
 from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -287,38 +287,71 @@ def careers_apply(request):
     if request.method == 'POST':
         form = JobApplicationForm(request.POST, role_choices=role_choices)
         submitted_role = request.POST.get('role', '')
-        if submitted_role in {role['title'] for role in CAREERS} and submitted_role not in dict(role_choices):
-            form.add_error('role', 'This position is no longer accepting applications. Please choose an open role.')
+        submitted_closed_role = (
+            submitted_role in {role['title'] for role in CAREERS}
+            and submitted_role not in dict(role_choices)
+        )
+        if submitted_closed_role:
             closed_role = True
         form_timestamp = request.POST.get('form_timestamp', '')
         if not is_form_timestamp_valid(form_timestamp):
-            form.add_error(
-                None,
-                'Please check your details and send it again.',
-            )
-            form_timestamp = create_form_timestamp()
-        elif form.is_valid():
-            if contact_rate_limit_exceeded(request):
+            try:
                 form.add_error(
                     None,
-                    'Please wait a while before submitting another application.',
+                    'Please check your details and send it again.',
                 )
-            else:
-                try:
-                    form.save()
-                except DatabaseError as error:
-                    logger.warning(
-                        'Job application save failed (%s)',
-                        type(error).__name__,
-                    )
+            except Error as error:
+                logger.warning(
+                    'Job application validation failed (%s)',
+                    type(error).__name__,
+                )
+                form.add_error(
+                    None,
+                    'Sorry, your application could not be saved. Please try again in a moment.',
+                )
+            form_timestamp = create_form_timestamp()
+        else:
+            try:
+                form_is_valid = form.is_valid()
+            except Error as error:
+                logger.warning(
+                    'Job application validation failed (%s)',
+                    type(error).__name__,
+                )
+                form.add_error(
+                    None,
+                    'Sorry, your application could not be saved. Please try again in a moment.',
+                )
+                form_timestamp = create_form_timestamp()
+                form_is_valid = False
+            if submitted_closed_role:
+                form.add_error(
+                    'role',
+                    'This position is no longer accepting applications. Please choose an open role.',
+                )
+                form_is_valid = False
+            if form_is_valid:
+                if contact_rate_limit_exceeded(request):
                     form.add_error(
                         None,
-                        'Sorry, your application could not be saved. Please try again in a moment.',
+                        'Please wait a while before submitting another application.',
                     )
-                    form_timestamp = create_form_timestamp()
                 else:
-                    messages.success(request, 'Your application has been received.')
-                    return redirect('careers_apply')
+                    try:
+                        form.save()
+                    except Error as error:
+                        logger.warning(
+                            'Job application save failed (%s)',
+                            type(error).__name__,
+                        )
+                        form.add_error(
+                            None,
+                            'Sorry, your application could not be saved. Please try again in a moment.',
+                        )
+                        form_timestamp = create_form_timestamp()
+                    else:
+                        messages.success(request, 'Your application has been received.')
+                        return redirect('careers_apply')
     else:
         initial = (
             {'role': requested_role}
@@ -456,6 +489,7 @@ def team_application_detail(request, pk):
     return render(request, 'team/application_detail.html', {
         'page_title': 'Application',
         'application': application,
+        'cv_link_is_http': application.cv_link.lower().startswith(('http://', 'https://')),
         'status_form': status_form,
         'decline_subject': subject,
         'decline_body': body,
