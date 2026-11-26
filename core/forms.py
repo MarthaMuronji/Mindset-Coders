@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import URLValidator
 
 from .models import JobApplication, Story
 from .phone_numbers import PHONE_ERROR, normalize_phone_number
@@ -52,6 +53,15 @@ class ContactForm(forms.Form):
 
 class JobApplicationForm(forms.ModelForm):
     role = forms.ChoiceField(choices=(), label='Role')
+    cv_link = forms.URLField(
+        max_length=500,
+        label='Link to your CV',
+        help_text='Use a link that anyone with the link can open, such as a shared Google Drive or Dropbox file.',
+        validators=[URLValidator(schemes=['http', 'https'])],
+        error_messages={
+            'invalid': 'Enter a valid link using http:// or https://.',
+        },
+    )
     consent = forms.BooleanField(
         required=True,
         label='I agree that Mindset Coders may use these details to consider my application.',

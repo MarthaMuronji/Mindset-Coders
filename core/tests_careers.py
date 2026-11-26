@@ -431,6 +431,38 @@ class JobApplicationTests(TestCase):
                 self.assertContains(response, 'errorlist')
                 self.assertEqual(JobApplication.objects.count(), 0)
 
+    def test_cv_link_accepts_only_http_and_https(self):
+        for link in ('http://example.test/cv', 'https://example.test/cv'):
+            with self.subTest(link=link):
+                response = self.post_application(self.valid_post(cv_link=link))
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue(JobApplication.objects.filter(cv_link=link).exists())
+
+        JobApplication.objects.all().delete()
+        invalid_links = (
+            'file:///home/applicant/cv.pdf',
+            'javascript:alert(1)',
+            'data:text/plain,cv',
+            'ftp://example.test/cv.pdf',
+            'mailto:applicant@example.test',
+        )
+        for link in invalid_links:
+            with self.subTest(link=link):
+                response = self.post_application(self.valid_post(cv_link=link))
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(
+                    response,
+                    'Enter a valid link using http:// or https://.',
+                )
+                self.assertEqual(JobApplication.objects.count(), 0)
+
+    def test_cv_link_sharing_hint_is_visible(self):
+        response = self.client.get(reverse('careers_apply'))
+        self.assertContains(
+            response,
+            'Use a link that anyone with the link can open, such as a shared Google Drive or Dropbox file.',
+        )
+
     def test_honeypot_is_rejected(self):
         response = self.post_application(
             self.valid_post(website='https://spam.example.test')
@@ -471,6 +503,53 @@ class JobApplicationTests(TestCase):
         )
         self.assertContains(response, 'Test Applicant')
         self.assertContains(response, 'applicant@example.test')
+        self.assertContains(response, '0700123456')
+        self.assertContains(response, 'https://example.test/cv')
+        self.assertContains(response, 'A short note.')
+        self.assertNotContains(response, 'Your application has been received.')
+        self.assertEqual(JobApplication.objects.count(), 0)
+
+    def test_validation_database_error_keeps_input_and_returns_friendly_page(self):
+        from django.db import OperationalError
+
+        constraint = JobApplication._meta.constraints[0]
+        with mock.patch.object(
+            constraint,
+            'validate',
+            side_effect=OperationalError('database unavailable'),
+        ):
+            response = self.post_application(self.valid_post())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            'Sorry, your application could not be saved. Please try again in a moment.',
+        )
+        self.assertContains(response, 'Test Applicant')
+        self.assertContains(response, 'applicant@example.test')
+        self.assertContains(response, '0700123456')
+        self.assertContains(response, 'https://example.test/cv')
+        self.assertContains(response, 'A short note.')
+        self.assertNotContains(response, 'Your application has been received.')
+        self.assertEqual(JobApplication.objects.count(), 0)
+
+    def test_database_error_during_invalid_timestamp_validation_is_friendly(self):
+        from django.db import OperationalError
+
+        constraint = JobApplication._meta.constraints[0]
+        with mock.patch.object(
+            constraint,
+            'validate',
+            side_effect=OperationalError('database unavailable'),
+        ):
+            response = self.post_application(
+                self.valid_post(form_timestamp='invalid timestamp')
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            'Sorry, your application could not be saved. Please try again in a moment.',
+        )
+        self.assertContains(response, 'Test Applicant')
         self.assertNotContains(response, 'Your application has been received.')
         self.assertEqual(JobApplication.objects.count(), 0)
 
@@ -652,3 +731,36 @@ class JobApplicationTests(TestCase):
         self.assertContains(response, 'detail@example.test')
         self.assertContains(response, 'href="https://example.test/detail-cv"')
         self.assertContains(response, 'Application note')
+
+    def test_team_detail_links_only_http_and_https_cv_urls(self):
+        self.client.force_login(self.owner)
+        links = (
+            ('http://example.test/http-cv', True),
+            ('https://example.test/https-cv', True),
+            ('file:///private/cv.pdf', False),
+            ('javascript:alert(1)', False),
+            ('data:text/plain,cv', False),
+            ('ftp://example.test/cv.pdf', False),
+        )
+        for link, clickable in links:
+            with self.subTest(link=link):
+                application = JobApplication.objects.create(
+                    role=views.CAREERS[0]['title'],
+                    full_name='CV Applicant',
+                    email='cv@example.test',
+                    phone='0700123456',
+                    cv_link=link,
+                    consent=True,
+                )
+                response = self.client.get(
+                    reverse('team_application_detail', kwargs={'pk': application.pk})
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, link)
+                if clickable:
+                    self.assertContains(
+                        response,
+                        f'href="{link}" target="_blank" rel="noopener noreferrer"',
+                    )
+                else:
+                    self.assertNotContains(response, f'href="{link}"')

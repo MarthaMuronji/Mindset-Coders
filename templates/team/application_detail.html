@@ -13,7 +13,7 @@
       <dt>Role</dt><dd>{{ application.role }}</dd>
       <dt>Email</dt><dd><a href="mailto:{{ application.email }}">{{ application.email }}</a></dd>
       <dt>Phone</dt><dd>{{ application.phone }}</dd>
-      <dt>CV link</dt><dd><a href="{{ application.cv_link }}" target="_blank" rel="noopener noreferrer">{{ application.cv_link }}</a></dd>
+      <dt>CV link</dt><dd>{% if cv_link_is_http %}<a href="{{ application.cv_link }}" target="_blank" rel="noopener noreferrer">{{ application.cv_link }}</a>{% else %}{{ application.cv_link }}{% endif %}</dd>
       <dt>Short note</dt><dd class="team-note">{{ application.note|default:"Not provided" }}</dd>
       <dt>Consent</dt><dd>{% if application.consent %}Yes{% else %}No{% endif %}</dd>
       <dt>Date</dt><dd>{{ application.created_at|date:"j M Y, g:i a" }}</dd>
