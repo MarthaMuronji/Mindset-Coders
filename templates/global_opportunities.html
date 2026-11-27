@@ -21,17 +21,11 @@
 <section class="home-section section-decor reveal" id="ways-to-take-part">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
     <h2>Ways to take part</h2>
-    <p class="section-subtitle">WRO is one doorway, and there are more</p>
     <div class="build-cards-grid adopt-grid">
         <div class="build-card reveal reveal-delay-1">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-globe"></i></div>
             <h3>International competitions</h3>
             <p>STEAM and robotics competitions where learners test what they have built against peers from other countries.</p>
-        </div>
-        <div class="build-card reveal reveal-delay-2">
-            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
-            <h3>World Robot Olympiad</h3>
-            <p>Uganda's top teams represent the country at the WRO finals. We have been Uganda's official WRO affiliate since 2020 and run the national qualifiers.</p>
         </div>
         <div class="build-card reveal reveal-delay-3">
             <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></div>
@@ -56,43 +50,94 @@
     </div>
 </section>
 
-<section class="home-section wro-spotlight home-global reveal">
-    <div class="wro-spotlight-content">
-        <img src="{% static 'images/wro-uganda-white.png' %}" alt="World Robot Olympiad Uganda" class="wro-spotlight-logo" width="320" height="227">
-        <span class="badge badge-flagship">Flagship program</span>
-        <h2>WRO Uganda National Championship</h2>
-        <p>As Uganda's official World Robot Olympiad affiliate, we run the national qualifiers that send our top learners to compete on the global stage.</p>
-        <a href="#how-competitions-work" class="btn btn-primary">See competition details</a>
-        <a href="https://www.wrouganda.org/" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-outline-light" data-umami-event="wro-uganda-link" data-umami-event-from="global-opportunities">Visit WRO Uganda</a>
+<section class="about-hero reveal">
+    <span class="badge">World Robot Olympiad Uganda</span>
+    <h1>Uganda's national robotics competition for young innovators</h1>
+    <p>Compete at school and regional level, advance to the national finals, and take your ideas to the world.</p>
+    <div class="hero-actions">
+        <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-primary" data-umami-event="contact-school" data-umami-event-from="global-opportunities">Register your school</a>
+        <a href="https://www.wrouganda.org/" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-umami-event="wro-uganda-link" data-umami-event-from="global-opportunities">Visit WRO Uganda</a>
     </div>
-    <div class="wro-spotlight-image">
-        <div class="img-slot img-slot--global-wro">
-            <img src="{% static 'images/global-page.jpg' %}" alt="Students presenting their wooden robot on stage at the Uganda National Championship" width="900" height="600" loading="lazy" onerror="this.remove()">
-        </div>
-    </div>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>What is WRO Uganda?</h2>
+    <p>WRO Uganda is the national version of the World Robot Olympiad. Students solve robotics challenges that follow international standards, and the best teams move up from school to regional to national level. Anyone can take part. Moving up is based on merit. Mindset Coders runs WRO Uganda nationally.</p>
 </section>
 
 <section class="home-section section-decor reveal" id="how-competitions-work">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
-    <h2>How competing works</h2>
+    <h2>How the pathway works</h2>
     <div class="build-cards-grid">
         <div class="build-card reveal reveal-delay-1">
-            <h3>Regional and national rounds</h3>
-            <p>School teams build and program robots to solve a themed annual challenge.</p>
+            <h3>1. Identification</h3>
+            <p>Students take on structured robotics challenges at school and regional level.</p>
         </div>
         <div class="build-card reveal reveal-delay-2">
-            <h3>Challenges through the year</h3>
-            <p>Shorter, themed hackathon-style challenges give learners a lower-stakes way to build competition experience.</p>
+            <h3>2. Selection</h3>
+            <p>The strongest teams go through to the national finals, judged to the same standards for everyone.</p>
         </div>
         <div class="build-card reveal reveal-delay-3">
-            <h3>Getting ready</h3>
-            <p>We help schools and learners form a team, prepare and register for the next qualifying round.</p>
+            <h3>3. Acceleration</h3>
+            <p>Top teams move on to regional and global competitions.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-4">
+            <h3>4. Continuity</h3>
+            <p>Through university innovation hubs, top students keep developing their ideas after the competition.</p>
         </div>
     </div>
-    <p class="section-subtitle">Registration details for the next cycle will be shared here when it opens.</p>
-    <div class="img-slot img-slot--wide">
-        <img src="{% static 'images/global-compete.jpg' %}" alt="A small wheeled robot on the floor at the Uganda National Championship" width="900" height="600" loading="lazy" onerror="this.remove()">
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>Who it is for</h2>
+    <div class="build-cards-grid">
+        <div class="build-card reveal reveal-delay-1">
+            <h3>Schools</h3>
+            <p>Build your school's reputation through a competition pathway with international standing.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-2">
+            <h3>Students</h3>
+            <p>Compete, qualify and advance on skill, creativity and teamwork.</p>
+        </div>
+        <div class="build-card reveal reveal-delay-3">
+            <h3>Sponsors and partners</h3>
+            <p>Help young talent in Uganda get noticed and grow, including students from schools with fewer resources.</p>
+        </div>
     </div>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>Fair to every school</h2>
+    <p>WRO Uganda works to include students from schools with few resources by removing cost barriers, without lowering the standard of the competition. Talent is everywhere. Opportunity is not.</p>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>After the competition</h2>
+    <p>Top students can get mentorship from industry professionals, access to advanced facilities and research centres, and support turning their projects into real innovations.</p>
+</section>
+
+<section class="home-section section-decor reveal">
+    <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
+    <h2>2027 season</h2>
+    <div class="build-card">
+        <ul>
+            <li><strong>Theme:</strong> Coming soon</li>
+            <li><strong>Dates and national finals:</strong> Coming soon</li>
+            <li><strong>Fees:</strong> Coming soon</li>
+            <li><strong>Age divisions and categories:</strong> Coming soon</li>
+        </ul>
+    </div>
+    <p class="section-subtitle">Registration for 2027 opens once WRO confirms the details.</p>
+</section>
+
+<section class="cta-banner reveal">
+    <h2>Want your school to be part of it?</h2>
+    <p>Tell us you are interested and we will follow up.</p>
+    <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-primary" data-umami-event="contact-school" data-umami-event-from="global-opportunities">Register your school</a>
 </section>
 
 <section class="home-section steam-pathway reveal">
@@ -116,12 +161,6 @@
             <p>Represent Uganda in international competitions and networks.</p>
         </div>
     </div>
-</section>
-
-<section class="cta-banner reveal">
-    <h2>Ready to take learners global?</h2>
-    <p>Tell us about your school or learner and we'll point you to the next opportunity.</p>
-    <a href="{% url 'contact' %}" class="btn btn-primary" data-umami-event="contact-general" data-umami-event-from="global-opportunities">Get in touch</a>
 </section>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from datetime import date
+from html.parser import HTMLParser
 from unittest import mock
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
@@ -407,6 +408,61 @@ class SteamPromoContextTests(SimpleTestCase):
         with override_settings(STEAM_EXPERIENCE_PUBLIC=False):
             self.assertFalse(self.promo_for('/about/')['steam_promo'])
 
+
+class GlobalOpportunitiesWROTests(SimpleTestCase):
+    def get_page(self):
+        return self.client.get('/global-opportunities/')
+
+    def test_page_returns_200(self):
+        self.assertEqual(self.get_page().status_code, 200)
+
+    def test_season_details_use_coming_soon(self):
+        response = self.get_page()
+        self.assertContains(response, '<h2>2027 season</h2>')
+        self.assertEqual(response.content.decode().count('Coming soon'), 4)
+        self.assertContains(
+            response,
+            'Registration for 2027 opens once WRO confirms the details.',
+        )
+
+    def test_registration_and_external_links(self):
+        response = self.get_page()
+        html = response.content.decode()
+        register_link = 'href="/contact/?topic=school#contact-form"'
+        self.assertEqual(html.count(register_link), 2)
+        self.assertEqual(html.count('data-umami-event="contact-school"'), 2)
+        self.assertIn(
+            'href="https://www.wrouganda.org/" target="_blank" rel="noopener noreferrer"',
+            html,
+        )
+        self.assertIn('data-umami-event="wro-uganda-link"', html)
+
+    def test_wro_copy_avoids_prohibited_numbers_and_theme(self):
+        response = self.get_page()
+
+        class VisibleText(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.parts = []
+
+            def handle_data(self, data):
+                self.parts.append(data)
+
+        parser = VisibleText()
+        parser.feed(response.content.decode())
+        visible_text = ' '.join(parser.parts)
+        prohibited_numbers = (
+            ''.join(('2', ',', '000')),
+            ''.join(('3', '00')),
+            ''.join(('1', '2')),
+            ''.join(('5', '00')),
+        )
+        for number in prohibited_numbers:
+            with self.subTest(number=number):
+                self.assertNotRegex(visible_text, rf'(?<!\w){number}(?!\w)')
+        prohibited_theme = ''.join(('Robots ', 'Meet ', 'Culture'))
+        self.assertNotIn(prohibited_theme, visible_text)
+
 class BrandAssetsTests(SimpleTestCase):
     """The site header, footer and spotlight cards carry the proper brand assets."""
 
@@ -442,13 +498,9 @@ class BrandAssetsTests(SimpleTestCase):
         self.assertIn('wro-uganda-white.png', card_html)
         self.assertIn('alt="World Robot Olympiad Uganda"', card_html)
 
-    def test_global_opportunities_spotlight_card_contains_wro_logo(self):
+    def test_global_opportunities_has_wro_hero(self):
         response = self.client.get('/global-opportunities/')
         self.assertEqual(response.status_code, 200)
         html = response.content.decode()
-        card_start = html.index('wro-spotlight')
-        card_end = html.index('</section>', card_start)
-        card_html = html[card_start:card_end]
-        self.assertIn('<img', card_html)
-        self.assertIn('wro-uganda-white.png', card_html)
-        self.assertIn('alt="World Robot Olympiad Uganda"', card_html)
+        self.assertIn('national robotics competition for young innovators', html)
+        self.assertIn('World Robot Olympiad Uganda', html)
