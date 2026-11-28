@@ -437,6 +437,14 @@ class GlobalOpportunitiesWROTests(SimpleTestCase):
         )
         self.assertIn('data-umami-event="wro-uganda-link"', html)
 
+    def test_wro_layout_uses_existing_photo_and_stepper_structure(self):
+        html = self.get_page().content.decode()
+        self.assertIn("static/images/global-page.jpg", html)
+        self.assertIn('alt="Students presenting a robotics project at a WRO Uganda event"', html)
+        self.assertIn('id="how-competitions-work"', html)
+        self.assertEqual(html.count('class="wro-step-badge"'), 4)
+        self.assertEqual(html.count('wro-season-card'), 4)
+
     def test_wro_copy_avoids_prohibited_numbers_and_theme(self):
         response = self.get_page()
 
