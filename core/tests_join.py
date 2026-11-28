@@ -532,6 +532,15 @@ class RegistrationNotificationTests(SimpleTestCase):
         self.assertIn('Payment method: Cash at the venue', body)
         self.assertIn('Amount due: UGX 400000', body)
 
+    def test_body_labels_the_school_programme_without_sentence_grammar(self):
+        registration = self.build_registration()
+        registration.programme = 'school'
+        body = self.send(registration)['textContent']
+        self.assertTrue(body.startswith(
+            'A new registration was received. Programme: '
+            'Through a participating school. Open it here: '
+        ))
+
     def test_body_carries_no_personal_details(self):
         payload = self.send(self.build_registration())
         body = payload['textContent']
