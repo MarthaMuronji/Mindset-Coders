@@ -215,7 +215,7 @@ def _build_registration_text(registration, admin_url):
         else 'Not set'
     )
     return (
-        'A new registration was received for the {}. Open it here: {}\n'
+        'A new registration was received. Programme: {}. Open it here: {}\n'
         'Payment method: {}\n'
         'Amount due: {}'
     ).format(
