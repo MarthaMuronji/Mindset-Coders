@@ -61,3 +61,21 @@ def contact_rate_limit_exceeded(request):
     # Vercel's per-instance memory cache makes this a soft limit across instances.
     cache.add(key, 0, timeout=CONTACT_RATE_LIMIT_WINDOW_SECONDS)
     return cache.incr(key) > CONTACT_SUBMISSIONS_PER_HOUR
+
+
+def _reset_limit_exceeded(scope, value):
+    digest = hmac.new(
+        settings.SECRET_KEY.encode('utf-8'),
+        value.encode('utf-8'),
+        hashlib.sha256,
+    ).hexdigest()
+    key = 'team-password-reset-{}:{}'.format(scope, digest)
+    cache.add(key, 0, timeout=CONTACT_RATE_LIMIT_WINDOW_SECONDS)
+    return cache.incr(key) > CONTACT_SUBMISSIONS_PER_HOUR
+
+
+def team_password_reset_rate_limit_exceeded(request, email):
+    """Limit reset mail by visitor and normalized email without storing either."""
+    visitor_limited = _reset_limit_exceeded('visitor', _visitor_ip(request))
+    email_limited = _reset_limit_exceeded('email', email.strip().casefold())
+    return visitor_limited or email_limited

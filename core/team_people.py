@@ -17,6 +17,12 @@ from django.views.decorators.http import require_POST
 
 from .audit import record_audit_event
 from .models import AuditEvent
+from .notifications import send_team_password_reset
+from .spam import (
+    create_form_timestamp,
+    is_form_timestamp_valid,
+    team_password_reset_rate_limit_exceeded,
+)
 from .team import (
     _allowed,
     _deny_or_login,
@@ -191,6 +197,21 @@ class InviteForm(forms.Form):
         return email
 
 
+class TeamPasswordResetRequestForm(forms.Form):
+    email = forms.EmailField(label='Email address')
+    form_timestamp = forms.CharField(required=False, widget=forms.HiddenInput)
+    website = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'tabindex': '-1',
+            'autocomplete': 'off',
+        }),
+    )
+
+    def clean_email(self):
+        return self.cleaned_data['email'].strip().casefold()
+
+
 class TeamPeopleActionForm(forms.Form):
     action = forms.ChoiceField(choices=(
         ('role', 'Change role'),
@@ -355,6 +376,106 @@ def team_welcome(request, uidb64, token):
         return redirect('team_home')
     return render(request, 'team/welcome.html', {
         'page_title': 'Set your password',
+        'form': form,
+    })
+
+
+def _password_reset_audit(action, detail):
+    record_audit_event(
+        action,
+        detail=detail,
+        username='',
+    )
+
+
+@private_team_page
+def team_password_reset_request(request):
+    done_template = 'team/password_reset_done.html'
+    if request.method == 'POST' and request.POST.get('website', '').strip():
+        return render(request, done_template, {
+            'page_title': 'Check your inbox',
+        })
+
+    if request.method == 'POST':
+        form = TeamPasswordResetRequestForm(request.POST)
+        timestamp = request.POST.get('form_timestamp', '')
+        if not is_form_timestamp_valid(timestamp):
+            data = request.POST.copy()
+            data['form_timestamp'] = create_form_timestamp()
+            form = TeamPasswordResetRequestForm(data)
+            form.is_valid()
+            form.add_error(None, 'Please check the form and try again.')
+        elif form.is_valid():
+            email = form.cleaned_data['email']
+            if team_password_reset_rate_limit_exceeded(request, email):
+                form.add_error(
+                    None,
+                    'Please wait a while before sending another message.',
+                )
+            else:
+                _password_reset_audit(
+                    'password_reset_requested',
+                    'Team password reset requested',
+                )
+                user = _team_user_queryset().filter(
+                    email__iexact=email,
+                    is_active=True,
+                ).first()
+                if user:
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
+                    token = default_token_generator.make_token(user)
+                    reset_path = reverse(
+                        'team_password_reset_confirm',
+                        kwargs={'uidb64': uid, 'token': token},
+                    )
+                    send_team_password_reset(
+                        user.email,
+                        user.get_username(),
+                        request.build_absolute_uri(reset_path),
+                    )
+                return render(request, done_template, {
+                    'page_title': 'Check your inbox',
+                })
+        if form.is_bound:
+            form.data = form.data.copy()
+            form.data['form_timestamp'] = create_form_timestamp()
+    else:
+        form = TeamPasswordResetRequestForm(initial={
+            'form_timestamp': create_form_timestamp(),
+        })
+
+    return render(request, 'team/password_reset_request.html', {
+        'page_title': 'Forgot password',
+        'form': form,
+    })
+
+
+@private_team_page
+def team_password_reset_confirm(request, uidb64, token):
+    candidate = _get_invited_user(uidb64)
+    user = None
+    if candidate is not None and candidate.is_active:
+        user = _team_user_queryset().filter(
+            pk=candidate.pk,
+            is_active=True,
+        ).first()
+    if user is None or not default_token_generator.check_token(user, token):
+        return render(request, 'team/password_reset_invalid.html', {
+            'page_title': 'Password reset link unavailable',
+        }, status=400)
+
+    form = SetPasswordForm(user, request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        user = form.save()
+        _password_reset_audit(
+            'password_reset_completed',
+            'Password changed through reset',
+        )
+        auth_login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0])
+        return redirect('team_home')
+
+    return render(request, 'team/password_reset_set_password.html', {
+        'page_title': 'Set a new password',
         'form': form,
     })
 

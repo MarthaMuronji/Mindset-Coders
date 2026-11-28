@@ -268,6 +268,8 @@ class AuditEvent(models.Model):
         ('career_role_reopened', 'Reopened role'),
         ('application_informed', 'Marked applicant informed'),
         ('application_deleted', 'Deleted application'),
+        ('password_reset_requested', 'Requested team password reset'),
+        ('password_reset_completed', 'Changed password through reset'),
     ]
 
     created_at = models.DateTimeField(auto_now_add=True)
