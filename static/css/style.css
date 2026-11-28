@@ -2404,6 +2404,419 @@ a.build-card:focus-visible {
     color: var(--white);
 }
 
+/* Global opportunities WRO layout */
+.wro-visual {
+    --wro-card-shadow: 0 10px 28px rgba(var(--navy-rgb), 0.07);
+}
+
+.wro-visual .wro-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 72px);
+    width: min(1176px, calc(100% - 48px));
+    max-width: 1176px;
+    padding: 64px 0;
+    text-align: left;
+}
+
+.wro-hero .badge {
+    grid-column: 1;
+    justify-self: start;
+    margin-bottom: -18px;
+}
+
+.wro-hero-copy {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.wro-hero-copy h1 {
+    font-size: clamp(32px, 4vw, 46px);
+}
+
+.wro-hero-copy p {
+    max-width: 560px;
+}
+
+.wro-hero .hero-actions {
+    justify-content: flex-start;
+}
+
+.wro-hero-image {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 0;
+}
+
+.wro-hero-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(var(--navy-rgb), 0.18);
+}
+
+.wro-hero-dots {
+    top: -22px;
+    right: -22px;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.wro-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(160px, 0.6fr);
+    align-items: center;
+    gap: 40px;
+}
+
+.wro-intro h2,
+.wro-intro p {
+    text-align: left;
+}
+
+.wro-intro-copy p {
+    max-width: 760px;
+    margin: 0;
+}
+
+.wro-intro-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+}
+
+.wro-intro-icons .why-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    box-shadow: var(--wro-card-shadow);
+}
+
+.wro-pathway {
+    background: var(--white);
+}
+
+.wro-stepper {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 20px;
+    max-width: 1176px;
+    margin: 0 auto;
+}
+
+.wro-stepper::before {
+    position: absolute;
+    top: 30px;
+    right: 12.5%;
+    left: 12.5%;
+    height: 2px;
+    background: var(--green-border);
+    content: '';
+}
+
+.wro-step {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.wro-step-badge {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 16px;
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.wro-step-badge i {
+    font-size: 16px;
+}
+
+.wro-step .build-card {
+    height: 100%;
+    padding: 24px 20px;
+    box-shadow: var(--wro-card-shadow);
+}
+
+.wro-step .build-card h3 {
+    margin-top: 0;
+}
+
+.wro-step .build-card p {
+    line-height: 1.6;
+}
+
+.wro-visual .build-card:hover {
+    transform: translateY(-3px);
+}
+
+.wro-visual .build-cards-grid .why-icon {
+    margin-bottom: 16px;
+}
+
+.wro-fair {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 28px;
+}
+
+.wro-fair-icon {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 22px;
+    background: var(--white);
+    color: var(--green-dark);
+    font-size: 34px;
+    box-shadow: var(--wro-card-shadow);
+}
+
+.wro-fair h2,
+.wro-fair p {
+    text-align: left;
+}
+
+.wro-fair p {
+    max-width: 860px;
+    margin-bottom: 0;
+}
+
+.wro-visual .wro-after {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 40px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+    color: var(--white);
+}
+
+.wro-after h2 {
+    color: var(--white);
+    text-align: left;
+}
+
+.wro-after p {
+    max-width: 820px;
+    margin: 0;
+    color: var(--white);
+    text-align: left;
+}
+
+.wro-after-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.wro-after-icons .why-icon {
+    width: 50px;
+    height: 50px;
+    border-color: rgba(var(--white-rgb), 0.45);
+    background: rgba(var(--white-rgb), 0.12);
+    color: var(--white);
+}
+
+.wro-season-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.wro-season-card {
+    display: flex;
+    min-width: 0;
+    min-height: 172px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: var(--wro-card-shadow);
+}
+
+.wro-season-card > i {
+    color: var(--green-dark);
+    font-size: 22px;
+}
+
+.wro-season-card strong {
+    color: var(--navy);
+    line-height: 1.4;
+}
+
+.wro-coming-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    margin-top: auto;
+    padding: 4px 11px;
+    border: 1px solid var(--green-border);
+    border-radius: 999px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.wro-visual .cta-banner {
+    margin-top: 0;
+}
+
+@media (max-width: 899px) {
+    .wro-visual .wro-hero {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
+        text-align: center;
+    }
+
+    .wro-hero .badge,
+    .wro-hero-copy,
+    .wro-hero-image {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .wro-hero .badge {
+        justify-self: center;
+        margin-bottom: -16px;
+    }
+
+    .wro-hero-copy p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .wro-hero .hero-actions {
+        justify-content: center;
+    }
+
+    .wro-hero-image {
+        width: min(100%, 620px);
+        margin: 0 auto;
+    }
+
+    .wro-hero-dots {
+        right: -8px;
+    }
+
+    .wro-stepper {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .wro-stepper::before {
+        top: 32px;
+        bottom: 32px;
+        left: 30px;
+        right: auto;
+        width: 2px;
+        height: auto;
+    }
+
+    .wro-step {
+        display: grid;
+        grid-template-columns: 62px minmax(0, 1fr);
+        align-items: start;
+        gap: 16px;
+    }
+
+    .wro-step-badge {
+        margin: 14px 0 0;
+    }
+
+    .wro-step .build-card {
+        padding: 22px;
+    }
+
+    .wro-season-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .wro-visual .wro-hero {
+        width: calc(100% - 40px);
+        padding: 46px 0;
+    }
+
+    .wro-intro {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+    }
+
+    .wro-intro h2,
+    .wro-intro p {
+        text-align: center;
+    }
+
+    .wro-fair {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        gap: 18px;
+    }
+
+    .wro-fair h2,
+    .wro-fair p {
+        text-align: center;
+    }
+
+    .wro-after {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 24px !important;
+    }
+
+    .wro-after h2,
+    .wro-after p {
+        text-align: center;
+    }
+
+    .wro-season-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .wro-season-card {
+        min-height: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wro-visual .reveal,
+    .wro-visual .build-card,
+    .wro-visual .build-card:hover {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .wro-visual .reveal-delay-1,
+    .wro-visual .reveal-delay-2,
+    .wro-visual .reveal-delay-3,
+    .wro-visual .reveal-delay-4 {
+        transition-delay: 0s;
+    }
+}
+
 /* ===== For Schools: How It Works photo ===== */
 
 /* The block this replaced had no aspect box, so the photo gets its own:

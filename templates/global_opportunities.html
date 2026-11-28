@@ -50,41 +50,67 @@
     </div>
 </section>
 
-<section class="about-hero reveal">
+<div class="wro-visual">
+<section class="about-hero wro-hero reveal">
     <span class="badge">World Robot Olympiad Uganda</span>
-    <h1>Uganda's national robotics competition for young innovators</h1>
-    <p>Compete at school and regional level, advance to the national finals, and take your ideas to the world.</p>
-    <div class="hero-actions">
-        <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-primary" data-umami-event="contact-school" data-umami-event-from="global-opportunities">Register your school</a>
-        <a href="https://www.wrouganda.org/" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-umami-event="wro-uganda-link" data-umami-event-from="global-opportunities">Visit WRO Uganda</a>
+    <div class="wro-hero-copy">
+        <h1>Uganda's national robotics competition for young innovators</h1>
+        <p>Compete at school and regional level, advance to the national finals, and take your ideas to the world.</p>
+        <div class="hero-actions">
+            <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-primary" data-umami-event="contact-school" data-umami-event-from="global-opportunities">Register your school</a>
+            <a href="https://www.wrouganda.org/" target="_blank" rel="noopener noreferrer" class="btn btn-outline" data-umami-event="wro-uganda-link" data-umami-event-from="global-opportunities">Visit WRO Uganda</a>
+        </div>
+    </div>
+    <div class="wro-spotlight-image wro-hero-image">
+        <div class="dot-grid wro-hero-dots" aria-hidden="true"></div>
+        <img src="{% static 'images/global-page.jpg' %}" alt="Students presenting a robotics project at a WRO Uganda event" width="900" height="600">
     </div>
 </section>
 
-<section class="home-section section-decor reveal">
+<section class="home-section section-decor section-tint wro-intro reveal">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
-    <h2>What is WRO Uganda?</h2>
-    <p>WRO Uganda is the national version of the World Robot Olympiad. Students solve robotics challenges that follow international standards, and the best teams move up from school to regional to national level. Anyone can take part. Moving up is based on merit. Mindset Coders runs WRO Uganda nationally.</p>
+    <div class="wro-intro-copy">
+        <h2>What is WRO Uganda?</h2>
+        <p>WRO Uganda is the national version of the World Robot Olympiad. Students solve robotics challenges that follow international standards, and the best teams move up from school to regional to national level. Anyone can take part. Moving up is based on merit. Mindset Coders runs WRO Uganda nationally.</p>
+    </div>
+    <div class="wro-intro-icons" aria-hidden="true">
+        <span class="why-icon"><i class="fa-solid fa-robot"></i></span>
+        <span class="why-icon"><i class="fa-solid fa-lightbulb"></i></span>
+        <span class="why-icon"><i class="fa-solid fa-trophy"></i></span>
+    </div>
 </section>
 
-<section class="home-section section-decor reveal" id="how-competitions-work">
+<section class="home-section section-decor wro-pathway reveal" id="how-competitions-work">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
     <h2>How the pathway works</h2>
-    <div class="build-cards-grid">
-        <div class="build-card reveal reveal-delay-1">
+    <div class="wro-stepper">
+        <div class="wro-step reveal reveal-delay-1">
+            <span class="wro-step-badge" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i><span>1</span></span>
+            <div class="build-card">
             <h3>1. Identification</h3>
             <p>Students take on structured robotics challenges at school and regional level.</p>
+            </div>
         </div>
-        <div class="build-card reveal reveal-delay-2">
+        <div class="wro-step reveal reveal-delay-2">
+            <span class="wro-step-badge" aria-hidden="true"><i class="fa-solid fa-list-check"></i><span>2</span></span>
+            <div class="build-card">
             <h3>2. Selection</h3>
             <p>The strongest teams go through to the national finals, judged to the same standards for everyone.</p>
+            </div>
         </div>
-        <div class="build-card reveal reveal-delay-3">
+        <div class="wro-step reveal reveal-delay-3">
+            <span class="wro-step-badge" aria-hidden="true"><i class="fa-solid fa-rocket"></i><span>3</span></span>
+            <div class="build-card">
             <h3>3. Acceleration</h3>
             <p>Top teams move on to regional and global competitions.</p>
+            </div>
         </div>
-        <div class="build-card reveal reveal-delay-4">
+        <div class="wro-step reveal reveal-delay-4">
+            <span class="wro-step-badge" aria-hidden="true"><i class="fa-solid fa-infinity"></i><span>4</span></span>
+            <div class="build-card">
             <h3>4. Continuity</h3>
             <p>Through university innovation hubs, top students keep developing their ideas after the competition.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -94,42 +120,53 @@
     <h2>Who it is for</h2>
     <div class="build-cards-grid">
         <div class="build-card reveal reveal-delay-1">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-school"></i></div>
             <h3>Schools</h3>
             <p>Build your school's reputation through a competition pathway with international standing.</p>
         </div>
         <div class="build-card reveal reveal-delay-2">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></div>
             <h3>Students</h3>
             <p>Compete, qualify and advance on skill, creativity and teamwork.</p>
         </div>
         <div class="build-card reveal reveal-delay-3">
+            <div class="why-icon" aria-hidden="true"><i class="fa-solid fa-handshake"></i></div>
             <h3>Sponsors and partners</h3>
             <p>Help young talent in Uganda get noticed and grow, including students from schools with fewer resources.</p>
         </div>
     </div>
 </section>
 
-<section class="home-section section-decor reveal">
+<section class="home-section section-decor section-tint wro-fair reveal">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
-    <h2>Fair to every school</h2>
-    <p>WRO Uganda works to include students from schools with few resources by removing cost barriers, without lowering the standard of the competition. Talent is everywhere. Opportunity is not.</p>
+    <div class="wro-fair-icon" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></div>
+    <div>
+        <h2>Fair to every school</h2>
+        <p>WRO Uganda works to include students from schools with few resources by removing cost barriers, without lowering the standard of the competition. Talent is everywhere. Opportunity is not.</p>
+    </div>
 </section>
 
-<section class="home-section section-decor reveal">
+<section class="home-section section-decor wro-after reveal">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
-    <h2>After the competition</h2>
-    <p>Top students can get mentorship from industry professionals, access to advanced facilities and research centres, and support turning their projects into real innovations.</p>
+    <div class="wro-after-copy">
+        <h2>After the competition</h2>
+        <p>Top students can get mentorship from industry professionals, access to advanced facilities and research centres, and support turning their projects into real innovations.</p>
+    </div>
+    <div class="wro-after-icons" aria-hidden="true">
+        <span class="why-icon"><i class="fa-solid fa-chalkboard-user"></i></span>
+        <span class="why-icon"><i class="fa-solid fa-building"></i></span>
+        <span class="why-icon"><i class="fa-solid fa-lightbulb"></i></span>
+    </div>
 </section>
 
 <section class="home-section section-decor reveal">
     <div class="dot-grid dot-grid--section dot-grid--section-tr" aria-hidden="true"></div>
     <h2>2027 season</h2>
-    <div class="build-card">
-        <ul>
-            <li><strong>Theme:</strong> Coming soon</li>
-            <li><strong>Dates and national finals:</strong> Coming soon</li>
-            <li><strong>Fees:</strong> Coming soon</li>
-            <li><strong>Age divisions and categories:</strong> Coming soon</li>
-        </ul>
+    <div class="wro-season-grid">
+        <div class="build-card wro-season-card"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><strong>Theme:</strong><span class="wro-coming-pill">Coming soon</span></div>
+        <div class="build-card wro-season-card"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><strong>Dates and national finals:</strong><span class="wro-coming-pill">Coming soon</span></div>
+        <div class="build-card wro-season-card"><i class="fa-solid fa-coins" aria-hidden="true"></i><strong>Fees:</strong><span class="wro-coming-pill">Coming soon</span></div>
+        <div class="build-card wro-season-card"><i class="fa-solid fa-people-group" aria-hidden="true"></i><strong>Age divisions and categories:</strong><span class="wro-coming-pill">Coming soon</span></div>
     </div>
     <p class="section-subtitle">Registration for 2027 opens once WRO confirms the details.</p>
 </section>
@@ -139,6 +176,7 @@
     <p>Tell us you are interested and we will follow up.</p>
     <a href="{% url 'contact' %}?topic=school#contact-form" class="btn btn-primary" data-umami-event="contact-school" data-umami-event-from="global-opportunities">Register your school</a>
 </section>
+</div>
 
 <section class="home-section steam-pathway reveal">
     <h2>From classroom to global stage</h2>
