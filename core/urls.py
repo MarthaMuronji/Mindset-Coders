@@ -59,6 +59,16 @@ urlpatterns = [
     path('blog/', views.blog, name='blog'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     path('team/login/', team.TeamLoginView.as_view(), name='team_login'),
+    path(
+        'team/password/forgot/',
+        team_people.team_password_reset_request,
+        name='team_password_reset_request',
+    ),
+    path(
+        'team/password/reset/<str:uidb64>/<str:token>/',
+        team_people.team_password_reset_confirm,
+        name='team_password_reset_confirm',
+    ),
     path('team/logout/', team.team_logout, name='team_logout'),
     path('team/', team.team_home, name='team_home'),
     path('team/registrations/', team.registration_list, name='team_registrations'),

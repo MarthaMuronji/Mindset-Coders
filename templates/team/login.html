@@ -19,5 +19,6 @@
       {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
       <button class="btn btn-primary team-submit" type="submit">Sign in</button>
     </form>
+    <a class="team-back-link team-forgot-link" href="{% url 'team_password_reset_request' %}">Forgot password?</a>
   </section>
 {% endblock %}

@@ -148,3 +148,56 @@ def send_team_invite(email, invite_url):
     except Exception as exc:
         logger.warning('Team invitation email failed (%s)', type(exc).__name__)
     return False
+
+
+def send_team_password_reset(email, username, reset_url):
+    """Send a short password reset message without logging account details."""
+    api_key = os.environ.get('BREVO_API_KEY')
+    from_email = os.environ.get('CONTACT_FROM_EMAIL')
+    if not api_key or not from_email or not email:
+        logger.warning(
+            'Team password reset email not sent because Brevo is not configured'
+        )
+        return False
+
+    try:
+        payload = {
+            'sender': {
+                'name': os.environ.get('CONTACT_FROM_NAME', 'Mindset Coders Website'),
+                'email': from_email,
+            },
+            'to': [{'email': email}],
+            'subject': 'Reset your Mindset Coders team password',
+            'textContent': (
+                'Hello. Someone asked to reset the password for the Mindset Coders '
+                'team account that uses this email address. Your username is: '
+                '{}. Open this link to set a new password: {}. If you did not ask '
+                'for this, you can ignore this email and your password will stay '
+                'the same.'
+            ).format(username, reset_url),
+        }
+        request = urllib.request.Request(
+            BREVO_SEND_URL,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                'api-key': api_key,
+                'content-type': 'application/json',
+                'accept': 'application/json',
+            },
+            method='POST',
+        )
+        response = urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS)
+        try:
+            response.read()
+        finally:
+            response.close()
+        return True
+    except urllib.error.HTTPError as exc:
+        logger.warning(
+            'Team password reset email failed with HTTP status %s', exc.code
+        )
+    except Exception as exc:
+        logger.warning(
+            'Team password reset email failed (%s)', type(exc).__name__
+        )
+    return False
